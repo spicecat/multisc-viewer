@@ -1,22 +1,23 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { preventDefault, self } from 'svelte/legacy';
 
-	let open: boolean = false,
-		datasets: string[] | null = null,
-		selectedDatasets: string[] = [],
-		genes: Promise<string[]> = Promise.resolve([]),
-		geneSearch: string = '',
-		selectedGene: string | null = null,
-		groupBy: string = 'Genotype',
-		plots: Record<string, { clustering: string; violin: string }> | null = null,
-		ordering: string[] | null = null,
-		plotting: boolean = false,
-		addingDataset: boolean = false,
-		newDatasets: FileList = null,
-		newDatasetName: string = '',
-		uploading: boolean = false;
+	let open: boolean = $state(false),
+		datasets: string[] | null = $state(null),
+		selectedDatasets: string[] = $state([]),
+		genes: Promise<string[]> = $state(Promise.resolve([])),
+		geneSearch: string = $state(''),
+		selectedGene: string | null = $state(null),
+		groupBy: string = $state('Genotype'),
+		plots: Record<string, { clustering: string; violin: string }> | null = $state(null),
+		ordering: string[] | null = $state(null),
+		plotting: boolean = $state(false),
+		addingDataset: boolean = $state(false),
+		newDatasets: FileList = $state(null),
+		newDatasetName: string = $state(''),
+		uploading: boolean = $state(false);
 
-	$: splitBy = groupBy === 'Genotype' ? 'CellType' : 'Genotype';
+	let splitBy = $derived(groupBy === 'Genotype' ? 'CellType' : 'Genotype');
 
 	let debounceTimeout: any | null = null;
 	function fetchGenes(): void {
@@ -76,8 +77,8 @@
 <main class="container">
 	<h1>Dataset Comparison</h1>
 
-	<button on:click={() => (open = true)}>Config</button>
-	<button on:click={() => (addingDataset = true)}>Upload Dataset</button>
+	<button onclick={() => (open = true)}>Config</button>
+	<button onclick={() => (addingDataset = true)}>Upload Dataset</button>
 
 	{#if plots !== null && ordering !== null}
 		<div class="row">
@@ -92,13 +93,13 @@
 	{/if}
 </main>
 
-<dialog {open} on:click|self={() => (open = false)}>
+<dialog {open} onclick={self(() => (open = false))}>
 	<article class="modal">
 		<header>
-			<a href="/" class="close" on:click|preventDefault={() => (open = false)}></a>
+			<a href="/" class="close" onclick={preventDefault(() => (open = false))}></a>
 			<h2>Config</h2>
 		</header>
-		<fieldset on:change={fetchGenes}>
+		<fieldset onchange={fetchGenes}>
 			<legend>
 				<h3>Datasets</h3>
 			</legend>
@@ -118,7 +119,7 @@
 				<p>{groupBy}</p>
 			</div>
 			<div class="col swap">
-				<button on:click={() => (groupBy = splitBy)}>
+				<button onclick={() => (groupBy = splitBy)}>
 					<i class="fa-solid fa-left-right"></i>
 				</button>
 			</div>
@@ -139,7 +140,7 @@
 				{@const filteredGenes = genes.filter((gene) => gene.toLowerCase().includes(geneSearch.toLowerCase())).slice(0, 100)}
 				<ul class="gene-list">
 					{#each filteredGenes as gene}
-						<li class="gene-option" class:selected={selectedGene === gene} on:click={() => (selectedGene = gene)}>{gene}</li>
+						<li class="gene-option" class:selected={selectedGene === gene} onclick={() => (selectedGene = gene)}>{gene}</li>
 					{/each}
 				</ul>
 				{#if genes.length > filteredGenes.length}
@@ -150,7 +151,7 @@
 			Error: {err}
 		{/await}
 		<footer>
-			<button on:click={plot} disabled={plotting}>
+			<button onclick={plot} disabled={plotting}>
 				{#if plotting}
 					<i class="fa-solid fa-spinner"></i>
 				{/if}
@@ -159,10 +160,10 @@
 		</footer>
 	</article>
 </dialog>
-<dialog open={addingDataset} on:click|self={() => (addingDataset = false)}>
+<dialog open={addingDataset} onclick={self(() => (addingDataset = false))}>
 	<article>
 		<header>
-			<a href="/" class="close" on:click|preventDefault={() => (addingDataset = false)}></a>
+			<a href="/" class="close" onclick={preventDefault(() => (addingDataset = false))}></a>
 			<h2>Upload Dataset</h2>
 		</header>
 		<h3>RDS File</h3>
@@ -172,7 +173,7 @@
 			<input type="text" bind:value={newDatasetName} />
 		</label>
 		<footer>
-			<button on:click={upload} disabled={uploading}>
+			<button onclick={upload} disabled={uploading}>
 				{#if uploading}
 					<i class="fa-solid fa-spinner"></i>
 				{/if}
