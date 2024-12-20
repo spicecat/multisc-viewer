@@ -2,9 +2,13 @@ import { CallHandler, ExecutionContext, Injectable, NestInterceptor, NotFoundExc
 import { RENDER_METADATA } from '@nestjs/common/constants';
 import { Request, Response } from 'express';
 import { readdirSync, statSync } from 'fs';
-import { Observable, from, throwError } from 'rxjs';
+import { from, Observable, throwError } from 'rxjs';
 import { map, mergeAll } from 'rxjs/operators';
 import { PAGE_METADATA } from '../decorators/page.decorator';
+
+function join(route: string, part: string): string {
+	return route === '' ? part : `${route}/${part}`;
+}
 
 function resolveRoute(parts: string[], route: string, dir: string, params: Record<string, string>): string | null {
 	if (parts.length === 0) {
@@ -18,11 +22,11 @@ function resolveRoute(parts: string[], route: string, dir: string, params: Recor
 		const [part] = parts;
 
 		if (available.includes(`${part}.svelte`)) {
-			return `${route}/${part}`;
+			return join(route, part);
 		} else if (part === '' && available.includes('index.svelte')) {
-			return `${route}/index`;
+			return join(route, 'index');
 		} else if (available.includes(part) && statSync(`${dir}/${part}`).isDirectory() && readdirSync(`${dir}/${part}`).includes('index.svelte')) {
-			return `${route}/${part}/index`;
+			return join(route, `${part}/index`);
 		} else if (
 			(pattern = available.find((route) => {
 				const match = /\[(\w+)\]\.svelte/.exec(route);
@@ -30,7 +34,7 @@ function resolveRoute(parts: string[], route: string, dir: string, params: Recor
 				return match !== null && match[1] in params;
 			})) !== undefined
 		) {
-			return `${route}/${pattern.replace('.svelte', '')}`;
+			return join(route, pattern.replace('.svelte', ''));
 		} else {
 			return null;
 		}
@@ -38,7 +42,7 @@ function resolveRoute(parts: string[], route: string, dir: string, params: Recor
 		const [part, ...rest] = parts;
 
 		if (available.includes(part) && statSync(`${dir}/${part}`).isDirectory()) {
-			return resolveRoute(rest, route === '' ? part : `${route}/${part}`, `${dir}/${part}`, params);
+			return resolveRoute(rest, join(route, part), `${dir}/${part}`, params);
 		} else if (
 			(pattern = available.find((route) => {
 				const match = /\[(\w+)\]/.exec(route);
@@ -47,7 +51,7 @@ function resolveRoute(parts: string[], route: string, dir: string, params: Recor
 			})) !== undefined &&
 			statSync(`${dir}/${pattern}`).isDirectory()
 		) {
-			return resolveRoute(rest, route === '' ? pattern : `${route}/${pattern}`, `${dir}/${pattern}`, params);
+			return resolveRoute(rest, join(route, pattern), `${dir}/${pattern}`, params);
 		} else {
 			return null;
 		}
@@ -72,7 +76,7 @@ export class RoutingInterceptor implements NestInterceptor {
 					const props = val ?? {};
 
 					const user = props.user ?? req.user;
-					const defaultMeta = { route, path: req.path, user, params: req.params };
+					const defaultMeta = { route, path: req.path, user, params: req.params, query: req.query };
 					const __meta = props.__meta ? { ...defaultMeta, ...props.__meta } : defaultMeta;
 
 					if ('user' in props) delete props.user;
@@ -91,16 +95,14 @@ export class RoutingInterceptor implements NestInterceptor {
 						const props = val ?? {};
 
 						const user = props.user ?? req.user;
-						const defaultMeta = { route, path: req.path, user, params: req.params };
+						const defaultMeta = { route, path: req.path, user, params: req.params, query: req.query };
 						const __meta = props.__meta ? { ...defaultMeta, ...props.__meta } : defaultMeta;
 
 						if ('user' in props) delete props.user;
 						if ('__meta' in props) delete props.__meta;
 
 						return from(
-							new Promise((resolve, reject) =>
-								res.render(route.slice(1), { props, __meta }, (err, html) => (err !== null ? reject(err) : resolve(html)))
-							)
+							new Promise((resolve, reject) => res.render(route, { props, __meta }, (err, html) => (err !== null ? reject(err) : resolve(html))))
 						);
 					}),
 					mergeAll()

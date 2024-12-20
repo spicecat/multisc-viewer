@@ -58,7 +58,6 @@
 
 			// fetch('/datasets', { body, method: 'POST' }).then(() => {
 			// 	if (datasets) datasets = [...datasets, newDatasetName];
-			// 	newDatasets = new FileList();
 			// 	newDatasetName = '';
 			// 	addingDataset = false;
 			// 	uploading = false;
@@ -177,7 +176,7 @@
 				{#if uploading}
 					<i class="fa-solid fa-spinner"></i>
 				{/if}
-				Plot
+				Upload
 			</button>
 		</footer>
 	</article>
@@ -231,9 +230,9 @@
 				}
 			}
 		}
+	}
 
-		.fa-spinner {
-			animation: spin 1s linear infinite;
-		}
+	:global(.fa-spinner) {
+		animation: spin 1s linear infinite;
 	}
 </style>
