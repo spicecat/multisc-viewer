@@ -1,8 +1,11 @@
 library(Seurat)
+library(rjson)
 
 rds <- readRDS(file = "./data.rds", refhook = NULL)
 
+genes <- list()
 for (gene in rownames(rds@assays$RNA@counts)) {
-	cat(gene)
-	cat("\n")
+	genes <- append(genes, gene)
 }
+
+write(toJSON(genes), "./genes.json")
