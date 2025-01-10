@@ -1,35 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { spawn } from 'child_process';
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
+import { existsSync, readdirSync, readFileSync, rmSync } from 'fs';
 
 export interface ChartResult {
 	clustering: string;
 	violin: string;
 }
 
+export interface Dataset {
+	name: string;
+	year: number;
+	region: string[];
+	PMID: string;
+	species: string;
+	author: string;
+	disease: string[];
+}
+
 @Injectable()
 export class AppService {
-	public getDatasets(): string[] {
-		return readdirSync('datasets').filter((dataset) => existsSync(`datasets/${dataset}/data.rds`) && existsSync(`datasets/${dataset}/genes.json`));
-	}
+	public static readonly META: Dataset[] = JSON.parse(readFileSync('datasets/meta.json').toString());
 
-	public async addDataset(file: Express.Multer.File, name: string): Promise<void> {
-		mkdirSync(`datasets/${name}`); // throws if dataset already exists
-
-		writeFileSync(`datasets/${name}/data.rds`, file.buffer);
-
-		return new Promise<string[]>((resolve, reject) => {
-			const proc = spawn('Rscript', ['../../genes.r'], { cwd: `datasets/${name}` });
-
-			let stdout = '',
-				stderr = '';
-
-			proc.stdout.on('data', (chunk) => (stdout += chunk));
-			proc.stderr.on('data', (chunk) => (stderr += chunk));
-
-			proc.on('error', () => reject(new Error(`Error reading genes of '${name}'`)));
-			proc.on('exit', () => resolve(stdout.split('\n').filter((ln) => ln !== '')));
-		}).then((genes) => writeFileSync(`datasets/${name}/genes.json`, JSON.stringify(genes)));
+	public getDatasets(): Dataset[] {
+		return readdirSync('datasets')
+			.filter((dataset) => existsSync(`datasets/${dataset}/data.rds`) && existsSync(`datasets/${dataset}/genes.json`))
+			.map((name) => AppService.META.find((dataset) => dataset.name === name))
+			.filter((dataset) => !!dataset);
 	}
 
 	public getGenes(datasets: string[]): string[] {
