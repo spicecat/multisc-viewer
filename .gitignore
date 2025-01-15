@@ -35,4 +35,9 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 .env
+
+# Datasets
 datasets/
+datasets.tar.gz
+
+ds-add/ds-add
