@@ -12,6 +12,19 @@ export class AppController {
 		return {};
 	}
 
+	@Page()
+	@Get('/compare')
+	public comparison(
+		@Query('datasets') datasets: string,
+		@Query('gene') gene: string,
+		@Query('groupBy') groupBy: string,
+		@Query('splitBy') splitBy: string
+	): PageProps {
+		this.service.preload(datasets.split(','), gene, groupBy, splitBy);
+
+		return {};
+	}
+
 	@Get('/datasets')
 	public getDatasets(): Dataset[] {
 		return this.service.getDatasets();
