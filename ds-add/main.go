@@ -116,8 +116,9 @@ func readPropArr[T any](name string, loc *[]T) {
 			os.Exit(1)
 		}
 
+		str = strings.TrimSpace(str)
 		if reflect.TypeOf(in) == reflect.TypeFor[string]() {
-			if strings.TrimSpace(str) == "" {
+			if str == "" {
 				*loc = arr
 				return
 			} else {
