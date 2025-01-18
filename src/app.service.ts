@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { spawn } from 'child_process';
+import { randomBytes } from 'crypto';
 import { existsSync, readdirSync, readFileSync, rmSync } from 'fs';
 
 export interface ChartResult {
@@ -60,7 +61,10 @@ export class AppService {
 			return this.cache.get(key)!;
 		} else {
 			const result = new Promise<ChartResult>((resolve, reject) => {
-				const proc = spawn('Rscript', ['../../plot.r', gene, groupBy, splitBy], { cwd: `datasets/${dataset}` });
+				const clusteringFile = randomBytes(16).toString('hex') + '.png';
+				const violinFile = randomBytes(16).toString('hex') + '.png';
+
+				const proc = spawn('Rscript', ['../../plot.r', gene, groupBy, splitBy, clusteringFile, violinFile], { cwd: `datasets/${dataset}` });
 
 				let stdout = '',
 					stderr = '';
@@ -71,11 +75,11 @@ export class AppService {
 				proc.on('error', () => reject(new Error(`Error reading genes of '${dataset}'`)));
 				proc.on('exit', () => {
 					try {
-						const clustering = 'data:image/png;base64,' + readFileSync(`datasets/${dataset}/clustering.png`).toString('base64');
-						const violin = 'data:image/png;base64,' + readFileSync(`datasets/${dataset}/violin.png`).toString('base64');
+						const clustering = 'data:image/png;base64,' + readFileSync(`datasets/${dataset}/${clusteringFile}`).toString('base64');
+						const violin = 'data:image/png;base64,' + readFileSync(`datasets/${dataset}/${violinFile}`).toString('base64');
 
-						rmSync(`datasets/${dataset}/clustering.png`);
-						rmSync(`datasets/${dataset}/violin.png`);
+						rmSync(`datasets/${dataset}/${clusteringFile}`);
+						rmSync(`datasets/${dataset}/${violinFile}`);
 
 						resolve({ clustering, violin });
 					} catch (e) {
