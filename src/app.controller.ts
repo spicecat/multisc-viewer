@@ -1,6 +1,7 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { BadRequestException, Controller, Get, HttpStatus, Query } from '@nestjs/common';
 import { AppService, ChartResult, Dataset } from './app.service';
 import { Page } from './utils/decorators/page.decorator';
+import { Redirect } from './utils/filters/redirect.filter';
 
 @Controller()
 export class AppController {
@@ -16,13 +17,29 @@ export class AppController {
 	@Get('/compare')
 	public comparison(
 		@Query('datasets') datasets: string,
-		@Query('gene') gene: string,
+		@Query('gene') gene: string | undefined,
 		@Query('groupBy') groupBy: string,
 		@Query('splitBy') splitBy: string
-	): PageProps {
+	): CompareProps {
+		const genes = this.getGenes(datasets);
+
+		if (gene === undefined) {
+			const defaultGene = genes[0];
+
+			if (defaultGene === undefined) {
+				throw new BadRequestException('No common genes between datasets');
+			}
+
+			throw new Redirect(`/compare?datasets=${datasets}&gene=${defaultGene}&groupBy=${groupBy}&splitBy=${splitBy}`, HttpStatus.SEE_OTHER);
+		}
+
+		if (!genes.includes(gene)) {
+			throw new BadRequestException('Selected gene is not in all datasets');
+		}
+
 		this.service.preload(datasets.split(','), gene, groupBy, splitBy);
 
-		return {};
+		return { genes, gene };
 	}
 
 	@Get('/datasets')
@@ -31,7 +48,7 @@ export class AppController {
 	}
 
 	@Get('/genes')
-	public async getGenes(@Query('datasets') datasets: string): Promise<string[]> {
+	public getGenes(@Query('datasets') datasets: string): string[] {
 		return this.service.getGenes(datasets.split(','));
 	}
 

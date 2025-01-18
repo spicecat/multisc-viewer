@@ -38,3 +38,8 @@ declare module '$meta' {
 	export default state;
 }
 
+interface CompareProps extends PageProps {
+	genes: string[];
+	gene: string;
+}
+
