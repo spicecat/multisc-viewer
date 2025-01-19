@@ -1,4 +1,4 @@
-import { BadRequestException, Controller, Get, HttpStatus, Query } from '@nestjs/common';
+import { BadRequestException, Controller, Get, HttpStatus, Post, Query } from '@nestjs/common';
 import { AppService, ChartResult, Dataset } from './app.service';
 import { Page } from './utils/decorators/page.decorator';
 import { Redirect } from './utils/filters/redirect.filter';
@@ -18,19 +18,30 @@ export class AppController {
 	public comparison(
 		@Query('datasets') datasets: string,
 		@Query('gene') gene: string | undefined,
-		@Query('groupBy') groupBy: string,
-		@Query('splitBy') splitBy: string
+		@Query('groupBy') groupBy: string | undefined,
+		@Query('splitBy') splitBy: string | undefined
 	): CompareProps {
 		const genes = this.getGenes(datasets);
 
-		if (gene === undefined) {
+		if (gene === undefined || groupBy === undefined || splitBy === undefined) {
 			const defaultGene = genes[0];
 
 			if (defaultGene === undefined) {
 				throw new BadRequestException('No common genes between datasets');
 			}
 
-			throw new Redirect(`/compare?datasets=${datasets}&gene=${defaultGene}&groupBy=${groupBy}&splitBy=${splitBy}`, HttpStatus.SEE_OTHER);
+			if (gene === undefined) gene = defaultGene;
+
+			if (groupBy === undefined && splitBy === undefined) {
+				groupBy = 'Genotype';
+				splitBy = 'CellType';
+			} else if (groupBy === undefined) {
+				groupBy = splitBy === 'Genotype' ? 'CellType' : 'Genotype';
+			} else if (splitBy === undefined) {
+				splitBy = groupBy === 'Genotype' ? 'CellType' : 'Genotype';
+			}
+
+			throw new Redirect(`/compare?datasets=${datasets}&gene=${gene}&groupBy=${groupBy}&splitBy=${splitBy}`, HttpStatus.SEE_OTHER);
 		}
 
 		if (!genes.includes(gene)) {
@@ -60,6 +71,18 @@ export class AppController {
 		@Query('splitBy') splitBy: string
 	): Promise<Record<string, ChartResult>> {
 		return this.service.generate(datasets.split(','), gene, groupBy, splitBy);
+	}
+
+	@Post('/preload')
+	public async preload(@Query('dataset') datasets: string): Promise<void> {
+		const genes = this.getGenes(datasets),
+			defaultGene = genes[0];
+
+		if (defaultGene === undefined) {
+			throw new BadRequestException('No common genes between datasets');
+		}
+
+		this.service.preload(datasets.split(','), defaultGene, 'Genotype', 'CellType');
 	}
 }
 
