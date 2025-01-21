@@ -34,6 +34,10 @@
 		width: 300px;
 	}
 
+	.col {
+		flex-shrink: 0;
+	}
+
 	img.smol {
 		cursor: pointer;
 	}

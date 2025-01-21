@@ -51,7 +51,7 @@
 		</div>
 	</div>
 </div>
-<div class="row">
+<div class="row charts">
 	{#each order as dataset}
 		<ChartDisplay {dataset} {config} />
 	{/each}
@@ -102,5 +102,9 @@
 				}
 			}
 		}
+	}
+
+	.charts {
+		max-width: 100vw;
 	}
 </style>
