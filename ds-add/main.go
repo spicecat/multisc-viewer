@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"os/exec"
+	"path"
 	"reflect"
 	"strings"
 
@@ -21,6 +23,7 @@ type DSMetadata struct {
 	Species string   `json:"species"`
 	Author  string   `json:"author"`
 	Disease []string `json:"disease"`
+	Size    int64    `json:"size"`
 }
 
 func main() {
@@ -35,6 +38,7 @@ func main() {
 	}
 
 	// TODO: prioritize deeper-nested meta.json, rather than first
+	dsRoot := path.Dir(metas[0])
 	meta, err := os.OpenFile(metas[0], os.O_RDWR, 0)
 
 	if err != nil {
@@ -75,6 +79,51 @@ func main() {
 	readProp("author", &ds.Author)
 	readPropArr("disease", &ds.Disease)
 
+	dsPath := path.Join(dsRoot, ds.Name)
+	_, err = os.Stat(dsPath)
+
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Could not find dataset path:", err)
+		os.Exit(1)
+	}
+
+	stat, err := os.Stat(path.Join(dsPath, "data.rds"))
+
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Could not find dataset file:", err)
+		os.Exit(1)
+	}
+
+	ds.Size = stat.Size()
+
+	_, err = os.Stat(path.Join(dsPath, "genes.json"))
+
+	if err != nil {
+		cwd, err := os.Getwd()
+
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "Failed to get CWD:", err)
+			os.Exit(1)
+		}
+
+		err = os.Chdir(dsPath)
+
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "Failed to change CWD:", err)
+			os.Exit(1)
+		}
+
+		cmd := exec.Command("Rscript", "../../genes.r")
+		cmd.Wait()
+
+		err = os.Chdir(cwd)
+
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "Failed to change CWD:", err)
+			os.Exit(1)
+		}
+	}
+
 	datasets := append(existing, ds)
 
 	serialized, err := json.MarshalIndent(datasets, "", "\t")
@@ -91,11 +140,24 @@ func main() {
 
 func readProp[T any](name string, loc *T) {
 	fmt.Printf("Enter %s: ", name)
-	_, err := fmt.Scan(loc)
 
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading %s: %s\n", name, err.Error())
-		os.Exit(1)
+	if reflect.TypeOf(loc) == reflect.TypeFor[*string]() {
+		rd := bufio.NewReader(os.Stdin)
+		str, err := rd.ReadString('\n')
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error reading %s: %s\n", name, err.Error())
+			os.Exit(1)
+		}
+
+		*loc = interface{}(strings.TrimSpace(str)).(T)
+	} else {
+		_, err := fmt.Scan(loc)
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error reading %s: %s\n", name, err.Error())
+			os.Exit(1)
+		}
 	}
 }
 
