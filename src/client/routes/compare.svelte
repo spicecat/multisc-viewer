@@ -1,17 +1,18 @@
 <script lang="ts">
+	import ChartDisplay from '$lib/components/ChartDisplay.svelte';
 	import meta from '$meta';
 
-	const { genes, gene }: CompareProps = $props();
+	const { genes, gene, order }: CompareProps = $props();
 
 	const { query } = meta;
-	const ordering = query.datasets.split(',');
 
 	let geneSearch: string = $state(''),
 		groupBy: string = $state('Genotype'),
 		selectedGene: string = $state(gene);
 
 	const filteredGenes = $derived(genes.filter((gene) => gene.toLowerCase().includes(geneSearch.toLowerCase())).slice(0, 100)),
-		splitBy = $derived(groupBy === 'Genotype' ? 'CellType' : 'Genotype');
+		splitBy = $derived(groupBy === 'Genotype' ? 'CellType' : 'Genotype'),
+		config = $derived({ selectedGene, groupBy, splitBy });
 
 	$effect(() => {
 		if (!history.state || history.state.selectedGene !== selectedGene || history.state.groupBy !== groupBy) {
@@ -50,21 +51,11 @@
 		</div>
 	</div>
 </div>
-{#await fetch(`/plots?datasets=${query.datasets}&gene=${selectedGene}&groupBy=${groupBy}&splitBy=${splitBy}`).then((res) => res.json())}
-	<i class="fa-solid fa-spinner"></i> Generating Plots...
-{:then plots}
-	<div class="row">
-		{#each ordering as dataset}
-			<div class="col">
-				<h3 class="dataset">{dataset.replaceAll('_', ' ')}</h3>
-				<img src={plots[dataset].clustering} alt="{dataset} clustering" />
-				<img src={plots[dataset].violin} alt="{dataset} violin" />
-			</div>
-		{/each}
-	</div>
-{:catch err}
-	<h1>Error: {err}</h1>
-{/await}
+<div class="row">
+	{#each order as dataset}
+		<ChartDisplay {dataset} {config} />
+	{/each}
+</div>
 
 <style lang="scss">
 	@keyframes spin {
@@ -75,14 +66,6 @@
 		100% {
 			transform: rotate(360deg);
 		}
-	}
-
-	img {
-		width: 300px;
-	}
-
-	.dataset {
-		text-align: center;
 	}
 
 	:global(.fa-spinner) {

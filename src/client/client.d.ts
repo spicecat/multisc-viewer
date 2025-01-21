@@ -41,5 +41,12 @@ declare module '$meta' {
 interface CompareProps extends PageProps {
 	genes: string[];
 	gene: string;
+	order: string[];
+}
+
+interface PlotConfig {
+	selectedGene: string;
+	groupBy: string;
+	splitBy: string;
 }
 

@@ -21,6 +21,12 @@ export class AppController {
 		@Query('groupBy') groupBy: string | undefined,
 		@Query('splitBy') splitBy: string | undefined
 	): CompareProps {
+		const knownDatasets = this.getDatasets();
+
+		if (!datasets.split(',').every((dataset) => knownDatasets.some((ds) => ds.name === dataset))) {
+			throw new BadRequestException('Unknown dataset requested');
+		}
+
 		const genes = this.getGenes(datasets);
 
 		if (gene === undefined || groupBy === undefined || splitBy === undefined) {
@@ -50,7 +56,9 @@ export class AppController {
 
 		this.service.preload(datasets.split(','), gene, groupBy, splitBy);
 
-		return { genes, gene };
+		const sizes = Object.fromEntries(knownDatasets.map((ds) => [ds.name, ds.size]));
+
+		return { order: datasets.split(',').sort((a, b) => sizes[a] - sizes[b]), genes, gene };
 	}
 
 	@Get('/datasets')
@@ -61,6 +69,16 @@ export class AppController {
 	@Get('/genes')
 	public getGenes(@Query('datasets') datasets: string): string[] {
 		return this.service.getGenes(datasets.split(','));
+	}
+
+	@Get('/plot')
+	public async getPlot(
+		@Query('dataset') dataset: string,
+		@Query('gene') gene: string,
+		@Query('groupBy') groupBy: string,
+		@Query('splitBy') splitBy: string
+	): Promise<ChartResult> {
+		return this.service.render(dataset, gene, groupBy, splitBy);
 	}
 
 	@Get('/plots')

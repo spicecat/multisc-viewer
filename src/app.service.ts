@@ -16,6 +16,7 @@ export interface Dataset {
 	species: string;
 	author: string;
 	disease: string[];
+	size: number;
 }
 
 @Injectable()
@@ -30,6 +31,7 @@ export class AppService {
 		this.expirations = new Map();
 	}
 
+	// TODO: probably don't need all the checks given the go script
 	public getDatasets(): Dataset[] {
 		return readdirSync('datasets')
 			.filter((dataset) => existsSync(`datasets/${dataset}/data.rds`) && existsSync(`datasets/${dataset}/genes.json`))
