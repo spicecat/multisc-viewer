@@ -26,6 +26,14 @@ rds <- readRDS(file="./data.rds", refhook=NULL)
 end <- Sys.time()
 rdsRead <- end - start
 
+if (args[2] == 'CellType') {
+	colors <- readRDS(file="./colors.rds", refhook=NULL)
+} else {
+	colors <- readRDS(file="../genotype_colors.rds", refhook=NULL)
+}
+
+# c("coral3", "deepskyblue3", "goldenrod2", "green3", "red3", "pink3")
+
 rds[["integrated"]] <- NULL
 rds[["SCT"]] <- NULL
 
@@ -35,7 +43,7 @@ png(args[4],
     height = 4*300,
     res = 300,            # 300 pixels per inch
     pointsize = 12)        # smaller font size
-DimPlot(rds, reduction="umap", label=FALSE, group.by=args[2], cols=c("coral3", "deepskyblue3", "goldenrod2", "green3"))
+DimPlot(rds, reduction="umap", label=FALSE, group.by=args[2], cols=colors)
 end <- Sys.time()
 clusterPlot <- end - start
 
@@ -50,7 +58,7 @@ VlnPlot(
 	pt.size=0,
 	split.by=args[3],
 	group.by=args[2],
-	cols=c("coral3", "deepskyblue3", "goldenrod2", "green3"),
+	cols=colors,
 	ncol=4
 )
 end <- Sys.time()
