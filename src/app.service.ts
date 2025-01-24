@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { spawn } from 'child_process';
-import { randomBytes } from 'crypto';
 import { existsSync, readdirSync, readFileSync, rmSync } from 'fs';
+import { DaemonService } from './daemon.service';
 
 export interface ChartResult {
 	clustering: string;
@@ -26,9 +25,13 @@ export class AppService {
 	private readonly cache: Map<string, Promise<ChartResult>>;
 	private readonly expirations: Map<string, NodeJS.Timeout>;
 
-	public constructor() {
+	private readonly activity: Map<string, NodeJS.Timeout>;
+
+	public constructor(private readonly daemon: DaemonService) {
 		this.cache = new Map();
 		this.expirations = new Map();
+
+		this.activity = new Map();
 	}
 
 	// TODO: probably don't need all the checks given the go script
@@ -45,81 +48,84 @@ export class AppService {
 		return geneSets.slice(1).reduce((curr, next) => curr.filter((gene) => next.includes(gene)), geneSets[0]);
 	}
 
-	public async render(dataset: string, gene: string, groupBy: string, splitBy: string): Promise<ChartResult> {
+	public async render(dataset: string, gene: string, groupBy: string, splitBy: string, token: string | null): Promise<ChartResult> {
 		const key = this._cacheKey(dataset, gene, groupBy, splitBy);
+
+		if (token !== null) {
+			this._refresh(token);
+		}
 
 		if (this.cache.has(key)) {
 			if (this.expirations.has(key)) {
-				clearTimeout(this.expirations.get(key)!);
-				this.expirations.set(
-					key,
-					setTimeout(() => {
-						this.cache.delete(key);
-						this.expirations.delete(key);
-					}, 30 * 60 * 1000)
-				);
+				this.expirations.get(key)!.refresh();
 			}
 
 			return this.cache.get(key)!;
 		} else {
-			const result = new Promise<ChartResult>((resolve, reject) => {
-				const clusteringFile = randomBytes(16).toString('hex') + '.png';
-				const violinFile = randomBytes(16).toString('hex') + '.png';
+			const result = this.daemon.render(dataset, gene, groupBy, splitBy).then((opid) => {
+				try {
+					const clustering = 'data:image/png;base64,' + readFileSync(`datasets/${dataset}/${opid}_umap.png`).toString('base64');
+					const violin = 'data:image/png;base64,' + readFileSync(`datasets/${dataset}/${opid}_vln.png`).toString('base64');
 
-				const proc = spawn('Rscript', ['../../plot.r', gene, groupBy, splitBy, clusteringFile, violinFile], { cwd: `datasets/${dataset}` });
+					rmSync(`datasets/${dataset}/${opid}_umap.png`);
+					rmSync(`datasets/${dataset}/${opid}_vln.png`);
 
-				let stdout = '',
-					stderr = '';
-
-				proc.stdout.on('data', (chunk) => (stdout += chunk));
-				proc.stderr.on('data', (chunk) => (stderr += chunk));
-
-				proc.on('error', () => reject(new Error(`Error reading genes of '${dataset}'`)));
-				proc.on('exit', () => {
-					try {
-						const clustering = 'data:image/png;base64,' + readFileSync(`datasets/${dataset}/${clusteringFile}`).toString('base64');
-						const violin = 'data:image/png;base64,' + readFileSync(`datasets/${dataset}/${violinFile}`).toString('base64');
-
-						rmSync(`datasets/${dataset}/${clusteringFile}`);
-						rmSync(`datasets/${dataset}/${violinFile}`);
-
-						resolve({ clustering, violin });
-					} catch (e) {
-						console.error(e);
-						console.error('stdout', stdout);
-						console.error('stderr', stderr);
-						reject(new Error(`Unable to find plot of '${dataset}'`));
-					}
-				});
+					return { clustering, violin };
+				} catch (e) {
+					console.error(e);
+					throw new Error(`Unable to find plot of '${dataset}'`);
+				}
 			});
 
-			result.then(() =>
-				this.expirations.set(
-					key,
-					setTimeout(() => {
-						this.cache.delete(key);
-						this.expirations.delete(key);
-					}, 30 * 60 * 1000)
+			result
+				.then(() =>
+					this.expirations.set(
+						key,
+						setTimeout(() => {
+							this.cache.delete(key);
+							this.expirations.delete(key);
+						}, 30 * 60 * 1000)
+					)
 				)
-			);
+				.then(() => {
+					if (token !== null) {
+						this._refresh(token);
+					}
+				});
 
 			this.cache.set(key, result);
 			return result;
 		}
 	}
 
-	public preload(datasets: string[], gene: string, groupBy: string, splitBy: string): void {
-		datasets.forEach((dataset) => this.render(dataset, gene, groupBy, splitBy));
-	}
+	public async preload(token: string | null, datasets: string[]): Promise<void> {
+		if (token !== null) {
+			this._refresh(token);
+		}
 
-	public async generate(datasets: string[], gene: string, groupBy: string, splitBy: string): Promise<Record<string, ChartResult>> {
-		return Promise.all(datasets.map((dataset) => this.render(dataset, gene, groupBy, splitBy))).then((results) =>
-			Object.fromEntries(results.map((result, i) => [datasets[i], result]))
-		);
+		return this.daemon.batch(token, datasets).then(() => {
+			if (token !== null) {
+				this._refresh(token);
+			}
+		});
 	}
 
 	private _cacheKey(dataset: string, gene: string, groupBy: string, splitBy: string): string {
 		return `${dataset}:${gene}:${groupBy}:${splitBy}`;
+	}
+
+	private _refresh(token: string) {
+		if (this.activity.has(token)) {
+			this.activity.get(token)!.refresh();
+		} else {
+			this.activity.set(
+				token,
+				setTimeout(() => {
+					this.activity.delete(token);
+					this.daemon.unload(token);
+				}, 60_000)
+			);
+		}
 	}
 }
 

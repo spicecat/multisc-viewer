@@ -19,7 +19,8 @@ export class AppController {
 		@Query('datasets') datasets: string,
 		@Query('gene') gene: string | undefined,
 		@Query('groupBy') groupBy: string | undefined,
-		@Query('splitBy') splitBy: string | undefined
+		@Query('splitBy') splitBy: string | undefined,
+		@Query('token') token: string | undefined
 	): CompareProps {
 		const knownDatasets = this.getDatasets();
 
@@ -36,6 +37,8 @@ export class AppController {
 				throw new BadRequestException('No common genes between datasets');
 			}
 
+			this.service.preload(token ?? null, datasets.split(','));
+
 			if (gene === undefined) gene = defaultGene;
 
 			if (groupBy === undefined && splitBy === undefined) {
@@ -47,14 +50,17 @@ export class AppController {
 				splitBy = groupBy === 'Genotype' ? 'CellType' : 'Genotype';
 			}
 
-			throw new Redirect(`/compare?datasets=${datasets}&gene=${gene}&groupBy=${groupBy}&splitBy=${splitBy}`, HttpStatus.SEE_OTHER);
+			throw new Redirect(
+				`/compare?datasets=${datasets}&gene=${gene}&groupBy=${groupBy}&splitBy=${splitBy}${token !== undefined ? `&token=${token}` : ''}`,
+				HttpStatus.SEE_OTHER
+			);
 		}
 
 		if (!genes.includes(gene)) {
 			throw new BadRequestException('Selected gene is not in all datasets');
 		}
 
-		this.service.preload(datasets.split(','), gene, groupBy, splitBy);
+		this.service.preload(token ?? null, datasets.split(','));
 
 		const sizes = Object.fromEntries(knownDatasets.map((ds) => [ds.name, ds.size]));
 
@@ -76,31 +82,15 @@ export class AppController {
 		@Query('dataset') dataset: string,
 		@Query('gene') gene: string,
 		@Query('groupBy') groupBy: string,
-		@Query('splitBy') splitBy: string
+		@Query('splitBy') splitBy: string,
+		@Query('token') token: string | undefined
 	): Promise<ChartResult> {
-		return this.service.render(dataset, gene, groupBy, splitBy);
-	}
-
-	@Get('/plots')
-	public async getPlots(
-		@Query('datasets') datasets: string,
-		@Query('gene') gene: string,
-		@Query('groupBy') groupBy: string,
-		@Query('splitBy') splitBy: string
-	): Promise<Record<string, ChartResult>> {
-		return this.service.generate(datasets.split(','), gene, groupBy, splitBy);
+		return this.service.render(dataset, gene, groupBy, splitBy, token ?? null);
 	}
 
 	@Post('/preload')
-	public async preload(@Query('dataset') datasets: string): Promise<void> {
-		const genes = this.getGenes(datasets),
-			defaultGene = genes[0];
-
-		if (defaultGene === undefined) {
-			throw new BadRequestException('No common genes between datasets');
-		}
-
-		this.service.preload(datasets.split(','), defaultGene, 'Genotype', 'CellType');
+	public async preload(@Query('token') token: string | undefined, @Query('datasets') datasets: string): Promise<void> {
+		return this.service.preload(token ?? null, datasets.split(','));
 	}
 }
 

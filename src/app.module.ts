@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { DaemonService } from './daemon.service';
 
 @Module({
 	imports: [
@@ -15,7 +16,7 @@ import { AppService } from './app.service';
 		})
 	],
 	controllers: [AppController],
-	providers: [AppService]
+	providers: [AppService, DaemonService]
 })
 export class AppModule {}
 
