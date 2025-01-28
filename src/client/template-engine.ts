@@ -1,37 +1,53 @@
-import { InternalServerErrorException } from '@nestjs/common';
-import { readFileSync } from 'fs';
-import { serialize } from 'src/utils/utils';
+import { readFileSync } from "node:fs";
+import { InternalServerErrorException } from "@nestjs/common";
+import { serialize } from "src/utils/utils";
 
-const template = readFileSync('src/client/templates/page.html').toString();
+const template = readFileSync("src/client/templates/page.html").toString();
 
-export function svelte(path: string, data: any, next: (e: any, rendered?: string) => void) {
-	const { props, __meta } = data;
+export function svelte(
+  path: string,
+  data: any,
+  next: (e: any, rendered?: string) => void,
+) {
+  const { props, __meta } = data;
 
-	import(/* @vite-ignore */ `${process.cwd()}/dist/client/routes/${__meta.route}.svelte.js`)
-		.then(({ default: page }) => {
-			try {
-				const { body, head } = page.render(props, __meta);
+  import(
+    /* @vite-ignore */ `${process.cwd()}/dist/client/routes/${__meta.route}.svelte.js`
+  )
+    .then(({ default: page }) => {
+      try {
+        const { body, head } = page.render(props, __meta);
 
-				const initialProps = serialize(props),
-					routeMeta = serialize(__meta);
+        const initialProps = serialize(props);
+        const routeMeta = serialize(__meta);
 
-				next(
-					null,
-					template
-						.replace(
-							'%SVELTE_HEAD%',
-							`${head}\n<script id="__init_script__">window.__INITIAL_PROPS=${initialProps};window.__ROUTE_META=${routeMeta}</script>`
-						)
-						.replace('%SVELTE_BODY%', `${body}\n<script type="module" src="/__app/${__meta.route}.svelte.js"></script>`)
-				);
-			} catch (err) {
-				console.error(err);
-				next(new InternalServerErrorException(`Unable to render route /${__meta.route.replace(/\/index$/, '')}`));
-			}
-		})
-		.catch((err) => {
-			console.error(err);
-			next(new InternalServerErrorException(`Unable to render route /${__meta.route.replace(/\/index$/, '')}`));
-		});
+        next(
+          null,
+          template
+            .replace(
+              "%SVELTE_HEAD%",
+              `${head}\n<script id="__init_script__">window.__INITIAL_PROPS=${initialProps};window.__ROUTE_META=${routeMeta}</script>`,
+            )
+            .replace(
+              "%SVELTE_BODY%",
+              `${body}\n<script type="module" src="/__app/${__meta.route}.svelte.js"></script>`,
+            ),
+        );
+      } catch (err) {
+        console.error(err);
+        next(
+          new InternalServerErrorException(
+            `Unable to render route /${__meta.route.replace(/\/index$/, "")}`,
+          ),
+        );
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      next(
+        new InternalServerErrorException(
+          `Unable to render route /${__meta.route.replace(/\/index$/, "")}`,
+        ),
+      );
+    });
 }
-
