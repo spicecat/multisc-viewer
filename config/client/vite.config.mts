@@ -1,3 +1,4 @@
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { existsSync, readFileSync } from 'fs';
 import { basename, dirname, resolve } from 'path';
 import preprocessor, { sveltePreprocess } from 'svelte-preprocess';
@@ -9,6 +10,9 @@ export default defineConfig({
 		conditions: ['svelte']
 	},
 	plugins: [
+		nodeResolve({
+			exportConditions: ['svelte']
+		}),
 		(() => {
 			let isSSR = false;
 
