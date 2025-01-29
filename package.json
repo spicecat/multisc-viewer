@@ -38,6 +38,7 @@
 		"@nestjs/schematics": "^10.0.2",
 		"@nestjs/testing": "^10.2.7",
 		"@rollup/plugin-node-resolve": "^16.0.0",
+		"@smui/button": "^8.0.0-beta.3",
 		"@swc/cli": "^0.1.62",
 		"@swc/core": "^1.3.95",
 		"@types/cookie-parser": "^1.4.4",

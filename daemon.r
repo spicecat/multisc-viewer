@@ -69,7 +69,7 @@ while (ln != "quit") {
         split.by = split_by,
         group.by = group_by,
         cols = colors,
-        ncol = 4
+        ncol = 1
       )
       print(vln)
       dev.off()
