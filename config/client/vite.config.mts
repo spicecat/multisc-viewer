@@ -1,3 +1,4 @@
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { existsSync, readFileSync } from 'fs';
 import { basename, dirname, resolve } from 'path';
 import preprocessor, { sveltePreprocess } from 'svelte-preprocess';
@@ -6,6 +7,9 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
 	plugins: [
+		nodeResolve({
+			exportConditions: ['svelte']
+		}),
 		(() => {
 			let isSSR = false;
 
