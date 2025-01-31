@@ -12,7 +12,9 @@ export function svelte(
   const { props, __meta } = data;
 
   import(
-    /* @vite-ignore */ `${process.cwd()}/dist/client/routes/${__meta.route}.svelte.js`
+    /* @vite-ignore */ `${process.cwd()}/dist/client/routes/${
+      __meta.route
+    }.svelte.js`
   )
     .then(({ default: page }) => {
       try {
