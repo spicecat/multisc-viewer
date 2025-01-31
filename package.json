@@ -48,7 +48,8 @@
     "dotenv": "^16.4.7",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "sass": "^1.83.4"
+    "sass": "^1.83.4",
+    "svelte-material-ui": "^8.0.0-beta.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
@@ -56,6 +57,9 @@
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.6",
     "@smui/button": "^8.0.0-beta.3",
+    "@smui/data-table": "^8.0.0-beta.3",
+    "@smui/icon-button": "^8.0.0-beta.3",
+    "@smui/layout-grid": "^8.0.0-beta.3",
     "@swc/cli": "^0.6.0",
     "@swc/core": "^1.10.12",
     "@types/cookie-parser": "^1.4.8",

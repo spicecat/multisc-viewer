@@ -1,9 +1,10 @@
 <script lang="ts">
+  import DatasetsTable from "$lib/components/DatasetsTable.svelte";
   import { onMount } from "svelte";
   import { preventDefault, self } from "svelte/legacy";
 
   let open: boolean = $state(false),
-    datasets: string[] | null = $state(null),
+    datasets: string[] | null = $state([]),
     selectedDatasets: string[] = $state([]),
     genes: Promise<string[]> = $state(Promise.resolve([])),
     geneSearch: string = $state(""),
@@ -77,6 +78,16 @@
       .then((res) => res.json())
       .then((data) => (datasets = data));
   });
+
+  let columns = [
+    { key: "name", label: "Name" },
+    { key: "year", label: "Year" },
+    { key: "region", label: "Region" },
+    { key: "PMID", label: "PMID" },
+    { key: "species", label: "Species" },
+    { key: "author", label: "Author" },
+    { key: "disease", label: "Disease" },
+  ];
 </script>
 
 <main class="container">
@@ -96,6 +107,7 @@
       {/each}
     </div>
   {/if}
+  <DatasetsTable {columns} items={datasets}></DatasetsTable>
 </main>
 
 <dialog {open} onclick={self(() => (open = false))}>
