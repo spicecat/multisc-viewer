@@ -1,5 +1,5 @@
 <script lang="ts">
-  import DatasetsTable from "$lib/components/DatasetsTable.svelte";
+  import DatasetsTable from "$lib/components/DataTable.svelte";
   import { onMount } from "svelte";
   import { preventDefault, self } from "svelte/legacy";
 

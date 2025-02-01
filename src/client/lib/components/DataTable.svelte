@@ -1,17 +1,12 @@
 <script lang="ts">
-  import DataTable, {
-    Head,
-    Body,
-    Row,
-    Cell,
-    Label,
-    SortValue,
-  } from "@smui/data-table";
+  import DataTable, { Head, Body, Row, Cell, Label } from "@smui/data-table";
+  import Checkbox from "@smui/checkbox";
   import IconButton from "@smui/icon-button";
 
   let { items = [], columns = [] } = $props();
-  let sort: keyof User = $state("id");
-  let sortDirection: Lowercase<keyof typeof SortValue> = $state("ascending");
+  let sort = $state("");
+  let sortDirection: "ascending" | "descending" = $state("ascending");
+  let selected = $state([]);
 
   function handleSort() {
     items.sort((a, b) => {
@@ -31,13 +26,15 @@
   bind:sort
   bind:sortDirection
   onSMUIDataTableSorted={handleSort}
-  table$aria-label="User list"
   style="width: 100%;"
   sortAscendingAriaLabel=""
   sortDescendingAriaLabel=""
 >
   <Head>
     <Row>
+      <Cell checkbox>
+        <Checkbox />
+      </Cell>
       {#each columns as { key, label, sortable = true }}
         <Cell
           columnId={key}
@@ -59,6 +56,9 @@
   <Body>
     {#each items as item}
       <Row>
+        <Cell checkbox>
+          <Checkbox bind:group={selected} value={item} />
+        </Cell>
         {#each columns as { key }}
           <Cell numeric={typeof item[key] === "number"}>
             {item[key]}
