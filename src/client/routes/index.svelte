@@ -1,14 +1,14 @@
 <script lang="ts">
-  import DatasetsTable from "$lib/components/DataTable.svelte";
+  import DataTable from "$lib/components/DataTable.svelte";
   import { onMount } from "svelte";
   import { preventDefault, self } from "svelte/legacy";
 
   let open: boolean = $state(false),
-    datasets: string[] | null = $state([]),
+    datasets: string[] = $state([]),
     selectedDatasets: string[] = $state([]),
-    genes: Promise<string[]> = $state(Promise.resolve([])),
+    genes: string[] = $state([]),
+    selectedGene: string = $state(""),
     geneSearch: string = $state(""),
-    selectedGene: string | null = $state(null),
     groupBy: string = $state("Genotype"),
     plots: Record<string, { clustering: string; violin: string }> | null =
       $state(null),
@@ -19,22 +19,16 @@
     newDatasetName: string = $state(""),
     uploading: boolean = $state(false);
 
+  // TODO: add debounce, clear selectedGene
+  $effect(() => {
+    if (selectedDatasets.length)
+      fetch(`/genes?datasets=${selectedDatasets.join(",")}`)
+        .then((res) => res.json())
+        .then((data) => (genes = data));
+    else genes = [];
+  });
+
   let splitBy = $derived(groupBy === "Genotype" ? "CellType" : "Genotype");
-
-  let debounceTimeout: any | null = null;
-  function fetchGenes(): void {
-    if (debounceTimeout !== null) {
-      clearTimeout(debounceTimeout);
-    }
-
-    debounceTimeout = setTimeout(() => {
-      debounceTimeout = null;
-      genes = fetch(`/genes?datasets=${selectedDatasets.join(",")}`).then(
-        (res) => res.json()
-      );
-    }, 500);
-    selectedGene = null;
-  }
 
   function plot(): void {
     if (selectedGene !== null) {
@@ -79,7 +73,7 @@
       .then((data) => (datasets = data));
   });
 
-  let columns = [
+  const datasetColumns = [
     { key: "name", label: "Name" },
     { key: "year", label: "Year" },
     { key: "region", label: "Region" },
@@ -107,7 +101,11 @@
       {/each}
     </div>
   {/if}
-  <DatasetsTable {columns} items={datasets}></DatasetsTable>
+  <DataTable
+    columns={datasetColumns}
+    items={datasets}
+    bind:selected={selectedDatasets}
+  />
 </main>
 
 <dialog {open} onclick={self(() => (open = false))}>
@@ -117,7 +115,7 @@
       ></a>
       <h2>Config</h2>
     </header>
-    <fieldset onchange={fetchGenes}>
+    <fieldset>
       <legend>
         <h3>Datasets</h3>
       </legend>

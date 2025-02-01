@@ -3,10 +3,10 @@
   import Checkbox from "@smui/checkbox";
   import IconButton from "@smui/icon-button";
 
-  let { items = [], columns = [] } = $props();
+  let { items = [], columns = [], selected = $bindable([]) } = $props();
+  let id = $derived(columns[0]?.key);
   let sort = $state("");
   let sortDirection: "ascending" | "descending" = $state("ascending");
-  let selected = $state([]);
 
   function handleSort() {
     items.sort((a, b) => {
@@ -23,10 +23,12 @@
 
 <DataTable
   sortable
+  stickyHeader
   bind:sort
   bind:sortDirection
   onSMUIDataTableSorted={handleSort}
-  style="width: 100%;"
+  table$aria-label="Data table"
+  style="max-width: 100%;"
   sortAscendingAriaLabel=""
   sortDescendingAriaLabel=""
 >
@@ -57,7 +59,7 @@
     {#each items as item}
       <Row>
         <Cell checkbox>
-          <Checkbox bind:group={selected} value={item} />
+          <Checkbox bind:group={selected} value={item[id]} />
         </Cell>
         {#each columns as { key }}
           <Cell numeric={typeof item[key] === "number"}>
