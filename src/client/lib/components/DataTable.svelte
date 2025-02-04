@@ -1,12 +1,21 @@
 <script lang="ts">
-  import DataTable, { Head, Body, Row, Cell, Label } from "@smui/data-table";
   import Checkbox from "@smui/checkbox";
+  import Radio from "@smui/radio";
+  import DataTable, {
+    Body,
+    Cell,
+    Head,
+    Label,
+    Pagination,
+    Row,
+  } from "@smui/data-table";
   import IconButton from "@smui/icon-button";
+  import Select, { Option } from "@smui/select";
 
-  let { items = [], columns = [], selected = $bindable([]) } = $props();
-  let id = $derived(columns[0]?.key);
-  let sort = $state("");
-  let sortDirection: "ascending" | "descending" = $state("ascending");
+  let { items = [], columns = [], selected = $bindable() } = $props();
+  let id = $derived(columns[0]?.key),
+    sort = $state(""),
+    sortDirection: "ascending" | "descending" = $state("ascending");
 
   function handleSort() {
     items.sort((a, b) => {
@@ -19,6 +28,18 @@
       return Number(aVal) - Number(bVal);
     });
   }
+
+  let perPage = $state(10),
+    currentPage = $state(0);
+
+  let start = $derived(currentPage * perPage),
+    end = $derived(Math.min(start + perPage, items.length)),
+    slice = $derived(items.slice(start, end)),
+    lastPage = $derived(Math.max(Math.ceil(items.length / perPage) - 1, 0));
+
+  $effect(() => {
+    if (currentPage > lastPage) currentPage = lastPage;
+  });
 </script>
 
 <DataTable
@@ -28,15 +49,19 @@
   bind:sortDirection
   onSMUIDataTableSorted={handleSort}
   table$aria-label="Data table"
-  style="max-width: 100%;"
+  style="width: 100%;"
   sortAscendingAriaLabel=""
   sortDescendingAriaLabel=""
 >
   <Head>
     <Row>
-      <Cell checkbox>
-        <Checkbox />
-      </Cell>
+      {#if selected !== undefined}
+        <Cell checkbox>
+          {#if Array.isArray(selected)}
+            <Checkbox />
+          {/if}
+        </Cell>
+      {/if}
       {#each columns as { key, label, sortable = true }}
         <Cell
           columnId={key}
@@ -56,11 +81,17 @@
     </Row>
   </Head>
   <Body>
-    {#each items as item}
+    {#each slice as item (item[id])}
       <Row>
-        <Cell checkbox>
-          <Checkbox bind:group={selected} value={item[id]} />
-        </Cell>
+        {#if selected !== undefined}
+          <Cell checkbox>
+            {#if Array.isArray(selected)}
+              <Checkbox bind:group={selected} value={item[id]} />
+            {:else}
+              <Radio bind:group={selected} value={item[id]} />
+            {/if}
+          </Cell>
+        {/if}
         {#each columns as { key }}
           <Cell numeric={typeof item[key] === "number"}>
             {item[key]}
@@ -69,4 +100,56 @@
       </Row>
     {/each}
   </Body>
+  {#snippet paginate()}
+    <Pagination>
+      {#snippet rowsPerPage()}
+        <Label>Rows Per Page</Label>
+        <Select variant="outlined" bind:value={perPage} noLabel>
+          <Option value={10}>10</Option>
+          <Option value={25}>25</Option>
+          <Option value={100}>100</Option>
+        </Select>
+      {/snippet}
+      {#snippet total()}
+        {start + 1}-{end} of {items.length}
+      {/snippet}
+
+      <IconButton
+        class="material-icons"
+        action="first-page"
+        title="First page"
+        onclick={() => (currentPage = 0)}
+        {...{ disabled: currentPage === 0 }}
+      >
+        first_page
+      </IconButton>
+      <IconButton
+        class="material-icons"
+        action="prev-page"
+        title="Prev page"
+        onclick={() => currentPage--}
+        {...{ disabled: currentPage === 0 }}
+      >
+        chevron_left
+      </IconButton>
+      <IconButton
+        class="material-icons"
+        action="next-page"
+        title="Next page"
+        onclick={() => currentPage++}
+        {...{ disabled: currentPage === lastPage }}
+      >
+        chevron_right
+      </IconButton>
+      <IconButton
+        class="material-icons"
+        action="last-page"
+        title="Last page"
+        onclick={() => (currentPage = lastPage)}
+        {...{ disabled: currentPage === lastPage }}
+      >
+        last_page
+      </IconButton>
+    </Pagination>
+  {/snippet}
 </DataTable>

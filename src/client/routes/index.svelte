@@ -1,5 +1,6 @@
 <script lang="ts">
   import DataTable from "$lib/components/DataTable.svelte";
+  import type { StringDecoder } from "string_decoder";
   import { onMount } from "svelte";
   import { preventDefault, self } from "svelte/legacy";
 
@@ -24,7 +25,9 @@
     if (selectedDatasets.length)
       fetch(`/genes?datasets=${selectedDatasets.join(",")}`)
         .then((res) => res.json())
-        .then((data) => (genes = data));
+        .then(
+          (data) => (genes = data.map((gene: StringDecoder) => ({ gene })))
+        );
     else genes = [];
   });
 
@@ -74,23 +77,24 @@
   });
 
   const datasetColumns = [
-    { key: "name", label: "Name" },
-    { key: "year", label: "Year" },
-    { key: "region", label: "Region" },
-    { key: "PMID", label: "PMID" },
-    { key: "species", label: "Species" },
-    { key: "author", label: "Author" },
-    { key: "disease", label: "Disease" },
-  ];
+      { key: "name", label: "Name" },
+      { key: "year", label: "Year" },
+      { key: "region", label: "Region" },
+      { key: "PMID", label: "PMID" },
+      { key: "species", label: "Species" },
+      { key: "author", label: "Author" },
+      { key: "disease", label: "Disease" },
+    ],
+    geneColumns = [{ key: "gene", label: "Gene" }];
 </script>
 
 <main class="container">
   <h1>Dataset Comparison</h1>
 
-  <button onclick={() => (open = true)}>Config</button>
-  <button onclick={() => (addingDataset = true)}>Upload Dataset</button>
+  <!-- <button onclick={() => (open = true)}>Config</button> -->
+  <!-- <button onclick={() => (addingDataset = true)}>Upload Dataset</button> -->
 
-  {#if plots !== null && ordering !== null}
+  <!-- {#if plots !== null && ordering !== null}
     <div class="row">
       {#each ordering as dataset}
         <div class="col">
@@ -100,15 +104,23 @@
         </div>
       {/each}
     </div>
-  {/if}
+  {/if} -->
+
   <DataTable
     columns={datasetColumns}
     items={datasets}
     bind:selected={selectedDatasets}
   />
+  {JSON.stringify(selectedGene)}
+  <DataTable 
+    columns={geneColumns}
+    items={genes} 
+    bind:selected={selectedGene} 
+  />
+  {JSON.stringify(genes)}
 </main>
 
-<dialog {open} onclick={self(() => (open = false))}>
+<!-- <dialog {open} onclick={self(() => (open = false))}>
   <article class="modal">
     <header>
       <a href="/" class="close" onclick={preventDefault(() => (open = false))}
@@ -215,9 +227,9 @@
       </button>
     </footer>
   </article>
-</dialog>
+</dialog> -->
 
-<style lang="scss">
+<!-- <style lang="scss">
   @keyframes spin {
     0% {
       transform: rotate(0deg);
@@ -270,4 +282,4 @@
   :global(.fa-spinner) {
     animation: spin 1s linear infinite;
   }
-</style>
+</style> -->
