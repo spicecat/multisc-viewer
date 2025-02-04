@@ -3,6 +3,7 @@
   import IconButton from "@smui/icon-button";
   import TextField from "@smui/textfield";
   import type { StringDecoder } from "string_decoder";
+  import Button, { Label } from "@smui/button";
   import { onMount } from "svelte";
   import { preventDefault, self } from "svelte/legacy";
 
@@ -104,12 +105,11 @@
 <main class="container">
   <h1>Dataset Comparison</h1>
 
-  <!-- <button onclick={() => (open = true)}>Config</button> -->
-  <!-- <button onclick={() => (addingDataset = true)}>Upload Dataset</button> -->
-
   <div class="row">
-    <h4>Group By:</h4>
-    <p>{groupBy}</p>
+    <div>
+      <h4>Group By:</h4>
+      <p>{groupBy}</p>
+    </div>
     <IconButton
       class="material-icons"
       onclick={() => {
@@ -118,9 +118,17 @@
     >
       swap_horiz</IconButton
     >
-    <h4>Split By:</h4>
-    <p>{splitBy}</p>
+    <div>
+      <h4>Split By:</h4>
+      <p>{splitBy}</p>
+    </div>
+    <Button onclick={plot} variant="raised">
+      <Label>Plot</Label>
+    </Button>
   </div>
+
+  <!-- <button onclick={() => (open = true)}>Config</button> -->
+  <!-- <button onclick={() => (addingDataset = true)}>Upload Dataset</button> -->
 
   <!-- {#if plots !== null && ordering !== null}
     <div class="row">
@@ -155,7 +163,7 @@
   />
 </main>
 
-<dialog {open} onclick={self(() => (open = false))}>
+<!-- <dialog {open} onclick={self(() => (open = false))}>
   <article class="modal">
     <header>
       <a href="/" class="close" onclick={preventDefault(() => (open = false))}
@@ -262,7 +270,7 @@
       </button>
     </footer>
   </article>
-</dialog>
+</dialog> -->
 
 <!-- <style lang="scss">
   @keyframes spin {
@@ -325,6 +333,6 @@
     align-items: center;
   }
   .row > div {
-    margin-right: 100px;
+    margin-right: 1em;
   }
 </style>
