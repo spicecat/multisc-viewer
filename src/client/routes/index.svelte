@@ -1,10 +1,10 @@
 <script lang="ts">
   import DataTable from "$lib/components/DataTable.svelte";
+  import IconButton from "@smui/icon-button";
+  import TextField from "@smui/textfield";
   import type { StringDecoder } from "string_decoder";
   import { onMount } from "svelte";
   import { preventDefault, self } from "svelte/legacy";
-  import IconButton from "@smui/icon-button";
-  import TextField, { Input } from "@smui/textfield";
 
   let open: boolean = $state(false),
     datasets: object[] = $state([]),
@@ -14,6 +14,7 @@
     selectedGene: string = $state(""),
     geneSearch: string = $state(""),
     groupBy: string = $state("Genotype"),
+    splitBy = $derived(groupBy === "Genotype" ? "CellType" : "Genotype"),
     plots: Record<string, { clustering: string; violin: string }> | null =
       $state(null),
     ordering: string[] | null = $state(null),
@@ -23,7 +24,7 @@
     newDatasetName: string = $state(""),
     uploading: boolean = $state(false);
 
-  // TODO: add debounce, clear selectedGene
+  // TODO: add lodash debounce
   $effect(() => {
     if (selectedDatasets.length)
       fetch(`/genes?datasets=${selectedDatasets.join(",")}`)
@@ -31,10 +32,11 @@
         .then(
           (data) => (genes = data.map((gene: StringDecoder) => ({ gene })))
         );
-    else genes = [];
+    else {
+      genes = [];
+      selectedGene = "";
+    }
   });
-
-  let splitBy = $derived(groupBy === "Genotype" ? "CellType" : "Genotype");
 
   function plot(): void {
     if (selectedGene !== null) {
@@ -105,6 +107,21 @@
   <!-- <button onclick={() => (open = true)}>Config</button> -->
   <!-- <button onclick={() => (addingDataset = true)}>Upload Dataset</button> -->
 
+  <div class="row">
+    <h4>Group By:</h4>
+    <p>{groupBy}</p>
+    <IconButton
+      class="material-icons"
+      onclick={() => {
+        groupBy = splitBy;
+      }}
+    >
+      swap_horiz</IconButton
+    >
+    <h4>Split By:</h4>
+    <p>{splitBy}</p>
+  </div>
+
   <!-- {#if plots !== null && ordering !== null}
     <div class="row">
       {#each ordering as dataset}
@@ -116,18 +133,20 @@
       {/each}
     </div>
   {/if} -->
-  <TextField>
-    <IconButton class="material-icons">search</IconButton>
-    <Input bind:value={datasetSearch} placeholder="Search" />
+  <TextField bind:value={datasetSearch} label="Datasets">
+    {#snippet leadingIcon()}
+      <IconButton class="material-icons">search</IconButton>
+    {/snippet}
   </TextField>
   <DataTable
     columns={datasetColumns}
     items={filterItems(datasets, datasetSearch)}
     bind:selected={selectedDatasets}
   />
-  <TextField>
-    <IconButton class="material-icons">search</IconButton>
-    <Input bind:value={geneSearch} placeholder="Search" />
+  <TextField bind:value={geneSearch} label="Genes">
+    {#snippet leadingIcon()}
+      <IconButton class="material-icons">search</IconButton>
+    {/snippet}
   </TextField>
   <DataTable
     columns={geneColumns}
@@ -136,7 +155,7 @@
   />
 </main>
 
-<!-- <dialog {open} onclick={self(() => (open = false))}>
+<dialog {open} onclick={self(() => (open = false))}>
   <article class="modal">
     <header>
       <a href="/" class="close" onclick={preventDefault(() => (open = false))}
@@ -243,7 +262,7 @@
       </button>
     </footer>
   </article>
-</dialog> -->
+</dialog>
 
 <!-- <style lang="scss">
   @keyframes spin {
@@ -299,3 +318,13 @@
     animation: spin 1s linear infinite;
   }
 </style> -->
+
+<style>
+  .row {
+    display: flex;
+    align-items: center;
+  }
+  .row > div {
+    margin-right: 100px;
+  }
+</style>
