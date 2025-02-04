@@ -1,11 +1,11 @@
 <script lang="ts">
+  // import { goto } from "$app/navigation";
   import DataTable from "$lib/components/DataTable.svelte";
+  import Button, { Label } from "@smui/button";
   import IconButton from "@smui/icon-button";
   import TextField from "@smui/textfield";
   import type { StringDecoder } from "string_decoder";
-  import Button, { Label } from "@smui/button";
   import { onMount } from "svelte";
-  import { preventDefault, self } from "svelte/legacy";
 
   let open: boolean = $state(false),
     datasets: object[] = $state([]),
@@ -40,21 +40,8 @@
   });
 
   function plot(): void {
-    if (selectedGene !== null) {
-      fetch(
-        `/plots?datasets=${selectedDatasets.join(",")}&gene=${selectedGene}&groupBy=${groupBy}&splitBy=${splitBy}`
-      )
-        .then((res) => res.json())
-        .then((plotsObj) => {
-          plots = plotsObj;
-          ordering = selectedDatasets;
-          open = false;
-          plotting = false;
-        });
-      plots = null;
-      ordering = null;
-      plotting = true;
-    }
+    if (selectedGene && selectedDatasets.length)
+      window.location.href = `/compare?datasets=${selectedDatasets.join(",")}&gene=${selectedGene}&groupBy=${groupBy}&splitBy=${splitBy}`; // use goto
   }
 
   function upload(): void {
