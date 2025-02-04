@@ -1,6 +1,5 @@
 <script lang="ts">
   import Checkbox from "@smui/checkbox";
-  import Radio from "@smui/radio";
   import DataTable, {
     Body,
     Cell,
@@ -10,6 +9,7 @@
     Row,
   } from "@smui/data-table";
   import IconButton from "@smui/icon-button";
+  import Radio from "@smui/radio";
   import Select, { Option } from "@smui/select";
 
   let { items = [], columns = [], selected = $bindable() } = $props();

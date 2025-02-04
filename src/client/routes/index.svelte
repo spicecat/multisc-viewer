@@ -3,11 +3,14 @@
   import type { StringDecoder } from "string_decoder";
   import { onMount } from "svelte";
   import { preventDefault, self } from "svelte/legacy";
+  import IconButton from "@smui/icon-button";
+  import TextField, { Input } from "@smui/textfield";
 
   let open: boolean = $state(false),
-    datasets: string[] = $state([]),
+    datasets: object[] = $state([]),
     selectedDatasets: string[] = $state([]),
-    genes: string[] = $state([]),
+    datasetSearch: string = $state(""),
+    genes: object[] = $state([]),
     selectedGene: string = $state(""),
     geneSearch: string = $state(""),
     groupBy: string = $state("Genotype"),
@@ -70,6 +73,14 @@
     }
   }
 
+  function filterItems(items: object[], search: string): object[] {
+    return items.filter((item) =>
+      Object.values(item).some((value) =>
+        value.toString().toLowerCase().includes(search.toLowerCase())
+      )
+    );
+  }
+
   onMount(() => {
     fetch("/datasets")
       .then((res) => res.json())
@@ -105,19 +116,24 @@
       {/each}
     </div>
   {/if} -->
-
+  <TextField>
+    <IconButton class="material-icons">search</IconButton>
+    <Input bind:value={datasetSearch} placeholder="Search" />
+  </TextField>
   <DataTable
     columns={datasetColumns}
-    items={datasets}
+    items={filterItems(datasets, datasetSearch)}
     bind:selected={selectedDatasets}
   />
-  {JSON.stringify(selectedGene)}
-  <DataTable 
+  <TextField>
+    <IconButton class="material-icons">search</IconButton>
+    <Input bind:value={geneSearch} placeholder="Search" />
+  </TextField>
+  <DataTable
     columns={geneColumns}
-    items={genes} 
-    bind:selected={selectedGene} 
+    items={filterItems(genes, geneSearch)}
+    bind:selected={selectedGene}
   />
-  {JSON.stringify(genes)}
 </main>
 
 <!-- <dialog {open} onclick={self(() => (open = false))}>
