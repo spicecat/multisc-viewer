@@ -5,6 +5,7 @@
   import IconButton from "@smui/icon-button";
   import TextField from "@smui/textfield";
   import { onMount } from "svelte";
+  import debounce from "lodash.debounce";
 
   let open: boolean = $state(false),
     datasets: object[] = $state([]),
@@ -26,17 +27,17 @@
     newDatasetName: string = $state(""),
     uploading: boolean = $state(false);
 
-  // TODO: add lodash debounce
   $effect(() => {
+    if (selectedDatasets.length) debounce(fetchGenes, 1000)();
+    else genes = [];
+  });
+
+  function fetchGenes() {
     if (selectedDatasets.length)
       fetch(`/genes?datasets=${selectedDatasets.join(",")}`)
         .then((res) => res.json())
         .then((data) => (genes = data.map((gene: string) => ({ gene }))));
-    else {
-      genes = [];
-      selectedGene = "";
-    }
-  });
+  }
 
   function plot(): void {
     if (selectedGene && selectedDatasets.length)
