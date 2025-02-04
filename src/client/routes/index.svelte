@@ -4,16 +4,17 @@
   import Button, { Label } from "@smui/button";
   import IconButton from "@smui/icon-button";
   import TextField from "@smui/textfield";
-  import type { StringDecoder } from "string_decoder";
   import { onMount } from "svelte";
 
   let open: boolean = $state(false),
     datasets: object[] = $state([]),
     selectedDatasets: string[] = $state([]),
     datasetSearch: string = $state(""),
+    filteredDatasets: object[] = $derived(filterItems(datasets, datasetSearch)),
     genes: object[] = $state([]),
     selectedGene: string = $state(""),
     geneSearch: string = $state(""),
+    filteredGenes: object[] = $derived(filterItems(genes, geneSearch)),
     groupBy: string = $state("Genotype"),
     splitBy = $derived(groupBy === "Genotype" ? "CellType" : "Genotype"),
     plots: Record<string, { clustering: string; violin: string }> | null =
@@ -30,9 +31,7 @@
     if (selectedDatasets.length)
       fetch(`/genes?datasets=${selectedDatasets.join(",")}`)
         .then((res) => res.json())
-        .then(
-          (data) => (genes = data.map((gene: StringDecoder) => ({ gene })))
-        );
+        .then((data) => (genes = data.map((gene: string) => ({ gene }))));
     else {
       genes = [];
       selectedGene = "";
@@ -135,7 +134,7 @@
   </TextField>
   <DataTable
     columns={datasetColumns}
-    items={filterItems(datasets, datasetSearch)}
+    data={filteredDatasets}
     bind:selected={selectedDatasets}
   />
   <TextField bind:value={geneSearch} label="Genes">
@@ -145,7 +144,7 @@
   </TextField>
   <DataTable
     columns={geneColumns}
-    items={filterItems(genes, geneSearch)}
+    data={filteredGenes}
     bind:selected={selectedGene}
   />
 </main>

@@ -12,22 +12,20 @@
   import Radio from "@smui/radio";
   import Select, { Option } from "@smui/select";
 
-  let { items = [], columns = [], selected = $bindable() } = $props();
+  let { data = [], columns = [], selected = $bindable() } = $props();
   let id = $derived(columns[0]?.key),
     sort = $state(""),
     sortDirection: "ascending" | "descending" = $state("ascending");
-
-  function handleSort() {
-    items.sort((a, b) => {
+  let items = $derived(
+    [...data].sort((a, b) => {
       const [aVal, bVal] = [a[sort], b[sort]][
         sortDirection === "ascending" ? "slice" : "reverse"
       ]();
-      if (typeof aVal === "string" && typeof bVal === "string") {
+      if (typeof aVal === "string" && typeof bVal === "string")
         return aVal.localeCompare(bVal);
-      }
       return Number(aVal) - Number(bVal);
-    });
-  }
+    })
+  );
 
   let perPage = $state(10),
     currentPage = $state(0);
@@ -47,7 +45,6 @@
   stickyHeader
   bind:sort
   bind:sortDirection
-  onSMUIDataTableSorted={handleSort}
   table$aria-label="Data table"
   style="width: 100%;"
   sortAscendingAriaLabel=""
