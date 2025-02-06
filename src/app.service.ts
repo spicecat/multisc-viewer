@@ -32,7 +32,6 @@ export class AppService {
   public constructor(private readonly daemon: DaemonService) {
     this.cache = new Map();
     this.expirations = new Map();
-
     this.activity = new Map();
   }
 
@@ -52,7 +51,6 @@ export class AppService {
     const geneSets = datasets.map<string[]>((dataset) =>
       JSON.parse(readFileSync(`datasets/${dataset}/genes.json`).toString()),
     );
-
     return geneSets
       .slice(1)
       .reduce(
@@ -70,15 +68,10 @@ export class AppService {
   ): Promise<ChartResult> {
     const key = this._cacheKey(dataset, gene, groupBy, splitBy);
 
-    if (token !== null) {
-      this._refresh(token);
-    }
+    if (token) this._refresh(token);
 
     if (this.cache.has(key)) {
-      if (this.expirations.has(key)) {
-        this.expirations.get(key)!.refresh();
-      }
-
+      if (this.expirations.has(key)) this.expirations.get(key)!.refresh();
       return this.cache.get(key)!;
     } else {
       const result = this.daemon
@@ -120,9 +113,7 @@ export class AppService {
           ),
         )
         .then(() => {
-          if (token !== null) {
-            this._refresh(token);
-          }
+          if (token) this._refresh(token);
         });
 
       this.cache.set(key, result);
@@ -139,9 +130,7 @@ export class AppService {
     }
 
     return this.daemon.batch(token, datasets).then(() => {
-      if (token !== null) {
-        this._refresh(token);
-      }
+      if (token) this._refresh(token);
     });
   }
 
@@ -155,9 +144,8 @@ export class AppService {
   }
 
   private _refresh(token: string) {
-    if (this.activity.has(token)) {
-      this.activity.get(token)!.refresh();
-    } else {
+    if (this.activity.has(token)) this.activity.get(token)!.refresh();
+    else {
       this.activity.set(
         token,
         setTimeout(() => {

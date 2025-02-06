@@ -2,13 +2,11 @@ import {
   BadRequestException,
   Controller,
   Get,
-  HttpStatus,
   Post,
   Query,
 } from "@nestjs/common";
 import { AppService, ChartResult, Dataset } from "./app.service";
 import { Page } from "./utils/decorators/page.decorator";
-import { Redirect } from "./utils/filters/redirect.filter";
 
 @Controller()
 export class AppController {
@@ -23,62 +21,44 @@ export class AppController {
   @Page()
   @Get("/compare")
   public comparison(
-    @Query("datasets") datasets: string,
-    @Query("gene") gene: string | undefined,
-    @Query("groupBy") groupBy: string | undefined,
-    @Query("splitBy") splitBy: string | undefined,
-    @Query("token") token: string | undefined,
+    @Query("datasets") datasets: string = "",
+    @Query("gene") gene: string = "",
+    @Query("groupBy") groupBy: string = "",
+    @Query("splitBy") splitBy: string = "",
+    @Query("token") token: string | null = null,
   ): CompareProps {
-    const knownDatasets = this.getDatasets();
+    const knownDatasets = Object.fromEntries(
+      this.getDatasets().map((ds) => [ds.name, ds]),
+    );
 
-    if (
-      !datasets
-        .split(",")
-        .every((dataset) => knownDatasets.some((ds) => ds.name === dataset))
-    ) {
+    if (!datasets?.split(",").every((dataset) => dataset in knownDatasets))
       throw new BadRequestException("Unknown dataset requested");
-    }
 
     const genes = this.getGenes(datasets);
 
-    if (gene === undefined || groupBy === undefined || splitBy === undefined) {
+    if (!gene) {
       const defaultGene = genes[0];
-
-      if (defaultGene === undefined) {
+      if (!defaultGene)
         throw new BadRequestException("No common genes between datasets");
-      }
-
-      this.service.preload(token ?? null, datasets.split(","));
-
-      if (gene === undefined) gene = defaultGene;
-
-      if (groupBy === undefined && splitBy === undefined) {
-        groupBy = "Genotype";
-        splitBy = "CellType";
-      } else if (groupBy === undefined) {
-        groupBy = splitBy === "Genotype" ? "CellType" : "Genotype";
-      } else if (splitBy === undefined) {
-        splitBy = groupBy === "Genotype" ? "CellType" : "Genotype";
-      }
-
-      throw new Redirect(
-        `/compare?datasets=${datasets}&gene=${gene}&groupBy=${groupBy}&splitBy=${splitBy}${token !== undefined ? `&token=${token}` : ""}`,
-        HttpStatus.SEE_OTHER,
-      );
+      gene = defaultGene;
     }
-
-    if (!genes.includes(gene)) {
+    if (!genes.includes(gene))
       throw new BadRequestException("Selected gene is not in all datasets");
-    }
 
-    this.service.preload(token ?? null, datasets.split(","));
+    if (!groupBy && !splitBy) {
+      groupBy = "Genotype";
+      splitBy = "CellType";
+    } else if (!groupBy)
+      groupBy = splitBy === "Genotype" ? "CellType" : "Genotype";
+    else if (!splitBy)
+      splitBy = groupBy === "Genotype" ? "CellType" : "Genotype";
 
-    const sizes = Object.fromEntries(
-      knownDatasets.map((ds) => [ds.name, ds.size]),
-    );
+    this.service.preload(token, datasets.split(","));
 
     return {
-      order: datasets.split(",").sort((a, b) => sizes[a] - sizes[b]),
+      order: datasets
+        .split(",")
+        .sort((a, b) => knownDatasets[a].size - knownDatasets[b].size),
       genes,
       gene,
     };
@@ -100,16 +80,16 @@ export class AppController {
     @Query("gene") gene: string,
     @Query("groupBy") groupBy: string,
     @Query("splitBy") splitBy: string,
-    @Query("token") token: string | undefined,
+    @Query("token") token: string | null = null,
   ): Promise<ChartResult> {
-    return this.service.render(dataset, gene, groupBy, splitBy, token ?? null);
+    return this.service.render(dataset, gene, groupBy, splitBy, token);
   }
 
   @Post("/preload")
   public async preload(
-    @Query("token") token: string | undefined,
+    @Query("token") token: string | null = null,
     @Query("datasets") datasets: string,
   ): Promise<void> {
-    return this.service.preload(token ?? null, datasets.split(","));
+    return this.service.preload(token, datasets.split(","));
   }
 }

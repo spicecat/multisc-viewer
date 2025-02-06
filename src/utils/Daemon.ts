@@ -37,9 +37,7 @@ export class Daemon {
 
       if (match !== null) {
         const opid = match[1];
-
         this._acks = this._acks.filter((ack) => ack(opid));
-
         data = data.slice(match[0].length);
       }
     });
@@ -54,7 +52,7 @@ export class Daemon {
   }
 
   public exec(
-    executor: (proc: ChildProcessWithoutNullStreams, opid: string) => void,
+    executor: (proc: ChildProcessWithoutNullStreams, opid: string) => void
   ): Promise<void> {
     const opid = randomBytes(16).toString("hex");
 
@@ -65,11 +63,8 @@ export class Daemon {
         this._acks.push((id) => {
           if (id === opid) {
             resolve();
-
             return true;
-          } else {
-            return false;
-          }
+          } else return false;
         });
       });
     });
@@ -94,11 +89,10 @@ export class Daemon {
     ds: string,
     gene: string,
     groupBy: string,
-    splitBy: string,
+    splitBy: string
   ): Promise<string> {
-    if (!this._datasets.some((dataset) => dataset.ds === ds)) {
+    if (!this._datasets.some((dataset) => dataset.ds === ds))
       throw new Error(`Attempt to render unloaded dataset ${ds}`);
-    }
 
     // TODO: kinda sus lol
     let id: string;
@@ -109,17 +103,16 @@ export class Daemon {
   }
 
   public async unload(ds: string): Promise<void> {
-    if (!this._datasets.some((dataset) => dataset.ds === ds)) {
+    if (!this._datasets.some((dataset) => dataset.ds === ds))
       throw new Error(`Attempt to unload unloaded dataset ${ds}`);
-    }
 
     this._datasets.splice(
       this._datasets.findIndex((dataset) => dataset.ds === ds),
-      1,
+      1
     );
 
     return this.exec((proc, opid) =>
-      proc.stdin.write(`${opid} unload ${ds}\n`),
+      proc.stdin.write(`${opid} unload ${ds}\n`)
     );
   }
 

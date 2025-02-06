@@ -320,6 +320,6 @@
     align-items: center;
   }
   .row > div {
-    margin-right: 1em;
+    margin: 2em;
   }
 </style>

@@ -18,7 +18,6 @@ export class ErrorPageFilter extends BaseExceptionFilter {
 
       if (err instanceof ErrorPage) {
         response.status(exception.getStatus()).render("error", err.props);
-
         return;
       }
     }
