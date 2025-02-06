@@ -17,14 +17,20 @@
     sort = $state(""),
     sortDirection: "ascending" | "descending" = $state("ascending");
   let items = $derived(
-    [...data].sort((a, b) => {
-      const [aVal, bVal] = [a[sort], b[sort]][
-        sortDirection === "ascending" ? "slice" : "reverse"
-      ]();
-      if (typeof aVal === "string" && typeof bVal === "string")
-        return aVal.localeCompare(bVal);
-      return Number(aVal) - Number(bVal);
-    })
+    [...data]
+      .map((item) =>
+        item && typeof item === "object" && !Array.isArray(item)
+          ? item
+          : { "": item }
+      )
+      .sort((a, b) => {
+        const [aVal, bVal] = [a[sort], b[sort]][
+          sortDirection === "ascending" ? "slice" : "reverse"
+        ]();
+        if (typeof aVal === "string" && typeof bVal === "string")
+          return aVal.localeCompare(bVal);
+        return Number(aVal) - Number(bVal);
+      })
   );
 
   let perPage = $state(10),

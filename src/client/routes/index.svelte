@@ -10,12 +10,8 @@
   let open: boolean = $state(false),
     datasets: object[] = $state([]),
     selectedDatasets: string[] = $state([]),
-    datasetSearch: string = $state(""),
-    filteredDatasets: object[] = $derived(filterItems(datasets, datasetSearch)),
     genes: object[] = $state([]),
     selectedGene: string = $state(""),
-    geneSearch: string = $state(""),
-    filteredGenes: object[] = $derived(filterItems(genes, geneSearch)),
     groupBy: string = $state("Genotype"),
     splitBy = $derived(groupBy === "Genotype" ? "CellType" : "Genotype"),
     plots: Record<string, { clustering: string; violin: string }> | null =
@@ -36,12 +32,12 @@
     if (selectedDatasets.length)
       fetch(`/genes?datasets=${selectedDatasets.join(",")}`)
         .then((res) => res.json())
-        .then((data) => (genes = data.map((gene: string) => ({ gene }))));
+        .then((data) => (genes = data));
   }
 
   // TODO: use goto from $app/navigation
   function plot(): void {
-    if (selectedGene && selectedDatasets.length)
+    if (selectedDatasets.length)
       window.location.href = `/compare?datasets=${selectedDatasets.join(",")}&gene=${selectedGene}&groupBy=${groupBy}&splitBy=${splitBy}`; // use goto
   }
 
@@ -64,14 +60,6 @@
     }
   }
 
-  function filterItems(items: object[], search: string): object[] {
-    return items.filter((item) =>
-      Object.values(item).some((value) =>
-        value.toString().toLowerCase().includes(search.toLowerCase())
-      )
-    );
-  }
-
   onMount(() => {
     fetch("/datasets")
       .then((res) => res.json())
@@ -87,7 +75,7 @@
       { key: "author", label: "Author" },
       { key: "disease", label: "Disease" },
     ],
-    geneColumns = [{ key: "gene", label: "Gene" }];
+    geneColumns = [{ key: "", label: "Gene" }];
 </script>
 
 <main class="container">
@@ -133,13 +121,13 @@
     label="Datasets"
     data={datasets}
     columns={datasetColumns}
-    selected={selectedDatasets}
+    bind:selected={selectedDatasets}
   />
   <DataTableSearch
     label="Genes"
     data={genes}
     columns={geneColumns}
-    selected={selectedGene}
+    bind:selected={selectedGene}
   />
 </main>
 

@@ -29,12 +29,10 @@ export class Daemon {
     this._idle = Promise.resolve();
 
     let data = "";
-
     this.proc.stdout.on("data", (chunk) => {
       data += chunk;
 
       const match = /^ack ([^\n]+)\n/.exec(data);
-
       if (match !== null) {
         const opid = match[1];
         this._acks = this._acks.filter((ack) => ack(opid));
