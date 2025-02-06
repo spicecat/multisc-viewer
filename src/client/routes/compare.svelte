@@ -1,10 +1,10 @@
 <script lang="ts">
 	import ChartDisplay from '$lib/components/ChartDisplay.svelte';
+	import DataTable from '$lib/components/DataTable.svelte';
 	import meta from '$meta';
 	import { dndzone } from 'svelte-dnd-action';
 
 	const { genes, gene, order }: CompareProps = $props();
-
 	const { query } = meta;
 
 	let geneSearch: string = $state(''),

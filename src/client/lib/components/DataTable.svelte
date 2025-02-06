@@ -59,7 +59,7 @@
           {/if}
         </Cell>
       {/if}
-      {#each columns as { key, label, sortable = true }}
+      {#each columns as { key, label, sortable = false }}
         <Cell
           columnId={key}
           numeric={typeof items[0]?.[key] === "number"}

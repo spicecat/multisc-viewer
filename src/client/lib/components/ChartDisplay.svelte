@@ -4,13 +4,11 @@
 	const cache = new Map<string, Promise<any>>();
 
 	function cachedFetch(url: string): Promise<any> {
-		if (cache.has(url)) {
+		if (cache.has(url))
 			return cache.get(url);
-		} else {
+		else {
 			const res = fetch(url).then((res) => res.json());
-
 			cache.set(url, res);
-
 			return res;
 		}
 	}
@@ -20,7 +18,6 @@
 	import { self } from 'svelte/legacy';
 
 	const { dataset, config }: { dataset: string; config: PlotConfig } = $props();
-
 	const { selectedGene, groupBy, splitBy } = $derived(config);
 
 	let bigImg: string | null = $state(null);

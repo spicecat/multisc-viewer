@@ -1,6 +1,6 @@
 <script lang="ts">
-  // import { goto } from "$app/navigation";
   import DataTable from "$lib/components/DataTable.svelte";
+  import DataTableSearch from "$lib/components/DataTableSearch.svelte";
   import Button, { Label } from "@smui/button";
   import IconButton from "@smui/icon-button";
   import TextField from "@smui/textfield";
@@ -39,6 +39,7 @@
         .then((data) => (genes = data.map((gene: string) => ({ gene }))));
   }
 
+  // TODO: use goto from $app/navigation
   function plot(): void {
     if (selectedGene && selectedDatasets.length)
       window.location.href = `/compare?datasets=${selectedDatasets.join(",")}&gene=${selectedGene}&groupBy=${groupBy}&splitBy=${splitBy}`; // use goto
@@ -79,7 +80,7 @@
 
   const datasetColumns = [
       { key: "name", label: "Name" },
-      { key: "year", label: "Year" },
+      { key: "year", label: "Year", sortable: true },
       { key: "region", label: "Region" },
       { key: "PMID", label: "PMID" },
       { key: "species", label: "Species" },
@@ -128,25 +129,17 @@
       {/each}
     </div>
   {/if} -->
-  <TextField bind:value={datasetSearch} label="Datasets">
-    {#snippet leadingIcon()}
-      <IconButton class="material-icons">search</IconButton>
-    {/snippet}
-  </TextField>
-  <DataTable
+  <DataTableSearch
+    label="Datasets"
+    data={datasets}
     columns={datasetColumns}
-    data={filteredDatasets}
-    bind:selected={selectedDatasets}
+    selected={selectedDatasets}
   />
-  <TextField bind:value={geneSearch} label="Genes">
-    {#snippet leadingIcon()}
-      <IconButton class="material-icons">search</IconButton>
-    {/snippet}
-  </TextField>
-  <DataTable
+  <DataTableSearch
+    label="Genes"
+    data={genes}
     columns={geneColumns}
-    data={filteredGenes}
-    bind:selected={selectedGene}
+    selected={selectedGene}
   />
 </main>
 
