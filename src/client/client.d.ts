@@ -56,3 +56,7 @@ interface PlotConfig {
 	splitBy: string;
 }
 
+interface RenderResult {
+	violin: string;
+	clustering: string;
+}
