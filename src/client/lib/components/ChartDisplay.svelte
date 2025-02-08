@@ -26,6 +26,10 @@
 	let bigImg: string | null = $state(null);
 </script>
 
+<svelte:head>
+	<link rel="stylesheet" href="https://mypico.jasonxu.dev/min" />
+</svelte:head>
+
 <div class="col">
 	<h3 class="dataset">{dataset.replaceAll('_', ' ')}</h3>
 	{#await cachedFetch(`/plot?dataset=${dataset}&gene=${selectedGene}&groupBy=${groupBy}&splitBy=${splitBy}`)}
