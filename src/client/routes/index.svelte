@@ -6,6 +6,8 @@
 	import TextField from '@smui/textfield';
 	import { onMount } from 'svelte';
 
+	const { token }: IndexProps = $props();
+
 	let datasets: object[] = $state([]),
 		selectedDatasets: string[] = $state([]),
 		datasetSearch: string = $state(''),
@@ -19,11 +21,12 @@
 
 	// TODO: add lodash debounce
 	$effect(() => {
-		if (selectedDatasets.length)
+		if (selectedDatasets.length) {
 			fetch(`/genes?datasets=${selectedDatasets.join(',')}`)
 				.then((res) => res.json())
 				.then((data) => (genes = data.map((gene: string) => ({ gene }))));
-		else {
+			fetch(`/preload?token=${token}&datasets=${selectedDatasets.join(',')}`, { method: 'POST' });
+		} else {
 			genes = [];
 			selectedGene = '';
 		}
