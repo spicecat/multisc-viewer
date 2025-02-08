@@ -35,7 +35,11 @@
 		if (bigViewCharts[0] === null) {
 			bigViewCharts[0] = myDataset;
 		} else {
-			bigViewCharts[1] = myDataset;
+			if (bigViewCharts[0] === myDataset) {
+				bigViewCharts[0] = null;
+			} else {
+				bigViewCharts[1] = myDataset;
+			}
 		}
 	}
 </script>
