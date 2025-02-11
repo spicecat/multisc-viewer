@@ -2,11 +2,14 @@ import {
   BadRequestException,
   Controller,
   Get,
+  HttpStatus,
   Post,
   Query,
 } from "@nestjs/common";
+import { randomBytes } from "crypto";
 import { AppService, ChartResult, Dataset } from "./app.service";
 import { Page } from "./utils/decorators/page.decorator";
+import { Redirect } from "./utils/filters/redirect.filter";
 
 @Controller()
 export class AppController {
@@ -14,8 +17,8 @@ export class AppController {
 
   @Page()
   @Get("/")
-  public index(): PageProps {
-    return {};
+  public index(): IndexProps {
+    return { token: randomBytes(32).toString("hex") };
   }
 
   @Page()

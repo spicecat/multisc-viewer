@@ -8,11 +8,12 @@
     Pagination,
     Row,
   } from "@smui/data-table";
+  import LinearProgress from "@smui/linear-progress";
   import IconButton from "@smui/icon-button";
   import Radio from "@smui/radio";
   import Select, { Option } from "@smui/select";
 
-  let { data = [], columns = [], selected = $bindable() } = $props();
+  let { data = [], columns = [], selected = $bindable(), loaded=true } = $props();
   let id = $derived(columns[0]?.key),
     sort = $state(""),
     sortDirection: "ascending" | "descending" = $state("ascending");
@@ -83,6 +84,13 @@
       {/each}
     </Row>
   </Head>
+  {#snippet progress()}
+    <LinearProgress
+      indeterminate
+      closed={loaded}
+      aria-label="Data is being loaded..."
+    />
+  {/snippet}
   <Body>
     {#each slice as item (item[id])}
       <Row>

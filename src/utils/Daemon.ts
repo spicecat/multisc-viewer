@@ -16,13 +16,18 @@ interface ProcRecord {
 
 export class Daemon {
   private readonly proc: ChildProcessWithoutNullStreams;
-
   private _acks: ((opid: string) => boolean)[];
   private _datasets: DSRecord[];
   private _idle: Promise<void>;
 
   public constructor() {
     this.proc = spawn("Rscript", ["daemon.r"]);
+
+    this.proc.stdin.on("error", (error: NodeJS.ErrnoException) => {
+      if (error.code === "EPIPE")
+        console.error("EPIPE error: child process pipe is closed.", error);
+      else console.error("Error on stdin:", error);
+    });
 
     this._acks = [];
     this._datasets = [];
@@ -50,7 +55,7 @@ export class Daemon {
   }
 
   public exec(
-    executor: (proc: ChildProcessWithoutNullStreams, opid: string) => void
+    executor: (proc: ChildProcessWithoutNullStreams, opid: string) => void,
   ): Promise<void> {
     const opid = randomBytes(16).toString("hex");
 
@@ -87,7 +92,7 @@ export class Daemon {
     ds: string,
     gene: string,
     groupBy: string,
-    splitBy: string
+    splitBy: string,
   ): Promise<string> {
     if (!this._datasets.some((dataset) => dataset.ds === ds))
       throw new Error(`Attempt to render unloaded dataset ${ds}`);
@@ -106,11 +111,11 @@ export class Daemon {
 
     this._datasets.splice(
       this._datasets.findIndex((dataset) => dataset.ds === ds),
-      1
+      1,
     );
 
     return this.exec((proc, opid) =>
-      proc.stdin.write(`${opid} unload ${ds}\n`)
+      proc.stdin.write(`${opid} unload ${ds}\n`),
     );
   }
 

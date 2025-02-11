@@ -10,10 +10,13 @@
     columns = [],
     selected = $bindable(),
     searchOptions = {},
+    loaded = true,
   } = $props();
 
   let defaultSearchOptions = $derived({
       keys: columns.map(({ key }) => key),
+      threshold: 0.0,
+      ignoreLocation: true,
       useExtendedSearch: true,
     }),
     fuse = $derived(
@@ -33,4 +36,4 @@
     <IconButton class="material-icons">search</IconButton>
   {/snippet}
 </TextField>
-<DataTable data={filteredItems} {columns} bind:selected />
+<DataTable data={filteredItems} {columns} bind:selected {loaded} />

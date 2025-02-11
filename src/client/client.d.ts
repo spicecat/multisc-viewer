@@ -48,6 +48,10 @@ declare module "$meta" {
   export default state;
 }
 
+interface IndexProps extends PageProps {
+  token: string;
+}
+
 interface CompareProps extends PageProps {
   genes: string[];
   gene: string;
@@ -58,4 +62,9 @@ interface PlotConfig {
   selectedGene: string;
   groupBy: string;
   splitBy: string;
+}
+
+interface RenderResult {
+  violin: string;
+  clustering: string;
 }
