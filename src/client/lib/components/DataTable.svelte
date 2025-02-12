@@ -13,7 +13,12 @@
   import Radio from "@smui/radio";
   import Select, { Option } from "@smui/select";
 
-  let { data = [], columns = [], selected = $bindable(), loaded=true } = $props();
+  let {
+    data = [],
+    columns = [],
+    selected = $bindable(),
+    loaded = true,
+  } = $props();
   let id = $derived(columns[0]?.key),
     sort = $state(""),
     sortDirection: "ascending" | "descending" = $state("ascending");
@@ -53,7 +58,7 @@
   bind:sort
   bind:sortDirection
   table$aria-label="Data table"
-  style="width: 100%;"
+  style="flex: 1;"
   sortAscendingAriaLabel=""
   sortDescendingAriaLabel=""
 >

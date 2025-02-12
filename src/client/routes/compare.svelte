@@ -1,6 +1,7 @@
 <script lang="ts">
   import ChartDisplay from "$lib/components/ChartDisplay.svelte";
   import DataTableSearch from "$lib/components/DataTableSearch.svelte";
+  import Navbar from "$lib/components/Navbar.svelte";
   import IconButton from "@smui/icon-button";
   import meta from "$meta";
   import { dndzone } from "svelte-dnd-action";
@@ -34,6 +35,7 @@
   const geneColumns = [{ key: "", label: "Gene" }];
 </script>
 
+<Navbar />
 <div class="row controls">
   <div class="nav">
     <a href="/" role="button">Back</a>

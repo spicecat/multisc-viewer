@@ -2,6 +2,7 @@
   import DataTable from "$lib/components/DataTable.svelte";
   import IconButton from "@smui/icon-button";
   import TextField from "@smui/textfield";
+  import { Cell, InnerGrid } from "@smui/layout-grid";
   import Fuse from "fuse.js";
 
   let {
@@ -31,9 +32,15 @@
     );
 </script>
 
-<TextField bind:value={query} {label}>
-  {#snippet leadingIcon()}
-    <IconButton class="material-icons">search</IconButton>
-  {/snippet}
-</TextField>
-<DataTable data={filteredItems} {columns} bind:selected {loaded} />
+<InnerGrid style="background-color:aliceblue;">
+  <Cell span={12}>
+    <TextField bind:value={query} {label} style="width: 100%;">
+      {#snippet leadingIcon()}
+        <IconButton class="material-icons">search</IconButton>
+      {/snippet}
+    </TextField>
+  </Cell>
+  <Cell span={12} style="background-color:red;">
+    <DataTable data={filteredItems} {columns} bind:selected {loaded} />
+  </Cell>
+</InnerGrid>

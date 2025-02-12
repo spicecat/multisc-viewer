@@ -2292,7 +2292,7 @@
     "@material/image-list" "^14.0.0"
     "@smui/common" "^8.0.0-beta.3"
 
-"@smui/layout-grid@8.0.0-beta.3", "@smui/layout-grid@^8.0.0-beta.3":
+"@smui/layout-grid@^8.0.0-beta.3":
   version "8.0.0-beta.3"
   resolved "https://registry.yarnpkg.com/@smui/layout-grid/-/layout-grid-8.0.0-beta.3.tgz#bcf21a42aced02a483aa8bdf0c84aa334a56a2d2"
   integrity sha512-YbK/3ppXONkeMKsHQMgAVKO8NQ/y+I4tMe2fAklXnU/q7UnoG8ltcD2zv9Y8M0fF7psDYl3Agt122ASyvZtnxQ==

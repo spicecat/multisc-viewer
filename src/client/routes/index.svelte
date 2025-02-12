@@ -1,7 +1,9 @@
 <script lang="ts">
   import DataTableSearch from "$lib/components/DataTableSearch.svelte";
+  import Navbar from "$lib/components/Navbar.svelte";
   import Button, { Label } from "@smui/button";
   import IconButton from "@smui/icon-button";
+  import LayoutGrid, { Cell } from "@smui/layout-grid";
   import debounce from "lodash.debounce";
   import { onMount } from "svelte";
 
@@ -63,44 +65,53 @@
     geneColumns = [{ key: "", label: "Gene" }];
 </script>
 
-<main class="container">
-  <h1>Dataset Comparison</h1>
+<svelte:head>
+  <title>Dataset Comparison</title>
+</svelte:head>
 
-  <div class="row">
-    <div>
-      <h4>Group By:</h4>
-      <p>{groupBy}</p>
+<Navbar />
+<LayoutGrid>
+  <Cell span={12}>
+    <div class="row">
+      <div>
+        <h4>Group By:</h4>
+        <p>{groupBy}</p>
+      </div>
+      <IconButton
+        class="material-icons"
+        onclick={() => {
+          groupBy = splitBy;
+        }}>swap_horiz</IconButton
+      >
+      <div>
+        <h4>Split By:</h4>
+        <p>{splitBy}</p>
+      </div>
+      <Button onclick={plot} variant="raised">
+        <Label>Plot</Label>
+      </Button>
     </div>
-    <IconButton
-      class="material-icons"
-      onclick={() => {
-        groupBy = splitBy;
-      }}>swap_horiz</IconButton
-    >
-    <div>
-      <h4>Split By:</h4>
-      <p>{splitBy}</p>
-    </div>
-    <Button onclick={plot} variant="raised">
-      <Label>Plot</Label>
-    </Button>
-  </div>
+  </Cell>
 
-  <DataTableSearch
-    label="Datasets"
-    data={datasets}
-    columns={datasetColumns}
-    bind:selected={selectedDatasets}
-    loaded={loadedDatasets}
-  />
-  <DataTableSearch
-    label="Genes"
-    data={genes}
-    columns={geneColumns}
-    bind:selected={selectedGene}
-    loaded={loadedGenes}
-  />
-</main>
+  <Cell span={6}>
+    <DataTableSearch
+      label="Datasets"
+      data={datasets}
+      columns={datasetColumns}
+      bind:selected={selectedDatasets}
+      loaded={loadedDatasets}
+    />
+  </Cell>
+  <Cell span={6}>
+    <DataTableSearch
+      label="Genes"
+      data={genes}
+      columns={geneColumns}
+      bind:selected={selectedGene}
+      loaded={loadedGenes}
+    />
+  </Cell>
+</LayoutGrid>
 
 <style>
   .row {
