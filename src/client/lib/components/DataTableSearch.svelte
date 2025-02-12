@@ -2,7 +2,7 @@
   import DataTable from "$lib/components/DataTable.svelte";
   import IconButton from "@smui/icon-button";
   import TextField from "@smui/textfield";
-  import { Cell, InnerGrid } from "@smui/layout-grid";
+  import LayoutGrid, { Cell } from "@smui/layout-grid";
   import Fuse from "fuse.js";
 
   let {
@@ -32,7 +32,7 @@
     );
 </script>
 
-<InnerGrid style="background-color:aliceblue;">
+<LayoutGrid>
   <Cell span={12}>
     <TextField bind:value={query} {label} style="width: 100%;">
       {#snippet leadingIcon()}
@@ -40,7 +40,7 @@
       {/snippet}
     </TextField>
   </Cell>
-  <Cell span={12} style="background-color:red;">
+  <Cell span={12}>
     <DataTable data={filteredItems} {columns} bind:selected {loaded} />
   </Cell>
-</InnerGrid>
+</LayoutGrid>

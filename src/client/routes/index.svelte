@@ -3,7 +3,7 @@
   import Navbar from "$lib/components/Navbar.svelte";
   import Button, { Label } from "@smui/button";
   import IconButton from "@smui/icon-button";
-  import LayoutGrid, { Cell } from "@smui/layout-grid";
+  import LayoutGrid, { Cell, InnerGrid } from "@smui/layout-grid";
   import debounce from "lodash.debounce";
   import { onMount } from "svelte";
 
@@ -71,29 +71,36 @@
 
 <Navbar />
 <LayoutGrid>
-  <Cell span={12}>
-    <div class="row">
-      <div>
-        <h4>Group By:</h4>
-        <p>{groupBy}</p>
-      </div>
-      <IconButton
-        class="material-icons"
-        onclick={() => {
-          groupBy = splitBy;
-        }}>swap_horiz</IconButton
-      >
-      <div>
-        <h4>Split By:</h4>
-        <p>{splitBy}</p>
-      </div>
-      <Button onclick={plot} variant="raised">
-        <Label>Plot</Label>
-      </Button>
-    </div>
+  <Cell span={12} class="controls">
+    <InnerGrid>
+      <Cell span={2}>
+        <div>
+          <h4>Group By:</h4>
+          <p>{groupBy}</p>
+        </div>
+      </Cell>
+      <Cell span={2}>
+        <IconButton
+          class="material-icons"
+          onclick={() => {
+            groupBy = splitBy;
+          }}>swap_horiz</IconButton
+        >
+      </Cell>
+      <Cell span={2}>
+        <div>
+          <h4>Split By:</h4>
+          <p>{splitBy}</p>
+        </div>
+      </Cell>
+      <Cell>
+        <Button onclick={plot} variant="raised">
+          <Label>Plot</Label>
+        </Button>
+      </Cell>
+    </InnerGrid>
   </Cell>
-
-  <Cell span={6}>
+</LayoutGrid>
     <DataTableSearch
       label="Datasets"
       data={datasets}
@@ -101,8 +108,6 @@
       bind:selected={selectedDatasets}
       loaded={loadedDatasets}
     />
-  </Cell>
-  <Cell span={6}>
     <DataTableSearch
       label="Genes"
       data={genes}
@@ -110,15 +115,14 @@
       bind:selected={selectedGene}
       loaded={loadedGenes}
     />
-  </Cell>
-</LayoutGrid>
 
 <style>
-  .row {
+  :global(.controls) {
+    display: flex;
+  }
+
+  :global(.controls .mdc-layout-grid__cell) {
     display: flex;
     align-items: center;
-  }
-  .row > div {
-    margin: 2em;
   }
 </style>

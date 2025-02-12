@@ -58,7 +58,6 @@
   bind:sort
   bind:sortDirection
   table$aria-label="Data table"
-  style="flex: 1;"
   sortAscendingAriaLabel=""
   sortDescendingAriaLabel=""
 >
