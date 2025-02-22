@@ -106,7 +106,7 @@
     {/if}
   </article>
 </dialog>
-
+<!-- 
 <style lang="scss">
   @keyframes spin {
     0% {
@@ -152,4 +152,4 @@
       }
     }
   }
-</style>
+</style> -->
