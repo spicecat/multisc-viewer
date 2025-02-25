@@ -70,7 +70,7 @@
 
 <Navbar />
 <div style="display: flex;align-items: center;">
-  <GeneControls bind:groupBy {splitBy} />
+  <GeneControls bind:groupBy />
   <Button onclick={plot} variant="raised" disabled={!selectedDatasets.length}>
     <Label>Plot</Label>
   </Button>

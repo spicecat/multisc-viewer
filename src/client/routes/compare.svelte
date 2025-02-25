@@ -1,5 +1,6 @@
 <script lang="ts">
   import ChartDisplay from "$lib/components/ChartDisplay.svelte";
+  import GeneControls from "$lib/components/GeneControls.svelte";
   import DataTableSearch from "$lib/components/DataTableSearch.svelte";
   import Navbar from "$lib/components/Navbar.svelte";
   import IconButton from "@smui/icon-button";
@@ -37,27 +38,7 @@
 
 <Navbar />
 <div class="row controls">
-  <div class="nav">
-    <a href="/" role="button">Back</a>
-  </div>
-  <div class="group-split">
-    <div class="row">
-      <div>
-        <h4>Group By:</h4>
-        <p>{groupBy}</p>
-      </div>
-      <IconButton
-        class="material-icons"
-        onclick={() => {
-          groupBy = splitBy;
-        }}>swap_horiz</IconButton
-      >
-      <div>
-        <h4>Split By:</h4>
-        <p>{splitBy}</p>
-      </div>
-    </div>
-  </div>
+  <GeneControls bind:groupBy />
   <DataTableSearch
     label="Gene"
     data={genes}
