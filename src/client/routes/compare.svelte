@@ -1,10 +1,20 @@
 <script lang="ts">
   import ChartDisplay from "$lib/components/ChartDisplay.svelte";
-  import GeneControls from "$lib/components/GeneControls.svelte";
-  import DataTableSearch from "$lib/components/DataTableSearch.svelte";
+  import GeneGroupSplit from "$lib/components/GeneControls/GeneGroupSplit.svelte";
+  import DataTableSearch from "$lib/components/DataTable/DataTableSearch.svelte";
   import Navbar from "$lib/components/Navbar.svelte";
   import IconButton from "@smui/icon-button";
+  import Drawer, {
+    AppContent,
+    Content,
+    Header,
+    Title,
+    Subtitle,
+    Scrim,
+  } from "@smui/drawer";
+  import List, { Item, Text } from "@smui/list";
   import meta from "$meta";
+  import Button, { Label } from "@smui/button";
   import { dndzone } from "svelte-dnd-action";
   import { self } from "svelte/legacy";
 
@@ -16,7 +26,8 @@
     selectedGene: string = $state(gene),
     dsOrder = $state(order.map((ds) => ({ id: ds }))),
     bigView: boolean = $state(false),
-    bigViewCharts: (Promise<RenderResult> | null)[] = $state([null, null]);
+    bigViewCharts: (Promise<RenderResult> | null)[] = $state([null, null]),
+    geneControlsOpen = $state(false);
 
   const splitBy = $derived(groupBy === "Genotype" ? "CellType" : "Genotype"),
     config = $derived({ selectedGene, groupBy, splitBy });
@@ -37,27 +48,43 @@
 </script>
 
 <Navbar />
-<div class="row controls">
-  <GeneControls bind:groupBy />
-  <DataTableSearch
-    label="Gene"
-    data={genes}
-    columns={geneColumns}
-    bind:selected={selectedGene}
-  />
-</div>
-<div
-  class="row charts"
-  use:dndzone={{ items: dsOrder }}
-  onconsider={(evt) => (dsOrder = evt.detail.items)}
-  onfinalize={(evt) => (dsOrder = evt.detail.items)}
->
-  {#each dsOrder as { id: dataset } (dataset)}
-    <ChartDisplay {dataset} {config} {bigView} {bigViewCharts} />
-  {/each}
+
+<div class="drawer-container">
+  <Drawer variant="modal" bind:open={geneControlsOpen}>
+    <Header>
+      <Title>Gene Controls</Title>
+    </Header>
+    <Content class="drawer-content">
+      <GeneGroupSplit bind:groupBy />
+      <DataTableSearch
+        label="Gene"
+        data={genes}
+        columns={geneColumns}
+        bind:selected={selectedGene}
+      />
+    </Content>
+  </Drawer>
+  <Scrim />
+  <AppContent>
+    <div class="row controls">
+      <Button onclick={() => (geneControlsOpen = !geneControlsOpen)}>
+        <Label>Open Gene Controls</Label>
+      </Button>
+    </div>
+    <div
+      class="row charts"
+      use:dndzone={{ items: dsOrder }}
+      onconsider={(evt) => (dsOrder = evt.detail.items)}
+      onfinalize={(evt) => (dsOrder = evt.detail.items)}
+    >
+      {#each dsOrder as { id: dataset } (dataset)}
+        <ChartDisplay {dataset} {config} {bigView} {bigViewCharts} />
+      {/each}
+    </div>
+  </AppContent>
 </div>
 
-<dialog
+<!-- <dialog
   open={!!(bigView && bigViewCharts[0] && bigViewCharts[1])}
   onclick={self(() => {
     bigView = false;
@@ -86,9 +113,22 @@
       </div>
     {/if}
   </article>
-</dialog>
-<!-- 
+</dialog> -->
+
 <style lang="scss">
+  .drawer-container {
+    display: flex;
+  }
+
+  .drawer-content {
+    display: table;
+  }
+
+  :global(.mdc-drawer--modal.mdc-drawer--open) {
+    position: relative;
+    display: table;
+  }
+
   @keyframes spin {
     0% {
       transform: rotate(0deg);
@@ -133,4 +173,4 @@
       }
     }
   }
-</style> -->
+</style>

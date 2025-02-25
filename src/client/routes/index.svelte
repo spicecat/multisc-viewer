@@ -1,6 +1,6 @@
 <script lang="ts">
-  import DataTableSearch from "$lib/components/DataTableSearch.svelte";
-  import GeneControls from "$lib/components/GeneControls.svelte";
+  import DataTableSearch from "$lib/components/DataTable/DataTableSearch.svelte";
+  import GeneGroupSplit from "$lib/components/GeneControls/GeneGroupSplit.svelte";
   import Navbar from "$lib/components/Navbar.svelte";
   import Button, { Label } from "@smui/button";
   import debounce from "lodash.debounce";
@@ -70,7 +70,7 @@
 
 <Navbar />
 <div style="display: flex;align-items: center;">
-  <GeneControls bind:groupBy />
+  <GeneGroupSplit bind:groupBy />
   <Button onclick={plot} variant="raised" disabled={!selectedDatasets.length}>
     <Label>Plot</Label>
   </Button>

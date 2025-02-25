@@ -1,5 +1,5 @@
 <script lang="ts">
-  import DataTable from "$lib/components/DataTable.svelte";
+  import DataTable from "$lib/components/DataTable/DataTable.svelte";
   import IconButton from "@smui/icon-button";
   import TextField from "@smui/textfield";
   import { Cell, InnerGrid } from "@smui/layout-grid";
