@@ -59,7 +59,7 @@ while (ln != "quit") {
 
       png(
         sprintf("./datasets/%s/%s_vln.png", ds, opid),
-        width = 13 * 300, height = 13 * 300, res = 300, pointsize = 4
+        width = 3 * 300, height = 3 * 300, res = 300, pointsize = 4
       )
       vln <- VlnPlot(
         datasets[[ds]],
