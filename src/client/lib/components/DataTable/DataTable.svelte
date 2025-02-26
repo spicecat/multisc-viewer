@@ -1,15 +1,16 @@
 <script lang="ts">
+  import { makeTitle } from "$lib/utils/utils";
   import Checkbox from "@smui/checkbox";
   import DataTable, {
-    Body,
-    Cell,
-    Head,
-    Label,
-    Pagination,
-    Row,
+  	Body,
+  	Cell,
+  	Head,
+  	Label,
+  	Pagination,
+  	Row,
   } from "@smui/data-table";
-  import LinearProgress from "@smui/linear-progress";
   import IconButton from "@smui/icon-button";
+  import LinearProgress from "@smui/linear-progress";
   import Radio from "@smui/radio";
   import Select, { Option } from "@smui/select";
 
@@ -109,7 +110,7 @@
         {/if}
         {#each columns as { key }}
           <Cell numeric={typeof item[key] === "number"}>
-            {item[key]}
+            {key === 'name' ? makeTitle(item[key]) : item[key]}
           </Cell>
         {/each}
       </Row>
