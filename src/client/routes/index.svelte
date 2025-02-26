@@ -1,18 +1,14 @@
 <script lang="ts">
   import DataTableSearch from "$lib/components/DataTable/DataTableSearch.svelte";
-  import GeneGroupSplit from "$lib/components/GeneControls/GeneGroupSplit.svelte";
   import GeneControlsDrawer from "$lib/components/GeneControls/GeneControlsDrawer.svelte";
+  import GeneControlsDrawerToggle from "$lib/components/GeneControls/GeneControlsDrawerToggle.svelte";
   import Navbar from "$lib/components/Navbar.svelte";
   import Button, { Label } from "@smui/button";
+  import {
+    AppContent
+  } from "@smui/drawer";
   import debounce from "lodash.debounce";
   import { onMount } from "svelte";
-  import Drawer, {
-    AppContent,
-    Content,
-    Header,
-    Title,
-    Scrim,
-  } from "@smui/drawer";
 
   const { token }: IndexProps = $props();
 
@@ -86,38 +82,20 @@
     {geneControlsOpen}
   />
   <AppContent>
-    <!-- <GeneGroupSplit bind:groupBy /> -->
     <div>
-      <Button
-        onclick={() => (geneControlsOpen = !geneControlsOpen)}
-        variant="raised"
-      >
-        <Label>Open Gene Controls</Label>
-      </Button>
-      <Button
-        variant="raised"
-        {...selectedDatasets.length
-          ? {
-              href: `/compare?datasets=${selectedDatasets.join(",")}&gene=${selectedGene}&groupBy=${groupBy}&splitBy=${splitBy}`,
-            }
-          : { disabled: true }}
-      >
-        <Label>Plot</Label>
-      </Button>
-      <Button
-        variant="raised"
-        href="https://google.com"
-        {...selectedDatasets.length
-          ? {
-              href: `/compare?datasets=${selectedDatasets.join(",")}&gene=${selectedGene}&groupBy=${groupBy}&splitBy=${splitBy}`,
-            }
-          : {
-            href: "javascript:void(0);",
-            disabled: true
-             }}
-      >
-        <Label>Plot</Label>
-      </Button>
+      <GeneControlsDrawerToggle bind:geneControlsOpen />
+      {#if selectedDatasets.length}
+        <Button
+          variant="raised"
+          href={`/compare?datasets=${selectedDatasets.join(",")}&gene=${selectedGene}&groupBy=${groupBy}&splitBy=${splitBy}`}
+        >
+          <Label>Plot</Label>
+        </Button>
+      {:else}
+        <Button variant="raised" {...{disabled:true}}>
+          <Label>Plot</Label>
+        </Button>
+      {/if}
     </div>
     <DataTableSearch
       label="Datasets"

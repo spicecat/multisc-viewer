@@ -1,7 +1,7 @@
 <script lang="ts">
   import ChartDisplay from "$lib/components/ChartDisplay.svelte";
-  import GeneGroupSplit from "$lib/components/GeneControls/GeneGroupSplit.svelte";
-  import DataTableSearch from "$lib/components/DataTable/DataTableSearch.svelte";
+  import GeneControlsDrawer from "$lib/components/GeneControls/GeneControlsDrawer.svelte";
+  import GeneControlsDrawerToggle from "$lib/components/GeneControls/GeneControlsDrawerToggle.svelte";
   import Navbar from "$lib/components/Navbar.svelte";
   import IconButton from "@smui/icon-button";
   import Drawer, {
@@ -47,30 +47,18 @@
 
 <Navbar />
 
-<div class="drawer-container">
-  <Drawer variant="modal" bind:open={geneControlsOpen}>
-    <Header>
-      <Title>Gene Controls</Title>
-    </Header>
-    <Content class="drawer-content">
-      <GeneGroupSplit bind:groupBy />
-      <DataTableSearch
-        label="Gene"
-        data={genes}
-        columns={geneColumns}
-        bind:selected={selectedGene}
-      />
-    </Content>
-  </Drawer>
+<div style="display: flex;">
+  <GeneControlsDrawer
+    {genes}
+    bind:selectedGene
+    loadedGenes={true}
+    bind:groupBy
+    {geneControlsOpen}
+  />
   <Scrim />
   <AppContent>
-    <div class="row controls">
-      <Button
-        onclick={() => (geneControlsOpen = !geneControlsOpen)}
-        variant="raised"
-      >
-        <Label>Open Gene Controls</Label>
-      </Button>
+    <div>
+      <GeneControlsDrawerToggle bind:geneControlsOpen />
     </div>
     <div
       class="row charts"
@@ -117,19 +105,6 @@
 </dialog> -->
 
 <style lang="scss">
-  .drawer-container {
-    display: flex;
-  }
-
-  .drawer-content {
-    display: table;
-  }
-
-  :global(.mdc-drawer--modal.mdc-drawer--open) {
-    position: relative;
-    display: table;
-  }
-
   @keyframes spin {
     0% {
       transform: rotate(0deg);
@@ -144,17 +119,9 @@
     animation: spin 1s linear infinite;
   }
 
-  .controls {
-    height: 300px;
-    gap: 1em;
-
-    h2 {
-      margin-bottom: 8px;
-    }
-  }
-
   .charts {
     max-width: 100vw;
+    display: flex;
   }
 
   .big-modal {
@@ -174,4 +141,5 @@
       }
     }
   }
+
 </style>
