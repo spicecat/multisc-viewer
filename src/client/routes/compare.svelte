@@ -9,10 +9,8 @@
     Content,
     Header,
     Title,
-    Subtitle,
     Scrim,
   } from "@smui/drawer";
-  import List, { Item, Text } from "@smui/list";
   import meta from "$meta";
   import Button, { Label } from "@smui/button";
   import { dndzone } from "svelte-dnd-action";
@@ -67,7 +65,10 @@
   <Scrim />
   <AppContent>
     <div class="row controls">
-      <Button onclick={() => (geneControlsOpen = !geneControlsOpen)}>
+      <Button
+        onclick={() => (geneControlsOpen = !geneControlsOpen)}
+        variant="raised"
+      >
         <Label>Open Gene Controls</Label>
       </Button>
     </div>

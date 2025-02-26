@@ -3,7 +3,7 @@
   import Button from "@smui/button";
 </script>
 
-<TopAppBar variant="standard" dense>
+<TopAppBar variant="standard" dense style="top: 0; left: 0;">
   <Row>
     <Section>
       <Button href="/">
