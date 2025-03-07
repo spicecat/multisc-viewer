@@ -10,9 +10,6 @@ library(parallel)
 
 stdin <- file("stdin", "r")
 
-genotype_colors <- readRDS(
-  file = "./datasets/genotype_colors.rds", refhook = NULL
-)
 datasets <- list()
 
 ln <- readLines(stdin, n = 1)
@@ -37,10 +34,12 @@ while (ln != "quit") {
       split_by <- cmd[6]
 
       if (group_by == "Genotype") {
-        colors <- genotype_colors
+        colors <- readRDS(
+          file = sprintf("./datasets/%s/genotype.colors.rds", ds), refhook = NULL
+        )
       } else {
         colors <- readRDS(
-          file = sprintf("./datasets/%s/colors.rds", ds), refhook = NULL
+          file = sprintf("./datasets/%s/cluster.colors.rds", ds), refhook = NULL
         )
       }
 

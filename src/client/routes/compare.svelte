@@ -12,7 +12,6 @@
 
   const { genes, gene, order }: CompareProps = $props();
   const { query } = meta;
-  console.log(genes, gene, order);
 
   let groupBy: string = $state("Genotype"),
     selectedGene: string = $state(gene),
