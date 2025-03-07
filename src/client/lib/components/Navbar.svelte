@@ -3,7 +3,7 @@
   import Button from "@smui/button";
 </script>
 
-<TopAppBar variant="standard" dense style="top: 0; left: 0;">
+<TopAppBar variant="standard" dense style="top: 0; left: 0; position: relative; margin-bottom: 1rem;">
   <Row>
     <Section>
       <Button href="/">
@@ -12,6 +12,3 @@
     </Section>
   </Row>
 </TopAppBar>
-
-<br />
-<br />

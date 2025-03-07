@@ -3,18 +3,12 @@
   import GeneControlsDrawer from "$lib/components/GeneControls/GeneControlsDrawer.svelte";
   import GeneControlsDrawerToggle from "$lib/components/GeneControls/GeneControlsDrawerToggle.svelte";
   import Navbar from "$lib/components/Navbar.svelte";
-  import IconButton from "@smui/icon-button";
-  import Drawer, {
-    AppContent,
-    Content,
-    Header,
-    Title,
-    Scrim,
-  } from "@smui/drawer";
   import meta from "$meta";
-  import Button, { Label } from "@smui/button";
+  import {
+    AppContent,
+    Scrim
+  } from "@smui/drawer";
   import { dndzone } from "svelte-dnd-action";
-  import { self } from "svelte/legacy";
 
   const { genes, gene, order }: CompareProps = $props();
   const { query } = meta;
@@ -42,7 +36,6 @@
         `/compare?datasets=${query.datasets}&gene=${selectedGene}&groupBy=${groupBy}&splitBy=${splitBy}`
       );
   });
-  const geneColumns = [{ key: "", label: "Gene" }];
 </script>
 
 <Navbar />
