@@ -50,7 +50,7 @@ export class Daemon {
   }
 
   public exec(
-    executor: (proc: ChildProcessWithoutNullStreams, opid: string) => void
+    executor: (proc: ChildProcessWithoutNullStreams, opid: string) => void,
   ): Promise<void> {
     const opid = randomBytes(16).toString("hex");
 
@@ -87,7 +87,7 @@ export class Daemon {
     ds: string,
     gene: string,
     groupBy: string,
-    splitBy: string
+    splitBy: string,
   ): Promise<string> {
     if (!this._datasets.some((dataset) => dataset.ds === ds))
       throw new Error(`Attempt to render unloaded dataset ${ds}`);
@@ -106,11 +106,11 @@ export class Daemon {
 
     this._datasets.splice(
       this._datasets.findIndex((dataset) => dataset.ds === ds),
-      1
+      1,
     );
 
     return this.exec((proc, opid) =>
-      proc.stdin.write(`${opid} unload ${ds}\n`)
+      proc.stdin.write(`${opid} unload ${ds}\n`),
     );
   }
 

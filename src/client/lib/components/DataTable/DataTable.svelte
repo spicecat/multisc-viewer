@@ -20,13 +20,12 @@
     selected = $bindable(),
     loaded = true,
   } = $props();
-  let items = $state.raw(data),
-    id = $derived(columns[0]?.key),
+  let id = $derived(columns[0]?.key),
     sort = $state(""),
     sortDirection: "ascending" | "descending" = $state("ascending");
 
-  function handleSort() {
-    items = [...data]
+  let items = $derived(
+    [...data]
       .map((item) =>
         item && typeof item === "object" && !Array.isArray(item)
           ? item
@@ -39,8 +38,8 @@
         if (typeof aVal === "string" && typeof bVal === "string")
           return aVal.localeCompare(bVal);
         return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
-      });
-  }
+      })
+  );
 
   let perPage = $state(10),
     currentPage = $state(0),
@@ -59,7 +58,6 @@
   stickyHeader
   bind:sort
   bind:sortDirection
-  onSMUIDataTableSorted={handleSort}
   table$aria-label="Data table"
 >
   <Head>
