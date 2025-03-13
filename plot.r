@@ -1,9 +1,6 @@
-packages <- c(
-  "Seurat", "sctransform", "RColorBrewer",
-  "ggplot2", "cowplot", "gplots", "dplyr"
-)
-new_packages <- packages[!(packages %in% installed.packages()[, "Package"])]
-if (length(new_packages)) install.packages(new_packages)
+# packages <- c("Seurat")
+# new_packages <- packages[!(packages %in% installed.packages()[, "Package"])]
+# if (length(new_packages)) install.packages(new_packages)
 
 start <- Sys.time()
 library(Seurat)

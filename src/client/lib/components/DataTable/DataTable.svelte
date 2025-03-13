@@ -2,12 +2,12 @@
   import { makeTitle } from "$lib/utils/utils";
   import Checkbox from "@smui/checkbox";
   import DataTable, {
-  	Body,
-  	Cell,
-  	Head,
-  	Label,
-  	Pagination,
-  	Row,
+    Body,
+    Cell,
+    Head,
+    Label,
+    Pagination,
+    Row,
   } from "@smui/data-table";
   import IconButton from "@smui/icon-button";
   import LinearProgress from "@smui/linear-progress";
@@ -20,11 +20,13 @@
     selected = $bindable(),
     loaded = true,
   } = $props();
-  let id = $derived(columns[0]?.key),
+  let items = $state.raw(data),
+    id = $derived(columns[0]?.key),
     sort = $state(""),
     sortDirection: "ascending" | "descending" = $state("ascending");
-  let items = $derived(
-    [...data]
+
+  function handleSort() {
+    items = [...data]
       .map((item) =>
         item && typeof item === "object" && !Array.isArray(item)
           ? item
@@ -36,14 +38,13 @@
         ]();
         if (typeof aVal === "string" && typeof bVal === "string")
           return aVal.localeCompare(bVal);
-        return Number(aVal) - Number(bVal);
-      })
-  );
+        return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+      });
+  }
 
   let perPage = $state(10),
-    currentPage = $state(0);
-
-  let start = $derived(currentPage * perPage),
+    currentPage = $state(0),
+    start = $derived(currentPage * perPage),
     end = $derived(Math.min(start + perPage, items.length)),
     slice = $derived(items.slice(start, end)),
     lastPage = $derived(Math.max(Math.ceil(items.length / perPage) - 1, 0));
@@ -58,9 +59,8 @@
   stickyHeader
   bind:sort
   bind:sortDirection
+  onSMUIDataTableSorted={handleSort}
   table$aria-label="Data table"
-  sortAscendingAriaLabel=""
-  sortDescendingAriaLabel=""
 >
   <Head>
     <Row>
@@ -71,19 +71,15 @@
           {/if}
         </Cell>
       {/if}
-      {#each columns as { key, label, sortable = false }}
+      {#each columns as { key, label, sortable = true }}
         <Cell
           columnId={key}
           numeric={typeof items[0]?.[key] === "number"}
           {sortable}
         >
           <Label>{label}</Label>
-          {#if sortable && key === sort}
-            <IconButton class="material-icons">
-              {sortDirection === "ascending"
-                ? "arrow_upward"
-                : "arrow_downward"}
-            </IconButton>
+          {#if sortable}
+            <IconButton class="material-icons">arrow_upward</IconButton>
           {/if}
         </Cell>
       {/each}
@@ -110,7 +106,7 @@
         {/if}
         {#each columns as { key }}
           <Cell numeric={typeof item[key] === "number"}>
-            {key === 'name' ? makeTitle(item[key]) : item[key]}
+            {key === "name" ? makeTitle(item[key]) : item[key]}
           </Cell>
         {/each}
       </Row>

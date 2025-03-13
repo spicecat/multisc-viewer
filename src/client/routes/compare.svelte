@@ -37,9 +37,12 @@
   });
 </script>
 
-<Navbar />
+<svelte:head>
+  <title>Dataset Comparison Plot</title>
+</svelte:head>
 
-<div style="display: flex;">
+<Navbar />
+<div style="display: flex; gap: 1rem;">
   <GeneControlsDrawer
     {genes}
     bind:selectedGene

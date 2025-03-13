@@ -58,7 +58,7 @@
 
   const datasetColumns = [
       { key: "name", label: "Name" },
-      { key: "year", label: "Year", sortable: true },
+      { key: "year", label: "Year" },
       { key: "region", label: "Region" },
       { key: "PMID", label: "PMID" },
       { key: "species", label: "Species" },
@@ -69,11 +69,11 @@
 </script>
 
 <svelte:head>
-  <title>Dataset Comparison</title>
+  <title>Dataset Comparison Home</title>
 </svelte:head>
 
 <Navbar />
-<div style="display: flex;">
+<div style="display: flex; gap: 1rem;">
   <GeneControlsDrawer
     {genes}
     bind:selectedGene
