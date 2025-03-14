@@ -2,7 +2,6 @@
   import DataTable from "$lib/components/DataTable/DataTable.svelte";
   import IconButton from "@smui/icon-button";
   import TextField from "@smui/textfield";
-  import { Cell, InnerGrid } from "@smui/layout-grid";
   import Fuse from "fuse.js";
 
   let {

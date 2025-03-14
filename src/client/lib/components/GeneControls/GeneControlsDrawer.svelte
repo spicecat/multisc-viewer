@@ -32,10 +32,6 @@
 <div></div>
 
 <style lang="scss">
-  // .drawer-content {
-  //   display: table;
-  // }
-
   :global(.mdc-drawer) {
     position: relative;
   }

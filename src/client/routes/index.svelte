@@ -73,7 +73,7 @@
 </svelte:head>
 
 <Navbar />
-<div style="display: flex; gap: 1rem;">
+<div style="display: inline-flex; gap: 1rem;">
   <GeneControlsDrawer
     {genes}
     bind:selectedGene
@@ -104,12 +104,5 @@
       bind:selected={selectedDatasets}
       loaded={loadedDatasets}
     />
-    <!-- <DataTableSearch
-    label="Genes"
-    data={genes}
-    columns={geneColumns}
-    bind:selected={selectedGene}
-    loaded={loadedGenes}
-    /> -->
   </AppContent>
 </div>
