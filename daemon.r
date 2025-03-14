@@ -65,8 +65,8 @@ while (ln != "quit") {
         assay = "RNA",
         features = c(gene),
         pt.size = 0,
-        split.by = split_by,
-        group.by = group_by,
+        split.by = group_by,
+        group.by = split_by,
         cols = colors,
         ncol = 1
       )
