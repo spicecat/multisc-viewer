@@ -104,7 +104,11 @@
         {/if}
         {#each columns as { key }}
           <Cell numeric={typeof item[key] === "number"}>
-            {key === "name" ? makeTitle(item[key]) : item[key]}
+            {#if key === "url"}
+              <a href={item[key].href}>{item[key].name}</a>
+            {:else}
+              {key === "name" ? makeTitle(item[key]) : item[key]}
+            {/if}
           </Cell>
         {/each}
       </Row>

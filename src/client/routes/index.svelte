@@ -57,13 +57,14 @@
   });
 
   const datasetColumns = [
-      { key: "name", label: "Name" },
+      { key: "name", label: "Dataset" },
       { key: "year", label: "Year" },
       { key: "region", label: "Region" },
       { key: "PMID", label: "PMID" },
       { key: "species", label: "Species" },
       { key: "author", label: "Author" },
       { key: "disease", label: "Disease" },
+      { key: "study", label: "Study", url:true },
     ],
     geneColumns = [{ key: "", label: "Gene" }];
 </script>
