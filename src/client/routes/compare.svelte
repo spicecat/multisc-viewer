@@ -35,7 +35,7 @@
 </script>
 
 <svelte:head>
-  <title>Dataset Comparison Plot</title>
+  <title>MultiSC-Viewer Plot</title>
 </svelte:head>
 
 <Navbar />

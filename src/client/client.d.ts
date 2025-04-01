@@ -3,6 +3,18 @@
 
 type Writable<T> = import("svelte/store").Writable<T>;
 
+interface Dataset {
+  name: string;
+  year: number;
+  region: string[];
+  PMID: string;
+  species: string;
+  author: string;
+  disease: string[];
+  size: number;
+  cellType: string;
+}
+
 interface User {
   id: number;
   name: string;

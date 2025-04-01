@@ -4,12 +4,12 @@
 
   let studies = [
     {
-      study: { url: "study1", name: "Example Study 1" },
+      study: { href: "study1", name: "Example Study 1" },
       authors: "Author A, Author B",
       diseases: "Disease X, Disease Y",
     },
     {
-      study: { url: "study2", name: "Example Study 2" },
+      study: { href: "study2", name: "Example Study 2" },
       authors: "Author E",
       diseases: "Disease X, Disease Z",
     },
@@ -23,7 +23,7 @@
 </script>
 
 <svelte:head>
-  <title>Dataset Comparison About</title>
+  <title>MultiSC-Viewer About</title>
 </svelte:head>
 
 <Navbar />

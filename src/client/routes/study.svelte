@@ -4,7 +4,7 @@
 </script>
 
 <svelte:head>
-  <title>Dataset Comparison About</title>
+  <title>MultiSC-Viewer Study</title>
 </svelte:head>
 
 <Navbar />
@@ -13,4 +13,4 @@
   <p>Example study description.</p>
 </div>
 
-<!-- <DataTableSearch label="Studiess" data={studies} columns={studyColumns} /> -->
+<!-- <DataTableSearch label="Studies" data={studies} columns={studyColumns} /> -->

@@ -4,23 +4,30 @@
   import GeneControlsDrawerToggle from "$lib/components/GeneControls/GeneControlsDrawerToggle.svelte";
   import Navbar from "$lib/components/Navbar.svelte";
   import Button, { Label } from "@smui/button";
-  import {
-    AppContent
-  } from "@smui/drawer";
+  import { AppContent } from "@smui/drawer";
   import debounce from "lodash.debounce";
   import { onMount } from "svelte";
+  import Tab from "@smui/tab";
+  import TabBar from "@smui/tab-bar";
 
   const { token }: IndexProps = $props();
 
-  let datasets: object[] = $state([]),
+  let datasets: Dataset[] = $state([]),
     selectedDatasets: string[] = $state([]),
     loadedDatasets: boolean = $state(true),
-    genes: object[] = $state([]),
+    genes: string[] = $state([]),
     selectedGene: string = $state(""),
     loadedGenes: boolean = $state(true),
     groupBy: string = $state("Genotype"),
     splitBy = $derived(groupBy === "Genotype" ? "CellType" : "Genotype"),
-    geneControlsOpen = $state(true);
+    geneControlsOpen = $state(true),
+    cellType = $state("All"),
+    cellTypes = $derived(new Set(datasets.map((ds) => ds.cellType))),
+    cellDatasets = $derived(
+      cellType === "All"
+        ? datasets
+        : datasets.filter((ds) => ds.cellType === cellType)
+    );
   $effect(() => {
     if (selectedDatasets.length) debounce(fetchGenes, 1000)();
     else genes = [];
@@ -41,11 +48,6 @@
     }
   }
 
-  function plot(): void {
-    if (selectedDatasets.length)
-      window.location.href = `/compare?datasets=${selectedDatasets.join(",")}&gene=${selectedGene}&groupBy=${groupBy}&splitBy=${splitBy}`; // use goto
-  }
-
   onMount(() => {
     loadedDatasets = false;
     fetch("/datasets")
@@ -64,13 +66,12 @@
       { key: "species", label: "Species" },
       { key: "author", label: "Author" },
       { key: "disease", label: "Disease" },
-      { key: "study", label: "Study", url:true },
     ],
     geneColumns = [{ key: "", label: "Gene" }];
 </script>
 
 <svelte:head>
-  <title>Dataset Comparison Home</title>
+  <title>MultiSC-Viewer</title>
 </svelte:head>
 
 <Navbar />
@@ -93,14 +94,21 @@
           <Label>Plot</Label>
         </Button>
       {:else}
-        <Button variant="raised" {...{disabled:true}}>
+        <Button variant="raised" {...{ disabled: true }}>
           <Label>Plot</Label>
         </Button>
       {/if}
     </div>
+    <TabBar tabs={["All", ...cellTypes]} bind:active={cellType}>
+      {#snippet tab(tab)}
+        <Tab {tab}>
+          <Label>{tab}</Label>
+        </Tab>
+      {/snippet}
+    </TabBar>
     <DataTableSearch
       label="Datasets"
-      data={datasets}
+      data={cellDatasets}
       columns={datasetColumns}
       bind:selected={selectedDatasets}
       loaded={loadedDatasets}
