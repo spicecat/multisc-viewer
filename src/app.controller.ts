@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Controller,
   Get,
+  Param,
   Post,
   Query,
 } from "@nestjs/common";
@@ -22,13 +23,19 @@ export class AppController {
   @Page()
   @Get("/about")
   public about() {
-    return;
+    return {
+      studies: this.service.getStudies()
+    };
   }
 
   @Page()
-  @Get("/study")
-  public study() {
-    return;
+  @Get("/study/:studyId")
+  public study(
+    @Param("studyId") studyId: string
+  ) {
+    return {
+      study: this.service.getStudies().find((study) => study.studyId === studyId),
+    };
   }
 
   @Page()
@@ -75,6 +82,11 @@ export class AppController {
       genes,
       gene,
     };
+  }
+
+  @Get("/study")
+  public getStudies(): Study[] {
+    return this.service.getStudies();
   }
 
   @Get("/datasets")

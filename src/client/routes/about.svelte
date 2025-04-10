@@ -1,25 +1,22 @@
 <script lang="ts">
   import DataTableSearch from "$lib/components/DataTable/DataTableSearch.svelte";
   import Navbar from "$lib/components/Navbar.svelte";
+  import { onMount } from "svelte";
 
-  let studies = [
-    {
-      study: { href: "study1", name: "Example Study 1" },
-      authors: "Author A, Author B",
-      diseases: "Disease X, Disease Y",
-    },
-    {
-      study: { href: "study2", name: "Example Study 2" },
-      authors: "Author E",
-      diseases: "Disease X, Disease Z",
-    },
-  ];
+  let studies: Study[] = $state([]);
 
   const studyColumns = [
     { key: "study", label: "Study", url: true },
-    { key: "authors", label: "Authors" },
-    { key: "diseases", label: "Diseases" },
+    { key: "description", label: "Description" },
   ];
+
+  onMount(() => {
+    fetch("/study")
+      .then((res) => res.json())
+      .then((data) => {studies = data.map(study=>
+        ({...study, study: {name: study.name, href: `/study/${study.name}`}})
+      );});
+  });
 </script>
 
 <svelte:head>
@@ -27,9 +24,14 @@
 </svelte:head>
 
 <Navbar />
-<div style="margin:1rem;">
+<div style="margin:auto 20rem;">
   <h1>About</h1>
-  <p>This is a website to compare plots across datasets.</p>
+  <p>
+    MultiSC-Viewer is a website to compare and visualize gene expression in
+    multiple single cell/nucleus datasets across different brain regions,
+    disease conditions, and species.
+  </p>
+  <hr />
+  <h1>Studies</h1>
+  <DataTableSearch label="Studies" data={studies} columns={studyColumns} />
 </div>
-
-<DataTableSearch label="Studies" data={studies} columns={studyColumns} />

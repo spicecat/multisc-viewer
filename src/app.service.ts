@@ -19,6 +19,13 @@ export interface Dataset {
 	cellType: string;
 }
 
+export interface Study {
+	studyId: string;
+	name: string;
+	description: string;
+	datasets: Dataset[];
+}
+
 @Injectable()
 export class AppService {
 	public static readonly META: Dataset[] = JSON.parse(readFileSync('datasets/meta.json').toString());
@@ -32,6 +39,23 @@ export class AppService {
 		this.cache = new Map();
 		this.expirations = new Map();
 		this.activity = new Map();
+	}
+
+	public getStudies(): Study[]{
+		return [
+			{
+				studyId: 'study1',
+				name: 'Study 1',
+				description: 'Study 1 description',
+				datasets: this.getDatasets(),
+			},
+			{
+				studyId: 'study2',
+				name: 'Study 2',
+				description: 'Study 2 description',
+				datasets: this.getDatasets(),
+			}
+		]
 	}
 
 	// TODO: probably don't need all the checks given the go script
