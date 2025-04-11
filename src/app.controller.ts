@@ -45,10 +45,10 @@ export class AppController {
     @Query("gene") gene: string = "",
     @Query("groupBy") groupBy: string = "",
     @Query("splitBy") splitBy: string = "",
-    @Query("token") token: string | null = null
+    @Query("token") token: string | null = null,
   ): CompareProps {
     const knownDatasets = Object.fromEntries(
-      this.getDatasets().map((ds) => [ds.name, ds])
+      this.getDatasets().map((ds) => [ds.name, ds]),
     );
 
     if (!datasets?.split(",").every((dataset) => dataset in knownDatasets))
@@ -105,7 +105,7 @@ export class AppController {
     @Query("gene") gene: string,
     @Query("groupBy") groupBy: string,
     @Query("splitBy") splitBy: string,
-    @Query("token") token: string | null = null
+    @Query("token") token: string | null = null,
   ): Promise<ChartResult> {
     return this.service.render(dataset, gene, groupBy, splitBy, token);
   }
@@ -113,7 +113,7 @@ export class AppController {
   @Post("/preload")
   public async preload(
     @Query("token") token: string | null = null,
-    @Query("datasets") datasets: string
+    @Query("datasets") datasets: string,
   ): Promise<void> {
     return this.service.preload(token, datasets.split(","));
   }

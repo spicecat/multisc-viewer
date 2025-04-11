@@ -16,10 +16,10 @@ interface Dataset {
 }
 
 interface Study {
-	studyId: string;
-	name: string;
-	description: string;
-	datasets: Dataset[];
+  studyId: string;
+  name: string;
+  description: string;
+  datasets: Dataset[];
 }
 
 interface User {

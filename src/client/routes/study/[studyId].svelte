@@ -20,9 +20,11 @@
 </svelte:head>
 
 <Navbar />
-<div style="margin:auto 20 rem;">
+<div style="margin:auto 20rem;">
   <h1>{study.name}</h1>
   <p>{study.description}</p>
+  <hr />
+  <h1>Datasets</h1>
+  <DataTableSearch label="Datasets" data={study.datasets} columns={datasetColumns} />
 </div>
 
-<DataTableSearch label="Datasets" data={study.datasets} columns={datasetColumns} />
