@@ -58,7 +58,7 @@ while (ln != "quit") {
 
       png(
         sprintf("./datasets/%s/%s_vln.png", ds, opid),
-        width = 3 * 300, height = 3 * 300, res = 300, pointsize = 4
+        width = (dim(table(datasets[[ds]]@meta.data$Genotype)) + 2) * 300, height = 3 * 300, res = 300, pointsize = 4
       )
       vln <- VlnPlot(
         datasets[[ds]],
