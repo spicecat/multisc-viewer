@@ -24,18 +24,18 @@ export class AppController {
   @Get("/about")
   public about() {
     return {
-      studies: this.service.getStudies()
+      studies: this.service.getStudies(),
     };
   }
 
   @Page()
   @Get("/study/:studyId")
-  public study(
-    @Param("studyId") studyId: string
-  ) {
-    return {
-      study: this.service.getStudies().find((study) => study.studyId === studyId),
-    };
+  public study(@Param("studyId") studyId: string) {
+    const study = this.service
+      .getStudies()
+      .find((study) => study.studyId === studyId);
+    if (!study) throw new BadRequestException("Unknown study requested");
+    return { study };
   }
 
   @Page()

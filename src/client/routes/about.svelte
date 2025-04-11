@@ -14,7 +14,7 @@
     fetch("/study")
       .then((res) => res.json())
       .then((data) => {studies = data.map(study=>
-        ({...study, study: {name: study.name, href: `/study/${study.name}`}})
+        ({...study, study: {name: study.name, href: `/study/${study.studyId}`}})
       );});
   });
 </script>

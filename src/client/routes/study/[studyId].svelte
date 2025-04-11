@@ -20,7 +20,7 @@
 </svelte:head>
 
 <Navbar />
-<div style="margin:1rem;">
+<div style="margin:auto 20 rem;">
   <h1>{study.name}</h1>
   <p>{study.description}</p>
 </div>
