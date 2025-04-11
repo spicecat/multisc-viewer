@@ -67,7 +67,6 @@
       { key: "author", label: "Author" },
       { key: "disease", label: "Disease" },
     ],
-    geneColumns = [{ key: "", label: "Gene" }];
 </script>
 
 <svelte:head>
