@@ -5,7 +5,20 @@
   import Navbar from "$lib/components/Navbar.svelte";
   import meta from "$meta";
   import { AppContent, Scrim } from "@smui/drawer";
+  import Button from "@smui/button";
   import { dndzone } from "svelte-dnd-action";
+  import html2canvas from "html2canvas";
+  import { tick } from "svelte";
+
+  interface RenderResult {
+    clustering: string;
+    violin: string;
+  }
+  interface CompareProps {
+    genes: string[];
+    gene: string;
+    order: string[];
+  }
 
   const { genes, gene, order }: CompareProps = $props();
   const { query } = meta;
@@ -15,7 +28,9 @@
     dsOrder = $state(order.map((ds) => ({ id: ds }))),
     bigView: boolean = $state(false),
     bigViewCharts: (Promise<RenderResult> | null)[] = $state([null, null]),
-    geneControlsOpen = $state(false);
+    geneControlsOpen = $state(false),
+    boardElement: HTMLElement | null = $state(null),
+    isDownloading = $state(false);
 
   const splitBy = $derived(groupBy === "Genotype" ? "CellType" : "Genotype"),
     config = $derived({ selectedGene, groupBy, splitBy });
@@ -32,10 +47,41 @@
         `/compare?datasets=${query.datasets}&gene=${selectedGene}&groupBy=${groupBy}&splitBy=${splitBy}`
       );
   });
+
+  async function downloadBoard() {
+    if (!boardElement || isDownloading) return;
+
+    isDownloading = true;
+    await tick();
+
+    try {
+      const canvas = await html2canvas(boardElement, {
+        useCORS: true,
+        allowTaint: true,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: boardElement.scrollWidth,
+        windowHeight: boardElement.scrollHeight,
+      });
+
+      const image = canvas.toDataURL("image/png");
+
+      const link = document.createElement("a");
+      link.href = image;
+      link.download = `MultiSC-Viewer-${selectedGene}-${groupBy}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading board:", error);
+    } finally {
+      isDownloading = false;
+    }
+  }
 </script>
 
 <svelte:head>
-  <title>Dataset Comparison Plot</title>
+  <title>MultiSC-Viewer Plot</title>
 </svelte:head>
 
 <Navbar />
@@ -51,9 +97,17 @@
   <AppContent>
     <div>
       <GeneControlsDrawerToggle bind:geneControlsOpen />
+      <Button variant="raised" onclick={downloadBoard}>
+        {#if isDownloading}
+          Downloading...
+        {:else}
+          Download
+        {/if}
+      </Button>
     </div>
     <section
       class="board"
+      bind:this={boardElement}
       use:dndzone={{ items: dsOrder }}
       onconsider={(evt) => (dsOrder = evt.detail.items)}
       onfinalize={(evt) => (dsOrder = evt.detail.items)}
@@ -71,23 +125,7 @@
     margin: 0.5em;
     display: flex;
     overflow-x: scroll;
+    background-color: white;
+    padding: 1em;
   }
-
-  // .big-modal {
-  //   padding: 0;
-  //   max-width: fit-content;
-
-  //   .row {
-  //     gap: 5vh;
-
-  //     .col {
-  //       gap: 5vh;
-  //       width: 40vw;
-
-  //       img {
-  //         height: 40vh;
-  //       }
-  //     }
-  //   }
-  // }
 </style>

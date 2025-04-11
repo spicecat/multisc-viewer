@@ -3,6 +3,25 @@
 
 type Writable<T> = import("svelte/store").Writable<T>;
 
+interface Dataset {
+  name: string;
+  year: number;
+  region: string[];
+  PMID: string;
+  species: string;
+  author: string;
+  disease: string[];
+  size: number;
+  cellType: string;
+}
+
+interface Study {
+  studyId: string;
+  name: string;
+  description: string;
+  datasets: Dataset[];
+}
+
 interface User {
   id: number;
   name: string;
@@ -50,6 +69,10 @@ declare module "$meta" {
 
 interface IndexProps extends PageProps {
   token: string;
+}
+
+interface StudyProps extends PageProps {
+  study: Study;
 }
 
 interface CompareProps extends PageProps {

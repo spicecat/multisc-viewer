@@ -41,3 +41,4 @@ datasets/
 datasets.tar.gz
 
 ds-add/ds-add
+config/vite.config.mts.timestamp*

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Controller,
   Get,
+  Param,
   Post,
   Query,
 } from "@nestjs/common";
@@ -17,6 +18,24 @@ export class AppController {
   @Get("/")
   public index(): IndexProps {
     return { token: randomBytes(32).toString("hex") };
+  }
+
+  @Page()
+  @Get("/about")
+  public about() {
+    return {
+      studies: this.service.getStudies(),
+    };
+  }
+
+  @Page()
+  @Get("/study/:studyId")
+  public study(@Param("studyId") studyId: string) {
+    const study = this.service
+      .getStudies()
+      .find((study) => study.studyId === studyId);
+    if (!study) throw new BadRequestException("Unknown study requested");
+    return { study };
   }
 
   @Page()
@@ -63,6 +82,11 @@ export class AppController {
       genes,
       gene,
     };
+  }
+
+  @Get("/study")
+  public getStudies(): Study[] {
+    return this.service.getStudies();
   }
 
   @Get("/datasets")
