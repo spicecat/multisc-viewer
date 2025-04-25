@@ -11,12 +11,15 @@
   <Row>
     <Section>
       <Button href="/">
-        <Title>Plot Viewer</Title>
+        <Title>MultiSC-Viewer</Title>
       </Button>
     </Section>
     <Section align="end">
-      <Button href="/about">
-        <Title>About</Title>
+      <Button href="/publications">
+        <Title>Publications</Title>
+      </Button>
+      <Button href="https://github.com/">
+        <Title>Install</Title>
       </Button>
     </Section>
   </Row>

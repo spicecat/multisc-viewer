@@ -85,7 +85,7 @@
 </svelte:head>
 
 <Navbar />
-<div style="display: inline-flex; gap: 1rem;">
+<main style="display: inline-flex; gap: 1rem;">
   <GeneControlsDrawer
     {genes}
     bind:selectedGene
@@ -117,7 +117,7 @@
       {/each}
     </section>
   </AppContent>
-</div>
+</main>
 
 <style lang="scss">
   .board {

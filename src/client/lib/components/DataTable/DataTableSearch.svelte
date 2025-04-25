@@ -1,34 +1,47 @@
 <script lang="ts">
-  import DataTable from "$lib/components/DataTable/DataTable.svelte";
+  import DataTable from "./DataTable.svelte";
   import IconButton from "@smui/icon-button";
   import TextField from "@smui/textfield";
   import Fuse from "fuse.js";
 
+  interface Column {
+    key: string;
+    label: string;
+  }
+
+  // Props with defaults
   let {
     label = "",
     data = [],
-    columns = [],
+    columns = [] as Column[],
     selected = $bindable(),
     searchOptions = {},
     loaded = true,
   } = $props();
 
-  let defaultSearchOptions = $derived({
-      keys: columns.map(({ key }) => key),
-      threshold: 0.0,
-      ignoreLocation: true,
-      useExtendedSearch: true,
-    }),
-    fuse = $derived(
-      new Fuse(data, {
-        ...defaultSearchOptions,
-        ...searchOptions,
-      })
-    ),
-    query: string = $state(""),
-    filteredItems = $derived(
-      query ? fuse.search(query).map(({ item }) => item) : data
-    );
+  // Default search configuration
+  const defaultSearchOptions = $derived({
+    keys: columns.map(({ key }) => key),
+    threshold: 0.0,
+    ignoreLocation: true,
+    useExtendedSearch: true,
+  });
+
+  // Initialize Fuse.js for fuzzy search
+  const fuse = $derived(
+    new Fuse(data, {
+      ...defaultSearchOptions,
+      ...searchOptions,
+    })
+  );
+
+  // State
+  let query: string = $state("");
+
+  // Filtered items based on search query
+  const filteredItems = $derived(
+    query ? fuse.search(query).map(({ item }) => item) : data
+  );
 </script>
 
 <div style="display: inline-block;">

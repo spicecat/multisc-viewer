@@ -1,30 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { existsSync, readdirSync, readFileSync, rmSync } from "fs";
 import { DaemonService } from "./daemon.service";
-
-export interface ChartResult {
-  clustering: string;
-  violin: string;
-}
-
-export interface Dataset {
-  name: string;
-  year: number;
-  region: string[];
-  PMID: string;
-  species: string;
-  author: string;
-  disease: string[];
-  size: number;
-  cellType: string;
-}
-
-export interface Study {
-  studyId: string;
-  name: string;
-  description: string;
-  datasets: Dataset[];
-}
+import { ChartResult, Dataset, Publication } from "./interfaces/types";
+import { publications } from "../src/config/publications";
 
 @Injectable()
 export class AppService {
@@ -34,7 +12,6 @@ export class AppService {
 
   private readonly cache: Map<string, Promise<ChartResult>>;
   private readonly expirations: Map<string, NodeJS.Timeout>;
-
   private readonly activity: Map<string, NodeJS.Timeout>;
 
   public constructor(private readonly daemon: DaemonService) {
@@ -43,24 +20,13 @@ export class AppService {
     this.activity = new Map();
   }
 
-  public getStudies(): Study[] {
-    return [
-      {
-        studyId: "study1",
-        name: "Study 1",
-        description: "Study 1 description",
-        datasets: this.getDatasets(),
-      },
-      {
-        studyId: "study2",
-        name: "Study 2",
-        description: "Study 2 description",
-        datasets: this.getDatasets(),
-      },
-    ];
+  public getPublications(): Publication[] {
+    return publications.map(publication => ({
+      ...publication,
+      datasets: this.getDatasets() // change
+    }));
   }
 
-  // TODO: probably don't need all the checks given the go script
   public getDatasets(): Dataset[] {
     return readdirSync("datasets")
       .filter(

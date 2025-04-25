@@ -2,6 +2,9 @@ export function fi<T>(): T {
   return undefined as T;
 }
 
+/**
+ * Serialize data to a string representation
+ */
 export function serialize(data: any): string | undefined {
   if (typeof data === "object") {
     if (data === null) return "null";
@@ -38,7 +41,7 @@ export function serialize(data: any): string | undefined {
   }
 }
 
-// Parameters obtained by linear regression (R^2=0.9999) via desmos on experimental data
+// Parameters obtained by linear regression (R^2=0.9999) on experimental data
 export function approximateRenderTime(sz: number): number {
   return 13.34865 * (sz / 1_000_000) + 0.63184;
 }

@@ -90,7 +90,7 @@
       aria-label="Data is being loaded..."
     />
   {/snippet}
-  <Body>
+  <Body style="white-space:normal;">
     {#each slice as item (item[id])}
       <Row>
         {#if selected !== undefined}

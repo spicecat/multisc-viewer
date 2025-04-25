@@ -1,26 +1,7 @@
 /// <reference types="svelte" />
 /// <reference types="vite/client" />
 
-type Writable<T> = import("svelte/store").Writable<T>;
-
-interface Dataset {
-  name: string;
-  year: number;
-  region: string[];
-  PMID: string;
-  species: string;
-  author: string;
-  disease: string[];
-  size: number;
-  cellType: string;
-}
-
-interface Study {
-  studyId: string;
-  name: string;
-  description: string;
-  datasets: Dataset[];
-}
+import type { Dataset, Publication } from '../interfaces/types';
 
 interface User {
   id: number;
@@ -67,12 +48,12 @@ declare module "$meta" {
   export default state;
 }
 
-interface IndexProps extends PageProps {
+interface SearchProps extends PageProps {
   token: string;
 }
 
-interface StudyProps extends PageProps {
-  study: Study;
+interface PublicationProps extends PageProps {
+  publication: Publication;
 }
 
 interface CompareProps extends PageProps {

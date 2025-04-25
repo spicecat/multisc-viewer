@@ -1,6 +1,4 @@
 <script lang="ts" module>
-  // NOTE: need global cache so that drag-n-drop doesn't cause refetching (looks dumb probably)
-  // TODO: make type lul
   const cache = new Map<string, Promise<RenderResult>>();
 
   function cachedFetch(url: string): Promise<RenderResult> {
@@ -16,8 +14,6 @@
 <script lang="ts">
   import { makeTitle } from "$lib/utils/utils";
   import CircularProgress from "@smui/circular-progress";
-
-  import { self } from "svelte/legacy";
 
   const {
     dataset,
@@ -40,123 +36,102 @@
     );
 
   let bigImg: string | null = $state(null);
-
-  // function pick(): void {
-  //   if (bigViewCharts[0] === null) bigViewCharts[0] = myDataset;
-  //   else {
-  //     if (bigViewCharts[0] === myDataset) bigViewCharts[0] = null;
-  //     else bigViewCharts[1] = myDataset;
-  //   }
-  // }
 </script>
 
-<div class="column">
-  <h3 class="column-title">
+<div class="chart-column">
+  <h3 class="chart-title">
     {makeTitle(dataset)}
   </h3>
-  <!-- <button onclick={pick}>
-    <h3
-      class="dataset"
-      class:selecting={bigView}
-      class:selected={bigView && bigViewCharts.includes(myDataset)}
-    >
-      {makeTitle(dataset)}
-    </h3>
-  </button> -->
-  {#await plots}
-    <CircularProgress indeterminate style="width: 100%; height: 100%;" />
-  {:then plots}
-    <button onclick={() => (bigImg = plots.clustering)}>
-      <img class="smol" src={plots.clustering} alt="{dataset} clustering" />
-    </button>
-    <button onclick={() => (bigImg = plots.violin)}>
-      <img class="smol" src={plots.violin} alt="{dataset} violin" />
-    </button>
-  {:catch err}
-    <h1>Error: {err}</h1>
-  {/await}
 
-  <!-- putting outside div breaks drag-n-drop
-  <dialog open={bigImg !== null} onclick={self(() => (bigImg = null))}>
-    <article class="big-modal">
-      <img src={bigImg} alt="Enlarged" />
-    </article>
-  </dialog> -->
+  {#await plots}
+    <div class="loading-container">
+      <CircularProgress indeterminate />
+    </div>
+  {:then plotData}
+    <div class="chart-images">
+      <button
+        class="chart-button"
+        onclick={() => (bigImg = plotData.clustering)}
+        aria-label="View clustering plot"
+      >
+        <img
+          class="chart-image"
+          src={plotData.clustering}
+          alt="{dataset} clustering"
+        />
+      </button>
+
+      <button
+        class="chart-button"
+        onclick={() => (bigImg = plotData.violin)}
+        aria-label="View violin plot"
+      >
+        <img class="chart-image" src={plotData.violin} alt="{dataset} violin" />
+      </button>
+    </div>
+  {:catch error}
+    <div class="error-message">
+      <p>Error: {error.message}</p>
+    </div>
+  {/await}
 </div>
 
 <style lang="scss">
-  .column {
+  .chart-column {
     width: 40vh;
-    padding: 0.5em;
-    margin: 0.5em;
-    float: left;
-    border: 1px solid #333333;
-    overflow: hidden;
+    padding: 0.8rem;
+    margin: 0.5rem;
+    border: 1px solid var(--border-color, #333);
+    border-radius: 4px;
+    background-color: var(--background-color, #fff);
   }
 
-  .column-title {
-    margin-bottom: 1em;
+  .chart-title {
+    margin-bottom: 1rem;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+
+  .loading-container {
     display: flex;
     justify-content: center;
     align-items: center;
+    min-height: 200px;
   }
 
-  img.smol {
-    width: 100%;
+  .chart-images {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .chart-button {
+    padding: 0;
+    border: none;
+    background: none;
     cursor: pointer;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scale(1.02);
+    }
+
+    &:focus {
+      outline: 2px solid var(--primary-color, #2196f3);
+      outline-offset: 2px;
+    }
   }
 
-  // .dataset {
-  //   width: 100%;
-  //   text-align: center;
-  //   position: relative;
-  //   overflow: hidden;
-  //   padding: 2px;
-  //   background: var(--background-color);
+  .chart-image {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+  }
 
-  //   &.selecting {
-  //     cursor: pointer;
-  //     color: goldenrod;
-  //     z-index: 0;
-
-  //     &:hover,
-  //     &.selected {
-  //       &::before {
-  //         content: "";
-  //         display: block;
-  //         width: calc(100% * 1.414); // sqrt(2) because diagonal
-  //         padding-bottom: calc(100% * 1.414); // sqrt(2) because diagonal
-  //         position: absolute;
-  //         left: 50%;
-  //         top: 50%;
-  //         transform: translate(-50%, -50%);
-  //         z-index: -2;
-
-  //         animation: spin 8s linear infinite;
-  //         background: repeating-conic-gradient(
-  //           from 0deg,
-  //           goldenrod 0deg 90deg,
-  //           var(--background-color) 90deg 360deg
-  //         );
-  //       }
-
-  //       &::after {
-  //         content: "";
-  //         position: absolute;
-  //         inset: 2px;
-  //         background: var(--background-color);
-  //         z-index: -1;
-  //       }
-  //     }
-  //   }
-  // }
-
-  // .big-modal {
-  //   padding: 0;
-  //   max-width: fit-content;
-
-  //   img {
-  //     height: 90vh;
-  //   }
-  // }
+  .error-message {
+    color: var(--error-color, #f44336);
+    text-align: center;
+    padding: 1rem;
+  }
 </style>

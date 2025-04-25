@@ -1,41 +1,57 @@
 <script lang="ts">
-  import GeneGroupSplit from "$lib/components/GeneControls/GeneGroupSplit.svelte";
-  import DataTableSearch from "$lib/components/DataTable/DataTableSearch.svelte";
+  import GeneGroupSplit from "./GeneGroupSplit.svelte";
+  import DataTableSearch from "../DataTable/DataTableSearch.svelte";
   import Drawer, { Content } from "@smui/drawer";
 
+  // Props with defaults
   let {
-    genes,
+    genes = [],
     selectedGene = $bindable(),
-    loadedGenes,
+    loadedGenes = true,
     groupBy = $bindable(),
-    geneControlsOpen,
+    geneControlsOpen = false,
   } = $props();
 
+  // Gene table configuration
   const geneColumns = [{ key: "", label: "Gene" }];
 </script>
 
 <Drawer
   variant="dismissible"
   bind:open={geneControlsOpen}
+  class="gene-controls-drawer"
 >
-  <Content style="display:inline-table;">
-    <GeneGroupSplit bind:groupBy />
-    <DataTableSearch
-      label="Gene"
-      data={genes}
-      columns={geneColumns}
-      bind:selected={selectedGene}
-      loaded={loadedGenes}
-    />
+  <Content>
+    <div class="drawer-content">
+      <GeneGroupSplit bind:groupBy />
+      
+      <div class="gene-search">
+        <DataTableSearch
+          label="Gene"
+          data={genes}
+          columns={geneColumns}
+          bind:selected={selectedGene}
+          loaded={loadedGenes}
+        />
+      </div>
+    </div>
   </Content>
 </Drawer>
-<div></div>
 
 <style lang="scss">
-  :global(.mdc-drawer) {
+  :global(.gene-controls-drawer) {
     position: relative;
+    
+    &.mdc-drawer--dismissible.mdc-drawer--open {
+      display: inline-table;
+    }
   }
-  :global(.mdc-drawer--dismissible.mdc-drawer--open) {
-    display: inline-table;
+
+  .drawer-content {
+    padding: 1rem;
+  }
+
+  .gene-search {
+    margin-top: 1rem;
   }
 </style>

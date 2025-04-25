@@ -7,48 +7,99 @@ import {
   Query,
 } from "@nestjs/common";
 import { randomBytes } from "crypto";
-import { AppService, ChartResult, Dataset } from "./app.service";
+import { AppService } from "./app.service";
+import type { Publication } from "./interfaces/types";
+import { ChartResult, Dataset } from "./interfaces/types";
 import { Page } from "./utils/decorators/page.decorator";
 
 @Controller()
 export class AppController {
   constructor(private readonly service: AppService) {}
 
-  @Page()
-  @Get("/")
-  public index(): IndexProps {
-    return { token: randomBytes(32).toString("hex") };
+  /**
+   * Get all available publications
+   */
+  @Get("/publication")
+  getPublications(): Publication[] {
+    return this.service.getPublications();
+  }
+
+  /**
+   * Get available genes for selected datasets
+   */
+  @Get("/genes")
+  getGenes(@Query("datasets") datasets: string): string[] {
+    return this.service.getGenes(datasets.split(","));
+  }
+
+  /**
+   * Get a list of all datasets
+   */
+  @Get("/datasets")
+  getDatasets(): Dataset[] {
+    return this.service.getDatasets();
+  }
+
+  /**
+   * Render plots for a dataset
+   */
+  @Get("/plot")
+  async getPlot(
+    @Query("dataset") dataset: string,
+    @Query("gene") gene: string,
+    @Query("groupBy") groupBy: string,
+    @Query("splitBy") splitBy: string,
+    @Query("token") token: string | null = null
+  ): Promise<ChartResult> {
+    return this.service.render(dataset, gene, groupBy, splitBy, token);
+  }
+
+  /**
+   * Preload datasets for faster rendering
+   */
+  @Post("/preload")
+  async preload(
+    @Query("token") token: string | null = null,
+    @Query("datasets") datasets: string
+  ): Promise<void> {
+    return this.service.preload(token, datasets.split(","));
   }
 
   @Page()
-  @Get("/about")
-  public about() {
+  @Get("/")
+  index() {
     return {
-      studies: this.service.getStudies(),
+      publications: this.service.getPublications(),
     };
   }
 
   @Page()
-  @Get("/study/:studyId")
-  public study(@Param("studyId") studyId: string) {
-    const study = this.service
-      .getStudies()
-      .find((study) => study.studyId === studyId);
-    if (!study) throw new BadRequestException("Unknown study requested");
-    return { study };
+  @Get("/search")
+  search(): SearchProps {
+    return { token: randomBytes(32).toString("hex") };
+  }
+
+  @Page()
+  @Get("/publication/:publicationId")
+  publication(@Param("publicationId") publicationId: string) {
+    const publication = this.service
+      .getPublications()
+      .find((publication) => publication.publicationId === publicationId);
+    if (!publication) throw new BadRequestException("Unknown publication requested");
+    return { publication };
   }
 
   @Page()
   @Get("/compare")
-  public comparison(
+  comparison(
     @Query("datasets") datasets: string = "",
     @Query("gene") gene: string = "",
     @Query("groupBy") groupBy: string = "",
     @Query("splitBy") splitBy: string = "",
-    @Query("token") token: string | null = null,
+    @Query("token") token: string | null = null
   ): CompareProps {
     const knownDatasets = Object.fromEntries(
-      this.getDatasets().map((ds) => [ds.name, ds]),
+      this.getDatasets().map((ds) => [ds.name, ds])
     );
 
     if (!datasets?.split(",").every((dataset) => dataset in knownDatasets))
@@ -82,39 +133,5 @@ export class AppController {
       genes,
       gene,
     };
-  }
-
-  @Get("/study")
-  public getStudies(): Study[] {
-    return this.service.getStudies();
-  }
-
-  @Get("/datasets")
-  public getDatasets(): Dataset[] {
-    return this.service.getDatasets();
-  }
-
-  @Get("/genes")
-  public getGenes(@Query("datasets") datasets: string): string[] {
-    return this.service.getGenes(datasets.split(","));
-  }
-
-  @Get("/plot")
-  public async getPlot(
-    @Query("dataset") dataset: string,
-    @Query("gene") gene: string,
-    @Query("groupBy") groupBy: string,
-    @Query("splitBy") splitBy: string,
-    @Query("token") token: string | null = null,
-  ): Promise<ChartResult> {
-    return this.service.render(dataset, gene, groupBy, splitBy, token);
-  }
-
-  @Post("/preload")
-  public async preload(
-    @Query("token") token: string | null = null,
-    @Query("datasets") datasets: string,
-  ): Promise<void> {
-    return this.service.preload(token, datasets.split(","));
   }
 }
