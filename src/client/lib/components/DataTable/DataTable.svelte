@@ -15,16 +15,23 @@
   import Select, { Option } from "@smui/select";
 
   let {
-    data = [],
-    columns = [],
+    data,
+    columns,
+    isLoading = false,
     selected = $bindable(),
-    loaded = true,
+  }: {
+    data: Data[];
+    columns: Column[];
+    isLoading?: boolean;
+    selected?: string | string[];
   } = $props();
-  let id = $derived(columns[0]?.key),
-    sort = $state(""),
-    sortDirection: "ascending" | "descending" = $state("ascending");
 
-  let items = $derived(
+  let sort = $state("");
+  let sortDirection: "ascending" | "descending" = $state("ascending");
+
+  const id = $derived(columns[0]?.key);
+
+  const items = $derived(
     [...data]
       .map((item) =>
         item && typeof item === "object" && !Array.isArray(item)
@@ -41,13 +48,12 @@
       })
   );
 
-  let perPage = $state(10),
-    currentPage = $state(0),
-    start = $derived(currentPage * perPage),
-    end = $derived(Math.min(start + perPage, items.length)),
-    slice = $derived(items.slice(start, end)),
-    lastPage = $derived(Math.max(Math.ceil(items.length / perPage) - 1, 0));
-
+  let perPage = $state(10);
+  let currentPage = $state(0);
+  const start = $derived(currentPage * perPage);
+  const end = $derived(Math.min(start + perPage, items.length));
+  const slice = $derived(items.slice(start, end));
+  const lastPage = $derived(Math.max(Math.ceil(items.length / perPage) - 1, 0));
   $effect(() => {
     if (currentPage > lastPage) currentPage = lastPage;
   });
@@ -86,11 +92,11 @@
   {#snippet progress()}
     <LinearProgress
       indeterminate
-      closed={loaded}
+      closed={!isLoading}
       aria-label="Data is being loaded..."
     />
   {/snippet}
-  <Body style="white-space:normal;">
+  <Body style="white-space: normal;">
     {#each slice as item (item[id])}
       <Row>
         {#if selected !== undefined}

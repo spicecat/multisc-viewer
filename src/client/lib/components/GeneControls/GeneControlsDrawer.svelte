@@ -1,19 +1,21 @@
 <script lang="ts">
-  import GeneGroupSplit from "./GeneGroupSplit.svelte";
-  import DataTableSearch from "../DataTable/DataTableSearch.svelte";
+  import GenesTable from "$lib/components/DataTable/GenesTable.svelte";
   import Drawer, { Content } from "@smui/drawer";
+  import GeneGroupSplit from "./GeneGroupSplit.svelte";
 
-  // Props with defaults
   let {
-    genes = [],
-    selectedGene = $bindable(),
-    loadedGenes = true,
+    genes,
+    isLoading,
+    selected = $bindable(),
     groupBy = $bindable(),
-    geneControlsOpen = false,
+    geneControlsOpen,
+  }: {
+    genes: Gene[];
+    isLoading?: boolean;
+    selected: string;
+    groupBy: Grouping;
+    geneControlsOpen: boolean;
   } = $props();
-
-  // Gene table configuration
-  const geneColumns = [{ key: "", label: "Gene" }];
 </script>
 
 <Drawer
@@ -22,17 +24,11 @@
   class="gene-controls-drawer"
 >
   <Content>
-    <div class="drawer-content">
+    <div style="padding: 1rem;">
       <GeneGroupSplit bind:groupBy />
-      
-      <div class="gene-search">
-        <DataTableSearch
-          label="Gene"
-          data={genes}
-          columns={geneColumns}
-          bind:selected={selectedGene}
-          loaded={loadedGenes}
-        />
+
+      <div style="margin-top: 1rem;">
+        <GenesTable {genes} {isLoading} bind:selected />
       </div>
     </div>
   </Content>
@@ -41,17 +37,10 @@
 <style lang="scss">
   :global(.gene-controls-drawer) {
     position: relative;
-    
+    margin-right: 1rem;
+
     &.mdc-drawer--dismissible.mdc-drawer--open {
       display: inline-table;
     }
-  }
-
-  .drawer-content {
-    padding: 1rem;
-  }
-
-  .gene-search {
-    margin-top: 1rem;
   }
 </style>

@@ -8,84 +8,69 @@ import {
 } from "@nestjs/common";
 import { randomBytes } from "crypto";
 import { AppService } from "./app.service";
-import type { Publication } from "./interfaces/types";
-import { ChartResult, Dataset } from "./interfaces/types";
 import { Page } from "./utils/decorators/page.decorator";
 
 @Controller()
 export class AppController {
   constructor(private readonly service: AppService) {}
 
-  /**
-   * Get all available publications
-   */
-  @Get("/publication")
+  @Get("/publications")
   getPublications(): Publication[] {
     return this.service.getPublications();
   }
 
-  /**
-   * Get available genes for selected datasets
-   */
   @Get("/genes")
   getGenes(@Query("datasets") datasets: string): string[] {
     return this.service.getGenes(datasets.split(","));
   }
 
-  /**
-   * Get a list of all datasets
-   */
   @Get("/datasets")
   getDatasets(): Dataset[] {
     return this.service.getDatasets();
   }
 
-  /**
-   * Render plots for a dataset
-   */
   @Get("/plot")
   async getPlot(
     @Query("dataset") dataset: string,
     @Query("gene") gene: string,
     @Query("groupBy") groupBy: string,
     @Query("splitBy") splitBy: string,
-    @Query("token") token: string | null = null
+    @Query("token") token: string | null = null,
   ): Promise<ChartResult> {
     return this.service.render(dataset, gene, groupBy, splitBy, token);
   }
 
-  /**
-   * Preload datasets for faster rendering
-   */
   @Post("/preload")
   async preload(
     @Query("token") token: string | null = null,
-    @Query("datasets") datasets: string
+    @Query("datasets") datasets: string,
   ): Promise<void> {
     return this.service.preload(token, datasets.split(","));
   }
 
   @Page()
   @Get("/")
-  index() {
+  index(): IndexProps {
+    const datasets = this.service.getDatasets();
+    return { datasets, token: randomBytes(32).toString("hex") };
+  }
+
+  @Page()
+  @Get("/publication")
+  publication() {
     return {
       publications: this.service.getPublications(),
     };
   }
 
   @Page()
-  @Get("/search")
-  search(): SearchProps {
-    return { token: randomBytes(32).toString("hex") };
-  }
-
-  @Page()
   @Get("/publication/:publicationId")
-  publication(@Param("publicationId") publicationId: string) {
+  publicationId(@Param("publicationId") publicationId: string) {
     const publication = this.service
       .getPublications()
       .find((publication) => publication.publicationId === publicationId);
-    if (!publication) throw new BadRequestException("Unknown publication requested");
+    if (!publication)
+      throw new BadRequestException("Unknown publication requested");
     return { publication };
   }
 
@@ -96,13 +81,13 @@ export class AppController {
     @Query("gene") gene: string = "",
     @Query("groupBy") groupBy: string = "",
     @Query("splitBy") splitBy: string = "",
-    @Query("token") token: string | null = null
+    @Query("token") token: string | null = null,
   ): CompareProps {
     const knownDatasets = Object.fromEntries(
-      this.getDatasets().map((ds) => [ds.name, ds])
+      this.getDatasets().map((ds) => [ds.name, ds]),
     );
 
-    if (!datasets?.split(",").every((dataset) => dataset in knownDatasets))
+    if (!datasets?.split(",").every((ds) => ds in knownDatasets))
       throw new BadRequestException("Unknown dataset requested");
 
     const genes = this.getGenes(datasets);

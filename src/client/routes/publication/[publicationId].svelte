@@ -1,6 +1,6 @@
 <script lang="ts">
   import Navbar from "$lib/components/Navbar.svelte";
-  import DatasetSearch from "$lib/components/DatasetSearch.svelte";
+  import DatasetsSelector from "$lib/components/DatasetsSelector.svelte";
 
   const { publication }: PublicationProps = $props();
 </script>
@@ -20,6 +20,6 @@
 
   <section>
     <h1>Datasets</h1>
-    <DatasetSearch datasets={publication.datasets} />
+    <DatasetsSelector datasets={publication.datasets} />
   </section>
 </main>

@@ -1,7 +1,35 @@
 /// <reference types="svelte" />
 /// <reference types="vite/client" />
 
-import type { Dataset, Publication } from '../interfaces/types';
+interface Dataset {
+  name: string;
+  year: number;
+  region: string[];
+  PMID: string;
+  species: string;
+  author: string;
+  disease: string[];
+  size: number;
+  cellType: string;
+}
+
+type Gene = string;
+
+interface Publication {
+  publicationId: string;
+  name: string;
+  description: string;
+  datasets: Dataset[];
+  year?: number[];
+  species?: string[];
+  author?: string[];
+  disease?: string[];
+  cellType?: string[];
+}
+
+type Data = Dataset | Gene | Publication;
+
+type Grouping = "Genotype" | "CellType";
 
 interface User {
   id: number;
@@ -48,7 +76,7 @@ declare module "$meta" {
   export default state;
 }
 
-interface SearchProps extends PageProps {
+interface IndexProps extends PageProps {
   token: string;
 }
 
@@ -71,4 +99,16 @@ interface PlotConfig {
 interface RenderResult {
   violin: string;
   clustering: string;
+}
+
+interface ChartResult {
+  clustering: string;
+  violin: string;
+}
+
+interface Column {
+  key: string;
+  label: string;
+  url?: boolean;
+  sortable?: boolean;
 }

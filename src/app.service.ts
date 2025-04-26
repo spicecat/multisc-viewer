@@ -1,8 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { existsSync, readdirSync, readFileSync, rmSync } from "fs";
-import { DaemonService } from "./daemon.service";
-import { ChartResult, Dataset, Publication } from "./interfaces/types";
 import { publications } from "../src/config/publications";
+import { DaemonService } from "./daemon.service";
 
 @Injectable()
 export class AppService {
@@ -21,26 +20,26 @@ export class AppService {
   }
 
   public getPublications(): Publication[] {
-    return publications.map(publication => ({
+    return publications.map((publication) => ({
       ...publication,
-      datasets: this.getDatasets() // change
+      datasets: this.getDatasets(), // TODO: add datasets to publication
     }));
   }
 
   public getDatasets(): Dataset[] {
     return readdirSync("datasets")
       .filter(
-        (dataset) =>
-          existsSync(`datasets/${dataset}/data.rds`) &&
-          existsSync(`datasets/${dataset}/genes.json`),
+        (ds) =>
+          existsSync(`datasets/${ds}/data.rds`) &&
+          existsSync(`datasets/${ds}/genes.json`),
       )
-      .map((name) => AppService.META.find((dataset) => dataset.name === name))
-      .filter((dataset) => !!dataset);
+      .map((name) => AppService.META.find((ds) => ds.name === name))
+      .filter((ds) => !!ds);
   }
 
   public getGenes(datasets: string[]): string[] {
-    const geneSets = datasets.map<string[]>((dataset) =>
-      JSON.parse(readFileSync(`datasets/${dataset}/genes.json`).toString()),
+    const geneSets = datasets.map<string[]>((ds) =>
+      JSON.parse(readFileSync(`datasets/${ds}/genes.json`).toString()),
     );
     return geneSets
       .slice(1)

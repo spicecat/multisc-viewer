@@ -5,9 +5,9 @@ export const appConfig = {
   // Server configuration
   server: {
     port: process.env.PORT || 3000,
-    host: process.env.HOST || 'localhost',
+    host: process.env.HOST || "localhost",
     cors: {
-      origin: process.env.CORS_ORIGIN || '*',
+      origin: process.env.CORS_ORIGIN || "*",
       credentials: true,
     },
   },
@@ -16,7 +16,7 @@ export const appConfig = {
   daemon: {
     maxParallel: 3,
     timeout: 5 * 60 * 1000, // 5 minutes
-    scriptPath: 'daemon.r',
+    scriptPath: "daemon.r",
   },
 
   // Cache configuration
@@ -27,15 +27,15 @@ export const appConfig = {
 
   // Dataset configuration
   datasets: {
-    basePath: 'datasets',
-    metaFile: 'meta.json',
-    requiredFiles: ['data.rds', 'genes.json'],
+    basePath: "datasets",
+    metaFile: "meta.json",
+    requiredFiles: ["data.rds", "genes.json"],
   },
 
   // Client configuration
   client: {
-    defaultGroupBy: 'Genotype',
-    defaultSplitBy: 'CellType',
+    defaultGroupBy: "Genotype",
+    defaultSplitBy: "CellType",
     maxDatasetSelections: 10,
     chartUpdateDebounce: 1000,
   },
@@ -43,11 +43,11 @@ export const appConfig = {
   // Theme configuration
   theme: {
     colors: {
-      primary: '#2196f3',
-      secondary: '#ff4081',
-      surface: '#ffffff',
-      background: '#f5f5f5',
-      error: '#f44336',
+      primary: "#2196f3",
+      secondary: "#ff4081",
+      surface: "#ffffff",
+      background: "#f5f5f5",
+      error: "#f44336",
     },
   },
 } as const;

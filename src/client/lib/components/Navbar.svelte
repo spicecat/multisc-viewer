@@ -1,6 +1,7 @@
 <script lang="ts">
   import TopAppBar, { Row, Section, Title } from "@smui/top-app-bar";
   import Button from "@smui/button";
+  import IconButton from "@smui/icon-button";
 </script>
 
 <TopAppBar
@@ -15,12 +16,12 @@
       </Button>
     </Section>
     <Section align="end">
-      <Button href="/publications">
+      <Button href="/publication">
         <Title>Publications</Title>
       </Button>
-      <Button href="https://github.com/">
-        <Title>Install</Title>
-      </Button>
+      <IconButton class="material-icons" href="https://git.jasonxu.dev/JasonXu/plot-viewer/">
+        source
+      </IconButton>
     </Section>
   </Row>
 </TopAppBar>

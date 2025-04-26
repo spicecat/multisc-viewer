@@ -4,11 +4,11 @@
   import GeneControlsDrawerToggle from "$lib/components/GeneControls/GeneControlsDrawerToggle.svelte";
   import Navbar from "$lib/components/Navbar.svelte";
   import meta from "$meta";
-  import { AppContent, Scrim } from "@smui/drawer";
   import Button from "@smui/button";
-  import { dndzone } from "svelte-dnd-action";
+  import { AppContent, Scrim } from "@smui/drawer";
   import html2canvas from "html2canvas";
   import { tick } from "svelte";
+  import { dndzone } from "svelte-dnd-action";
 
   interface RenderResult {
     clustering: string;
@@ -23,17 +23,17 @@
   const { genes, gene, order }: CompareProps = $props();
   const { query } = meta;
 
-  let groupBy: string = $state("Genotype"),
-    selectedGene: string = $state(gene),
-    dsOrder = $state(order.map((ds) => ({ id: ds }))),
-    bigView: boolean = $state(false),
-    bigViewCharts: (Promise<RenderResult> | null)[] = $state([null, null]),
-    geneControlsOpen = $state(false),
-    boardElement: HTMLElement | null = $state(null),
-    isDownloading = $state(false);
+  let groupBy: Grouping = $state("Genotype");
+  let selectedGene: string = $state(gene);
+  let dsOrder = $state(order.map((ds) => ({ id: ds })));
+  let bigView: boolean = $state(false);
+  let bigViewCharts: (Promise<RenderResult> | null)[] = $state([null, null]);
+  let geneControlsOpen = $state(false);
+  let boardElement: HTMLElement | null = $state(null);
+  let isDownloading = $state(false);
 
-  const splitBy = $derived(groupBy === "Genotype" ? "CellType" : "Genotype"),
-    config = $derived({ selectedGene, groupBy, splitBy });
+  const splitBy = $derived(groupBy === "Genotype" ? "CellType" : "Genotype");
+  const config = $derived({ selectedGene, groupBy, splitBy });
 
   $effect(() => {
     if (
@@ -81,21 +81,20 @@
 </script>
 
 <svelte:head>
-  <title>MultiSC-Viewer Plot</title>
+  <title>MultiSC-Viewer - Compare</title>
 </svelte:head>
 
 <Navbar />
-<main style="display: inline-flex; gap: 1rem;">
+<main style="display: inline-flex;gap: 1rem;">
   <GeneControlsDrawer
     {genes}
-    bind:selectedGene
-    loadedGenes={true}
+    bind:selected={selectedGene}
     bind:groupBy
     {geneControlsOpen}
   />
   <Scrim />
   <AppContent>
-    <div>
+    <div style="align-items: center;display: flex;gap: 1rem;">
       <GeneControlsDrawerToggle bind:geneControlsOpen />
       <Button variant="raised" onclick={downloadBoard}>
         {#if isDownloading}

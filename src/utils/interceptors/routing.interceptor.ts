@@ -1,7 +1,7 @@
 import type {
-    CallHandler,
-    ExecutionContext,
-    NestInterceptor,
+  CallHandler,
+  ExecutionContext,
+  NestInterceptor,
 } from "@nestjs/common";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { RENDER_METADATA } from "@nestjs/common/constants";
@@ -20,7 +20,7 @@ function resolveRoute(
   parts: string[],
   route: string,
   dir: string,
-  params: Record<string, string>
+  params: Record<string, string>,
 ): string | null {
   if (parts.length === 0) {
     return route;
@@ -70,7 +70,7 @@ function resolveRoute(
         rest,
         join(route, pattern),
         `${dir}/${pattern}`,
-        params
+        params,
       );
     } else {
       return null;
@@ -82,7 +82,7 @@ function resolveRoute(
 export class RoutingInterceptor implements NestInterceptor {
   public intercept(
     context: ExecutionContext,
-    next: CallHandler
+    next: CallHandler,
   ): Observable<any> {
     const req = context.switchToHttp().getRequest<Request>();
     const res = context.switchToHttp().getResponse<Response>();
@@ -91,13 +91,13 @@ export class RoutingInterceptor implements NestInterceptor {
     if (Reflect.hasMetadata(RENDER_METADATA, context.getHandler())) {
       const path: string = Reflect.getMetadata(
         RENDER_METADATA,
-        context.getHandler()
+        context.getHandler(),
       );
 
       const parts = path
         .split("/")
         .map((part, i, arr) =>
-          i === arr.length - 1 ? part.replace(".svelte", "") : part
+          i === arr.length - 1 ? part.replace(".svelte", "") : part,
         );
       const route = parts.slice(parts.indexOf("routes") + 1).join("/");
 
@@ -121,7 +121,7 @@ export class RoutingInterceptor implements NestInterceptor {
           if ("__meta" in props) delete props.__meta;
 
           return { props, __meta };
-        })
+        }),
       );
     } else if (Reflect.hasMetadata(PAGE_METADATA, context.getHandler())) {
       const parts = req.path.split("/");
@@ -129,7 +129,7 @@ export class RoutingInterceptor implements NestInterceptor {
         parts.slice(1),
         "",
         "src/client/routes",
-        req.params
+        req.params,
       );
 
       if (route !== null) {
@@ -155,12 +155,12 @@ export class RoutingInterceptor implements NestInterceptor {
             return from(
               new Promise((resolve, reject) =>
                 res.render(route, { props, __meta }, (err, html) =>
-                  err !== null ? reject(err) : resolve(html)
-                )
-              )
+                  err !== null ? reject(err) : resolve(html),
+                ),
+              ),
             );
           }),
-          mergeAll()
+          mergeAll(),
         );
       } else {
         return throwError(() => new NotFoundException()); // TODO: consider adding message

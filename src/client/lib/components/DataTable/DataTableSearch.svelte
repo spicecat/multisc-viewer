@@ -1,25 +1,25 @@
 <script lang="ts">
-  import DataTable from "./DataTable.svelte";
   import IconButton from "@smui/icon-button";
   import TextField from "@smui/textfield";
-  import Fuse from "fuse.js";
+  import Fuse, { type IFuseOptions } from "fuse.js";
+  import DataTable from "./DataTable.svelte";
 
-  interface Column {
-    key: string;
-    label: string;
-  }
-
-  // Props with defaults
   let {
     label = "",
-    data = [],
-    columns = [] as Column[],
+    data,
+    columns,
+    isLoading,
     selected = $bindable(),
     searchOptions = {},
-    loaded = true,
+  }: {
+    label: string;
+    data: Data[];
+    columns: Column[];
+    isLoading?: boolean;
+    selected?: string | string[];
+    searchOptions?: IFuseOptions<Data>;
   } = $props();
 
-  // Default search configuration
   const defaultSearchOptions = $derived({
     keys: columns.map(({ key }) => key),
     threshold: 0.0,
@@ -27,7 +27,6 @@
     useExtendedSearch: true,
   });
 
-  // Initialize Fuse.js for fuzzy search
   const fuse = $derived(
     new Fuse(data, {
       ...defaultSearchOptions,
@@ -35,16 +34,14 @@
     })
   );
 
-  // State
-  let query: string = $state("");
+  let query = $state("");
 
-  // Filtered items based on search query
   const filteredItems = $derived(
     query ? fuse.search(query).map(({ item }) => item) : data
   );
 </script>
 
-<div style="display: inline-block;">
+<div style="display: flex;flex-direction:column;">
   <div>
     <TextField bind:value={query} {label}>
       {#snippet leadingIcon()}
@@ -52,5 +49,5 @@
       {/snippet}
     </TextField>
   </div>
-  <DataTable data={filteredItems} {columns} bind:selected {loaded} />
+  <DataTable data={filteredItems} {columns} {isLoading} bind:selected />
 </div>
