@@ -73,6 +73,16 @@ while (ln != "quit") {
       print(vln)
       dev.off()
 
+	  png(sprintf("./datasets/%s/%s_feat.png", ds, opid),     
+		width = 4 *300,        # 5 x 300 pixels
+		height = 4*300,
+		res = 300,            # 300 pixels per inch
+		pointsize = 5)        # smaller font size
+	  
+	  feature <- FeaturePlot(datasets[[ds]], features = marker_genes, min.cutoff = "q5", max.cutoff = "q95")
+	  print(feature)
+	  dev.off()
+
       write(sprintf("ack %s", opid), stdout())
     } else if (cmd[2] == "unload") {
       ds <- cmd[3]
