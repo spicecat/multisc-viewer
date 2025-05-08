@@ -1,21 +1,20 @@
 <script lang="ts">
-  import Select, { Option } from "@smui/select";
+  import Radio from "@smui/radio";
+  import FormField from "@smui/form-field";
 
-  let { groupBy = $bindable() } = $props();
+  let { groupBy = $bindable() }: { groupBy: Grouping } = $props();
 
+  const groupOptions = [
+    { value: "Genotype", label: "Group by Genotype" },
+    { value: "CellType", label: "Group by Cell Type" },
+  ];
 </script>
 
-<div style="margin: 1rem;">
-  <div>
-    <Select bind:value={groupBy} label="Group by">
-      <Option value="Genotype">Genotype</Option>
-      <Option value="CellType">Cell Type</Option>
-    </Select>
-  </div>
-  <div>
-    <Select bind:value={groupBy} label="Split by">
-      <Option value="CellType">Genotype</Option>
-      <Option value="Genotype">Cell Type</Option>
-    </Select>
-  </div>
+<div>
+  {#each groupOptions as { value, label }}
+    <FormField>
+      <Radio bind:group={groupBy} {value} />
+      <span>{label}</span>
+    </FormField>
+  {/each}
 </div>

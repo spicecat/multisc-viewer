@@ -1,6 +1,6 @@
 import type { ArgumentsHost, ExceptionFilter } from "@nestjs/common";
-import type { Response } from "express";
 import { Catch, HttpStatus } from "@nestjs/common";
+import type { Response } from "express";
 
 export class Redirect {
   public constructor(

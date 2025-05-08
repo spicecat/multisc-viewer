@@ -1,7 +1,7 @@
 import type { ArgumentsHost } from "@nestjs/common";
-import type { Response } from "express";
 import { Catch, HttpException } from "@nestjs/common";
 import { BaseExceptionFilter } from "@nestjs/core";
+import type { Response } from "express";
 
 export class ErrorPage {
   public constructor(public readonly props: any) {}

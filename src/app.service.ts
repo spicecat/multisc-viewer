@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { existsSync, readdirSync, readFileSync, rmSync } from 'fs';
+import { publications } from './config/publications';
 import { DaemonService } from './daemon.service';
 
 export interface ChartResult {
@@ -42,33 +43,22 @@ export class AppService {
 		this.activity = new Map();
 	}
 
-	public getStudies(): Study[] {
-		return [
-			{
-				studyId: 'study1',
-				name: 'Study 1',
-				description: 'Study 1 description',
-				datasets: this.getDatasets()
-			},
-			{
-				studyId: 'study2',
-				name: 'Study 2',
-				description: 'Study 2 description',
-				datasets: this.getDatasets()
-			}
-		];
+	public getPublications(): Publication[] {
+		return publications.map((publication) => ({
+			...publication,
+			datasets: this.getDatasets() // TODO: add datasets to publication
+		}));
 	}
 
-	// TODO: probably don't need all the checks given the go script
 	public getDatasets(): Dataset[] {
 		return readdirSync('datasets')
-			.filter((dataset) => existsSync(`datasets/${dataset}/data.rds`) && existsSync(`datasets/${dataset}/genes.json`))
-			.map((name) => AppService.META.find((dataset) => dataset.name === name))
-			.filter((dataset) => !!dataset);
+			.filter((ds) => existsSync(`datasets/${ds}/data.rds`) && existsSync(`datasets/${ds}/genes.json`))
+			.map((name) => AppService.META.find((ds) => ds.name === name))
+			.filter((ds) => !!ds);
 	}
 
 	public getGenes(datasets: string[]): string[] {
-		const geneSets = datasets.map<string[]>((dataset) => JSON.parse(readFileSync(`datasets/${dataset}/genes.json`).toString()));
+		const geneSets = datasets.map<string[]>((ds) => JSON.parse(readFileSync(`datasets/${ds}/genes.json`).toString()));
 		return geneSets.slice(1).reduce((curr, next) => curr.filter((gene) => next.includes(gene)), geneSets[0]);
 	}
 

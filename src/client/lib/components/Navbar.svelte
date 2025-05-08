@@ -1,6 +1,7 @@
 <script lang="ts">
   import TopAppBar, { Row, Section, Title } from "@smui/top-app-bar";
   import Button from "@smui/button";
+  import IconButton from "@smui/icon-button";
 </script>
 
 <TopAppBar
@@ -11,13 +12,16 @@
   <Row>
     <Section>
       <Button href="/">
-        <Title>Plot Viewer</Title>
+        <Title>MultiSC-Viewer</Title>
       </Button>
     </Section>
     <Section align="end">
-      <Button href="/about">
-        <Title>About</Title>
+      <Button href="/publication">
+        <Title>Publications</Title>
       </Button>
+      <IconButton class="material-icons" href="https://git.jasonxu.dev/JasonXu/plot-viewer/">
+        source
+      </IconButton>
     </Section>
   </Row>
 </TopAppBar>

@@ -1,8 +1,6 @@
 /// <reference types="svelte" />
 /// <reference types="vite/client" />
 
-type Writable<T> = import("svelte/store").Writable<T>;
-
 interface Dataset {
   name: string;
   year: number;
@@ -15,12 +13,23 @@ interface Dataset {
   cellType: string;
 }
 
-interface Study {
-  studyId: string;
+type Gene = string;
+
+interface Publication {
+  publicationId: string;
   name: string;
   description: string;
   datasets: Dataset[];
+  year?: number[];
+  species?: string[];
+  author?: string[];
+  disease?: string[];
+  cellType?: string[];
 }
+
+type Data = Dataset | Gene | Publication;
+
+type Grouping = "Genotype" | "CellType";
 
 interface User {
   id: number;
@@ -71,8 +80,8 @@ interface IndexProps extends PageProps {
   token: string;
 }
 
-interface StudyProps extends PageProps {
-  study: Study;
+interface PublicationProps extends PageProps {
+  publication: Publication;
 }
 
 interface CompareProps extends PageProps {
@@ -90,4 +99,16 @@ interface PlotConfig {
 interface RenderResult {
   violin: string;
   clustering: string;
+}
+
+interface ChartResult {
+  clustering: string;
+  violin: string;
+}
+
+interface Column {
+  key: string;
+  label: string;
+  url?: boolean;
+  sortable?: boolean;
 }
