@@ -79,7 +79,7 @@ while (ln != "quit") {
 		res = 300,            # 300 pixels per inch
 		pointsize = 5)        # smaller font size
 	  
-	  feature <- FeaturePlot(datasets[[ds]], features = marker_genes, min.cutoff = "q5", max.cutoff = "q95")
+	  feature <- FeaturePlot(datasets[[ds]], features = c(gene), min.cutoff = "q5", max.cutoff = "q95")
 	  print(feature)
 	  dev.off()
 
