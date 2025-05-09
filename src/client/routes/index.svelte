@@ -18,6 +18,7 @@
       MultiSC-Viewer is a web-based tool designed to compare and visualize gene
       expression in multiple single cell/nucleus dataset side by side for any
       gene across different brain regions, disease conditions, and species.
+      <a href="https://git.jasonxu.dev/JasonXu/plot-viewer/">Source Code</a>
     </p>
   </section>
 

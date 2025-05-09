@@ -17,10 +17,12 @@ type Gene = string;
 
 interface Publication {
   publicationId: string;
-  name: string;
-  description: string;
+  title: string;
+  journal: string;
+  abstract: string;
   datasets: Dataset[];
   year?: number[];
+  PMID?: string[];
   species?: string[];
   author?: string[];
   disease?: string[];

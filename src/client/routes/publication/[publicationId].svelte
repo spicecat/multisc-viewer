@@ -12,8 +12,8 @@
 <Navbar />
 <main style="margin:auto 10rem;">
   <section>
-    <h1>{publication.name}</h1>
-    <p>{publication.description}</p>
+    <h1>{publication.title}</h1>
+    <p>{publication.abstract}</p>
   </section>
 
   <hr />

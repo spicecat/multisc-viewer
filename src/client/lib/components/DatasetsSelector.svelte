@@ -13,7 +13,7 @@
   let isLoadingGenes: boolean = $state(true);
   let selectedGene: string = $state("");
   let groupBy: Grouping = $state("Genotype");
-  let geneControlsOpen: boolean = $state(true);
+  let geneControlsOpen: boolean = $state(false);
 
   const splitBy = $derived(groupBy === "Genotype" ? "CellType" : "Genotype");
 

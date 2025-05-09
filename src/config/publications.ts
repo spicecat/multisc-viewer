@@ -1,16 +1,24 @@
 export const publications: Publication[] = [
   {
-    publicationId: "astro-ad",
-    name: "Astrocyte Publications in Alzheimer's Disease",
-    description:
-      "Collection of publications examining astrocyte populations in Alzheimer's Disease across different brain regions",
+    publicationId: "yamada-2025",
+    title:
+      "Transcriptomic changes in Lewy body disease and Alzheimer disease linked to selective regional and neuronal vulnerability",
+    abstract: "TBD abstract",
+    journal: "TBD journal",
     datasets: [], // TODO: add datasets
+    year: [2025],
+    PMID: ["TBD PMID"],
+    author: ["Shinnosuke Yamada"],
   },
   {
-    publicationId: "astro-hd",
-    name: "Astrocyte Publications in Huntington's Disease",
-    description:
-      "Collection of publications examining astrocyte populations in Huntington's Disease across different brain regions",
+    publicationId: "saliu-2025",
+    title:
+      "Unveiling Convergent Molecular Mechanisms in Astrocytes via Single-Cell Genomics Across Six Neurodegenerative Diseases and Seven Brain Regions",
+    abstract: "TBD abstract",
+    journal: "TBD journal",
     datasets: [], // TODO: add datasets
+    year: [2025],
+    PMID: ["TBD PMID"],
+    author: ["Ibrahim Saliu"],
   },
 ];

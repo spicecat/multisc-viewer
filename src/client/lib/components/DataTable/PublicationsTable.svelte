@@ -7,26 +7,27 @@
     publications.map((publication) => ({
       ...publication,
       publication: {
-        name: publication.name,
+        name: publication.title,
         href: `/publication/${publication.publicationId}`,
       },
-      year: [...new Set(publication.datasets.map((ds) => ds.year))],
+      datasets: publication.datasets,
+      // year: [...new Set(publication.datasets.map((ds) => ds.year))],
+      // PMID: [...new Set(publication.datasets.map((ds) => ds.PMID))],
       species: [...new Set(publication.datasets.map((ds) => ds.species))],
-      author: [...new Set(publication.datasets.map((ds) => ds.author))],
+      // author: [...new Set(publication.datasets.map((ds) => ds.author))],
       disease: [
         ...new Set(publication.datasets.map((ds) => ds.disease).flat()),
       ],
       cellType: [...new Set(publication.datasets.map((ds) => ds.cellType))],
-      datasets: publication.datasets,
     }))
   );
 
   const publicationColumns: Column[] = [
     { key: "publication", label: "Publication", url: true },
-    { key: "description", label: "Description" },
-    { key: "year", label: "Year" },
-    { key: "species", label: "Species" },
     { key: "author", label: "Authors" },
+    { key: "journal", label: "Journal" },
+    { key: "year", label: "Year" },
+    { key: "PMID", label: "PMID" },
     { key: "disease", label: "Disease" },
     { key: "cellType", label: "Cell Type" },
     { key: "datasets", label: "Datasets" },
