@@ -1,6 +1,7 @@
 <script lang="ts">
   import { makeTitle } from "$lib/utils/utils";
   import Checkbox from "@smui/checkbox";
+  import Chip, { Set, Text } from '@smui/chips';
   import DataTable, {
     Body,
     Cell,
@@ -112,6 +113,14 @@
           <Cell numeric={typeof item[key] === "number"}>
             {#if url}
               <a href={item[key].href}>{item[key].name}</a>
+            {:else if Array.isArray(item[key])}
+              <Set chips={item[key]}>
+                {#snippet chip(chip)}
+                <Chip {chip}>
+                  <Text>{chip}</Text>
+                </Chip>
+                {/snippet}
+              </Set>
             {:else}
               {key === "name" ? makeTitle(item[key]) : item[key]}
             {/if}
