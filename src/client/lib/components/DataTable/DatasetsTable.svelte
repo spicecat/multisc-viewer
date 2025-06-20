@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { Label } from "@smui/button";
-  import Tab from "@smui/tab";
+  import Tab, { Label } from "@smui/tab";
   import TabBar from "@smui/tab-bar";
   import DataTableSearch from "./DataTableSearch.svelte";
 
