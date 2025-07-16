@@ -1,137 +1,123 @@
-import { Injectable } from '@nestjs/common';
-import { existsSync, readdirSync, readFileSync, rmSync } from 'fs';
-import { publications } from './config/publications';
-import { DaemonService } from './daemon.service';
+import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import NodeCache from "node-cache";
+import { existsSync, readFileSync, rmSync } from "node:fs";
+import { DaemonService } from "./daemon.service";
 
 export interface ChartResult {
-	clustering: string;
-	violin: string;
-	feature: string;
-}
-
-export interface Dataset {
-	name: string;
-	year: number;
-	region: string[];
-	PMID: string;
-	species: string;
-	author: string;
-	disease: string[];
-	size: number;
-	cellType: string;
-}
-
-export interface Study {
-	studyId: string;
-	name: string;
-	description: string;
-	datasets: Dataset[];
+  clustering: string;
+  violin: string;
+  feature: string;
 }
 
 @Injectable()
 export class AppService {
-	public static readonly META: Dataset[] = JSON.parse(readFileSync('datasets/meta.json').toString());
+  private readonly plotCache: NodeCache;
+  private readonly datasetsBasePath: string;
+  readonly publications: Map<number, Publication>;
+  readonly datasets: Map<string, Dataset>;
 
-	private readonly cache: Map<string, Promise<ChartResult>>;
-	private readonly expirations: Map<string, NodeJS.Timeout>;
+  public constructor(
+    private readonly configService: ConfigService,
+    private readonly daemon: DaemonService
+  ) {
+    this.plotCache = new NodeCache({
+      stdTTL: this.configService.get<number>("plot.ttl"),
+    });
 
-	private readonly activity: Map<string, NodeJS.Timeout>;
+    const publicationsMeta = `${this.configService.get<string>("publications.basePath")!}/${this.configService.get<string>("publications.metaFile")!}`;
+    this.publications = new Map(
+      JSON.parse(readFileSync(publicationsMeta).toString()).map(
+        (pub: Publication) => [pub.PMID, pub]
+      )
+    );
 
-	public constructor(private readonly daemon: DaemonService) {
-		this.cache = new Map();
-		this.expirations = new Map();
-		this.activity = new Map();
-	}
+    this.datasetsBasePath =
+      this.configService.get<string>("datasets.basePath")!;
+    const datasetsMeta = `${this.datasetsBasePath}/${this.configService.get<string>("datasets.metaFile")!}`;
+    this.datasets = new Map(
+      JSON.parse(readFileSync(datasetsMeta).toString())
+        .filter(({ name }: Dataset) =>
+          this.configService
+            .get<string[]>("datasets.requiredFiles")!
+            .every((file) =>
+              existsSync(`${this.datasetsBasePath}/${name}/${file}`)
+            )
+        )
+        .map((ds: Dataset) => [ds.name, ds])
+    );
+  }
 
-	public getPublications(): Publication[] {
-		return publications.map((publication) => ({
-			...publication,
-			datasets: this.getDatasets() // TODO: add datasets to publication
-		}));
-	}
+  public getGenes(datasets: string[]): string[] {
+    return Array.from(
+      new Set(
+        datasets
+          .map((ds) =>
+            JSON.parse(
+              readFileSync(
+                `${this.datasetsBasePath}/${ds}/genes.json`
+              ).toString()
+            )
+          )
+          .flat()
+      )
+    ).toSorted();
+  }
 
-	public getDatasets(): Dataset[] {
-		return readdirSync('datasets')
-			.filter((ds) => existsSync(`datasets/${ds}/data.rds`) && existsSync(`datasets/${ds}/genes.json`))
-			.map((name) => AppService.META.find((ds) => ds.name === name))
-			.filter((ds) => !!ds);
-	}
+  public async render(
+    dataset: string,
+    gene: string,
+    groupBy: string,
+    splitBy: string
+  ): Promise<ChartResult> {
+    const key = this._cacheKey(dataset, gene, groupBy, splitBy);
+    const cachedResult = this.plotCache.get<Promise<ChartResult>>(key);
+    if (cachedResult) return cachedResult;
 
-	public getGenes(datasets: string[]): string[] {
-		const geneSets = datasets.map<string[]>((ds) => JSON.parse(readFileSync(`datasets/${ds}/genes.json`).toString()));
-		return geneSets.slice(1).reduce((curr, next) => curr.filter((gene) => next.includes(gene)), geneSets[0]);
-	}
+    const result = this.daemon
+      .render(dataset, gene, groupBy, splitBy)
+      .then((opid) => {
+        try {
+          const clusteringPath = `${this.datasetsBasePath}/${dataset}/${opid}_umap.png`;
+          const violinPath = `${this.datasetsBasePath}/${dataset}/${opid}_vln.png`;
+          const featurePath = `${this.datasetsBasePath}/${dataset}/${opid}_feat.png`;
 
-	public async render(dataset: string, gene: string, groupBy: string, splitBy: string, token: string | null): Promise<ChartResult> {
-		const key = this._cacheKey(dataset, gene, groupBy, splitBy);
+          const clustering =
+            "data:image/png;base64," +
+            readFileSync(clusteringPath).toString("base64");
+          const violin =
+            "data:image/png;base64," +
+            readFileSync(violinPath).toString("base64");
+          const feature =
+            "data:image/png;base64," +
+            readFileSync(featurePath).toString("base64");
 
-		if (token) this._refresh(token);
+          rmSync(clusteringPath);
+          rmSync(violinPath);
+          rmSync(featurePath);
 
-		if (this.cache.has(key)) {
-			if (this.expirations.has(key)) this.expirations.get(key)!.refresh();
-			return this.cache.get(key)!;
-		} else {
-			const result = this.daemon.render(dataset, gene, groupBy, splitBy).then((opid) => {
-				try {
-					const clustering = 'data:image/png;base64,' + readFileSync(`datasets/${dataset}/${opid}_umap.png`).toString('base64');
-					const violin = 'data:image/png;base64,' + readFileSync(`datasets/${dataset}/${opid}_vln.png`).toString('base64');
-					const feature = 'data:image/png;base64,' + readFileSync(`datasets/${dataset}/${opid}_feat.png`).toString('base64');
+          return { clustering, violin, feature } as ChartResult;
+        } catch (e) {
+          console.error(e);
+          this.plotCache.del(key);
+          throw new Error(`Unable to find plot for '${dataset}'`);
+        }
+      });
 
-					rmSync(`datasets/${dataset}/${opid}_umap.png`);
-					rmSync(`datasets/${dataset}/${opid}_vln.png`);
-					rmSync(`datasets/${dataset}/${opid}_feat.png`);
+    this.plotCache.set(key, result);
+    return result;
+  }
 
-					return { clustering, violin, feature };
-				} catch (e) {
-					console.error(e);
-					throw new Error(`Unable to find plot of '${dataset}'`);
-				}
-			});
+  public async load(datasets: string[]): Promise<void> {
+    return this.daemon.load(datasets);
+  }
 
-			result
-				.then(() =>
-					this.expirations.set(
-						key,
-						setTimeout(() => {
-							this.cache.delete(key);
-							this.expirations.delete(key);
-						}, 30 * 60 * 1000)
-					)
-				)
-				.then(() => {
-					if (token) this._refresh(token);
-				});
-
-			this.cache.set(key, result);
-			return result;
-		}
-	}
-
-	public async preload(token: string | null, datasets: string[]): Promise<void> {
-		if (token !== null) {
-			this._refresh(token);
-		}
-
-		return this.daemon.batch(token, datasets).then(() => {
-			if (token) this._refresh(token);
-		});
-	}
-
-	private _cacheKey(dataset: string, gene: string, groupBy: string, splitBy: string): string {
-		return `${dataset}:${gene}:${groupBy}:${splitBy}`;
-	}
-
-	private _refresh(token: string) {
-		if (this.activity.has(token)) this.activity.get(token)!.refresh();
-		else {
-			this.activity.set(
-				token,
-				setTimeout(() => {
-					this.activity.delete(token);
-					this.daemon.unload(token);
-				}, 60_000)
-			);
-		}
-	}
+  private _cacheKey(
+    dataset: string,
+    gene: string,
+    groupBy: string,
+    splitBy: string
+  ): string {
+    return `${dataset}:${gene}:${groupBy}:${splitBy}`;
+  }
 }
-

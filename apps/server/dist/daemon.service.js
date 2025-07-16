@@ -8,90 +8,77 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DaemonService = void 0;
 const common_1 = require("@nestjs/common");
-const app_service_1 = require("./app.service");
-const Daemon_1 = require("./utils/Daemon");
-const utils_1 = require("./utils/utils");
+const axios_1 = __importDefault(require("axios"));
+const node_cache_1 = __importDefault(require("node-cache"));
+const DAEMON_SERVER = "http://localhost";
+const DAEMON_PORT_START = 8001;
+const DAEMON_COUNT = 10;
 let DaemonService = class DaemonService {
-    procs;
+    #datasetCache = new node_cache_1.default({ stdTTL: 30 * 60 });
+    #procs = new Map();
     constructor() {
-        this.procs = new Array(10).fill(null).map(() => new Daemon_1.Daemon());
+        this.#datasetCache.on("expired", (ds, daemon) => this._unload(daemon, ds));
     }
-    async batch(loader, datasets) {
-        return Promise.all(datasets.map((ds) => this.load(loader, ds))).then();
-    }
-    async load(loader, ds) {
-        const proc = this.procs.find((proc) => proc.datasets.some((dataset) => dataset.ds === ds));
-        if (proc) {
-            if (loader)
-                proc.datasets.find((dataset) => dataset.ds === ds).loaders.add(loader);
-            // TODO: not precise (could be an operation later than the actual end of the load of this dataset)
-            // consider changing to Promise.resolve if all operations dependent on this case are queued operations
-            return proc.idle;
-        }
-        else {
-            if (loader) {
-                const availableProc = this.procs.find((proc) => !proc.datasets.some((set) => set.loaders.has(loader)));
-                if (availableProc)
-                    return availableProc.load(loader, ds);
-                else {
-                    const newProc = this._spawn();
-                    return newProc.load(loader, ds);
-                }
+    async onModuleInit() {
+        console.log("Initializing DaemonService...");
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        await Promise.all(Array.from({ length: DAEMON_COUNT }, async (_, i) => {
+            const port = DAEMON_PORT_START + i;
+            try {
+                const response = await axios_1.default.get(`${DAEMON_SERVER}:${port}/status`);
+                if (response.data)
+                    this.#procs.set(port, {
+                        port,
+                        load: 0,
+                        datasets: new Set(),
+                    });
             }
-            else {
-                const bestProc = this.procs.reduce((best, proc) => proc.datasets.length < best.datasets.length ? proc : best, this.procs[0]);
-                return bestProc.load(loader, ds).then(() => {
-                    setTimeout(() => {
-                        if (bestProc.datasets.find((dataset) => dataset.ds === ds)?.loaders
-                            .size === 0) {
-                            if (bestProc.datasets.length === 1 && this.procs.length > 10) {
-                                bestProc.kill();
-                                this.procs.splice(this.procs.indexOf(bestProc), 1);
-                            }
-                            else
-                                bestProc.unload(ds);
-                        }
-                    }, (0, utils_1.approximateRenderTime)(app_service_1.AppService.META.find((dataset) => dataset.name === ds).size) * 30);
-                });
+            catch (error) {
+                console.error(`Daemon on port ${port} not responding`);
             }
-        }
+        }));
     }
-    async unload(loader) {
-        const promises = [];
-        this.procs.forEach((proc) => {
-            proc.datasets.forEach((ds) => {
-                if (ds.loaders.has(loader)) {
-                    if (ds.loaders.size === 1) {
-                        if (proc.datasets.length === 1 && this.procs.length > 10) {
-                            proc.kill();
-                            this.procs.splice(this.procs.indexOf(proc), 1);
-                        }
-                        else {
-                            promises.push(proc.unload(ds.ds));
-                            proc.datasets.splice(proc.datasets.indexOf(ds), 1);
-                        }
-                    }
-                    else
-                        ds.loaders.delete(loader);
-                }
-            });
-        });
-        return Promise.all(promises).then();
+    async load(datasets) {
+        if (!Array.isArray(datasets))
+            datasets = [datasets];
+        await Promise.all(datasets.map(async (ds, index) => {
+        }));
+        console.log("Datasets in cache:", this.#datasetCache.keys());
     }
     async render(ds, gene, groupBy, splitBy) {
-        const proc = this.procs.find((proc) => proc.datasets.some((dataset) => dataset.ds === ds));
-        if (proc)
-            return proc.render(ds, gene, groupBy, splitBy);
-        else
-            return this.load(null, ds).then(() => this.render(ds, gene, groupBy, splitBy));
+        await this.load(ds);
+        const daemon = this.#datasetCache.get(ds);
+        if (!daemon) {
+            throw new Error(`Dataset ${ds} is not loaded`);
+        }
+        try {
+            const response = await axios_1.default.post(`${DAEMON_SERVER}:${daemon.port}/render`, {
+                ds,
+                gene,
+                groupBy,
+                splitBy,
+            });
+            return response.data.opid;
+        }
+        catch (error) {
+            console.error(`Failed to render dataset ${ds} on port ${daemon.port}:`, error.message);
+            throw new Error(`Failed to render plot for dataset ${ds}`);
+        }
     }
-    _spawn() {
-        const proc = new Daemon_1.Daemon();
-        this.procs.push(proc);
-        return proc;
+    async _unload(daemon, ds) {
+        try {
+            await axios_1.default.post(`${DAEMON_SERVER}:${daemon.port}/unload`, { ds });
+            daemon.datasets.delete(ds);
+        }
+        catch (error) {
+            console.error(`Failed to unload dataset ${ds} from port ${daemon.port}:`, error.message);
+        }
     }
 };
 exports.DaemonService = DaemonService;

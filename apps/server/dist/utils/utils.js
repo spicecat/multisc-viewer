@@ -6,9 +6,6 @@ exports.approximateRenderTime = approximateRenderTime;
 function fi() {
     return undefined;
 }
-/**
- * Serialize data to a string representation
- */
 function serialize(data) {
     if (typeof data === "object") {
         if (data === null)
@@ -49,7 +46,6 @@ function serialize(data) {
         }
     }
 }
-// Parameters obtained by linear regression (R^2=0.9999) on experimental data
 function approximateRenderTime(sz) {
     return 13.34865 * (sz / 1_000_000) + 0.63184;
 }
