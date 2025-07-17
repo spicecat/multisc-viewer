@@ -41,7 +41,7 @@ export class PlotService {
     if (cachedResult) return cachedResult;
 
     const opid = await this.daemon.render(dataset, gene, groupBy, splitBy);
-    
+    console.log(`Rendering plots for ${dataset} with opid ${opid}`);
     const clusteringPath = `${this.datasetsBasePath}/${dataset}/${opid}_umap.png`;
     const violinPath = `${this.datasetsBasePath}/${dataset}/${opid}_vln.png`;
     const featurePath = `${this.datasetsBasePath}/${dataset}/${opid}_feat.png`;

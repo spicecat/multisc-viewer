@@ -22,6 +22,6 @@ export default () => ({
   daemon: {
     ttl: 30 * 60 * 1000, // 30 minutes
     server: "http://localhost",
-    ports: (process.env.DAEMON_PORTS ?? "").split(",").map(Number),
+    ports: JSON.parse(process.env.DAEMON_PORTS ?? "[]"),
   },
 });
