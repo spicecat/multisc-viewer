@@ -1,10 +1,8 @@
 import { Injectable, OnModuleInit } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import axios from "axios";
 import NodeCache from "node-cache";
-
-const DAEMON_SERVER = "http://localhost";
-const DAEMON_PORT_START = 8001;
-const DAEMON_COUNT = 10;
+import { DataService } from "./data.service";
 
 interface Daemon {
   port: number;
@@ -14,24 +12,35 @@ interface Daemon {
 
 @Injectable()
 export class DaemonService implements OnModuleInit {
-  readonly #datasetCache = new NodeCache({ stdTTL: 30 * 60 }); // 30 minutes TTL
-  readonly #procs: Map<number, Daemon> = new Map();
+  private readonly DAEMON_SERVER: string;
+  private readonly datasetCache: NodeCache;
+  private readonly procs: Map<number, Daemon> = new Map();
 
-  public constructor() {
-    this.#datasetCache.on("expired", (ds: string, daemon: Daemon) => this._unload(daemon, ds));
+  public constructor(
+    private readonly configService: ConfigService,
+    private readonly dataService: DataService
+  ) {
+    this.DAEMON_SERVER = this.configService.get<string>("daemon.server")!;
+    this.datasetCache = new NodeCache({
+      stdTTL: this.configService.get<number>("daemon.ttl"),
+    });
+
+    this.datasetCache.on("expired", (ds: string, daemon: Daemon) =>
+      this._unload(daemon, ds)
+    );
   }
 
   async onModuleInit(): Promise<void> {
     console.log("Initializing DaemonService...");
     await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait for daemons to start
-
     await Promise.all(
-      Array.from({ length: DAEMON_COUNT }, async (_, i) => {
-        const port = DAEMON_PORT_START + i;
+      this.configService.get<number[]>("daemon.ports")!.map(async (port) => {
         try {
-          const response = await axios.get(`${DAEMON_SERVER}:${port}/status`);
+          const response = await axios.get(
+            `${this.DAEMON_SERVER}:${port}/status`
+          );
           if (response.data)
-            this.#procs.set(port, {
+            this.procs.set(port, {
               port,
               load: 0,
               datasets: new Set<string>(),
@@ -43,30 +52,61 @@ export class DaemonService implements OnModuleInit {
     );
   }
 
+  private async _unload(daemon: Daemon, ds: string): Promise<void> {
+    try {
+      await axios.post(`${this.DAEMON_SERVER}:${daemon.port}/unload`, { ds });
+      daemon.datasets.delete(ds);
+      const datasetInfo = this.dataService.datasets.get(ds);
+      if (datasetInfo) {
+        daemon.load -= datasetInfo.size;
+      }
+    } catch (error: any) {
+      console.error(
+        `Failed to unload dataset ${ds} from port ${daemon.port}:`,
+        error.message
+      );
+    }
+  }
+
   public async load(datasets: string | string[]): Promise<void> {
+    if (this.procs.size === 0)
+      throw new Error("No daemons available to load dataset.");
+
     if (!Array.isArray(datasets)) datasets = [datasets];
 
     await Promise.all(
-      datasets.map(async (ds, index) => {
-        // if (this.#datasetCache.has(ds)) this.#datasetCache.ttl(ds);
-        // else {
-        //   const daemon = this.#procs[index % this.#procs.length];
-        //   try {
-        //     await axios.post(`${DAEMON_SERVER}:${daemon.port}/load`, { ds });
-        //     daemon.datasets.add(ds);
-        //     this.#datasetCache.set(ds, daemon);
-        //   } catch (error: any) {
-        //     console.error(
-        //       `Failed to load dataset ${ds} on port ${daemon.port}:`,
-        //       error.message
-        //     );
-        //     // Handle error, maybe try another daemon or throw
-        //   }
-        // }
+      datasets.map(async (ds) => {
+        if (this.datasetCache.has(ds)) this.datasetCache.ttl(ds);
+        else {
+          const datasetInfo = this.dataService.datasets.get(ds);
+          if (!datasetInfo) {
+            console.error(`Dataset ${ds} not found.`);
+            return;
+          }
+
+          const daemon = [...this.procs.values()].reduce((a, b) =>
+            a.load < b.load ? a : b
+          ); // daemon with the least load
+          daemon.load += datasetInfo.size;
+
+          try {
+            await axios.post(`${this.DAEMON_SERVER}:${daemon.port}/load`, {
+              ds,
+            });
+            daemon.datasets.add(ds);
+            this.datasetCache.set(ds, daemon);
+          } catch (error: any) {
+            daemon.load -= datasetInfo.size;
+            console.error(
+              `Failed to load dataset ${ds} on port ${daemon.port}:`,
+              error.message
+            );
+          }
+        }
       })
     );
 
-    console.log("Datasets in cache:", this.#datasetCache.keys());
+    console.log("Datasets in cache:", this.datasetCache.keys());
   }
 
   public async render(
@@ -76,14 +116,13 @@ export class DaemonService implements OnModuleInit {
     splitBy: string
   ): Promise<string> {
     await this.load(ds);
-    const daemon = this.#datasetCache.get<Daemon>(ds);
-    if (!daemon) {
+    const daemon = this.datasetCache.get<Daemon>(ds);
+    if (!daemon)
       throw new Error(`Dataset ${ds} is not loaded`);
-    }
 
     try {
       const response = await axios.post(
-        `${DAEMON_SERVER}:${daemon.port}/render`,
+        `${this.DAEMON_SERVER}:${daemon.port}/render`,
         {
           ds,
           gene,
@@ -98,18 +137,6 @@ export class DaemonService implements OnModuleInit {
         error.message
       );
       throw new Error(`Failed to render plot for dataset ${ds}`);
-    }
-  }
-
-  private async _unload(daemon: Daemon, ds: string): Promise<void> {
-    try {
-      await axios.post(`${DAEMON_SERVER}:${daemon.port}/unload`, { ds });
-      daemon.datasets.delete(ds);
-    } catch (error: any) {
-      console.error(
-        `Failed to unload dataset ${ds} from port ${daemon.port}:`,
-        error.message
-      );
     }
   }
 }

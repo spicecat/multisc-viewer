@@ -1,9 +1,9 @@
-type Author = {
+interface Author {
   name: string;
   affiliation: string;
-};
+}
 
-type Publication = {
+interface Publication {
   PMID: number;
   title: string;
   abstract: string;
@@ -12,9 +12,9 @@ type Publication = {
   doi: string;
   year: number;
   datasets: string[];
-};
+}
 
-type Dataset = {
+interface Dataset {
   name: string;
   year: number;
   region: string[];
@@ -24,12 +24,14 @@ type Dataset = {
   disease: string[];
   size: number;
   cellType: string;
-};
+  defaultGene: string;
+}
 
-type ChartResult = {
-  key: string;
-  path: string;
-};
+interface ChartResult {
+  clustering: string;
+  violin: string;
+  feature: string;
+}
 
 type IndexProps = {
   datasets: Dataset[];

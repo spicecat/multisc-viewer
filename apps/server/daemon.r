@@ -1,13 +1,8 @@
-library(plumber)
-library(Seurat)
-library(sctransform)
-# library(Matrix)
-library(RColorBrewer) # colorRampPalette(), brewer.pal
-library(ggplot2) # qplot(), position_nudge(), geom_text()
-library(cowplot) # for plot_grid
-library(gplots) # for heatmap2
-library(dplyr) # for mutate, top_n# Setup the Seurat Object
-library(parallel)
+suppressPackageStartupMessages({
+  library(plumber)
+  library(Seurat)
+  library(ggplot2)
+})
 
 # --- Helper Functions ---
 get_colors <- function(ds, group_by) {

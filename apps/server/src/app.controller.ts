@@ -2,47 +2,52 @@ import {
   BadRequestException,
   Controller,
   Get,
-  Param,
+  Body,
   Post,
   Query,
 } from "@nestjs/common";
-import { randomBytes } from "crypto";
-import { AppService } from "./app.service";
+import { DataService } from "./data.service";
+import { PlotService } from "./plot.service";
+import { DaemonService } from "./daemon.service";
 // import { Page } from "./utils/decorators/page.decorator";
 
 @Controller()
 export class AppController {
-  constructor(private readonly service: AppService) {}
+  constructor(
+    private readonly dataService: DataService,
+    private readonly plotService: PlotService,
+    private readonly daemonService: DaemonService
+  ) {}
 
   @Get("/publications")
   getPublications(): Publication[] {
-    return [...this.service.publications.values()];
+    return [...this.dataService.publications.values()];
   }
 
   @Get("/datasets")
   getDatasets(): Dataset[] {
-    return [...this.service.datasets.values()];
+    return [...this.dataService.datasets.values()];
   }
 
   @Get("/genes")
   getGenes(@Query("datasets") datasets: string = ""): string[] {
-    return this.service.getGenes(datasets.split(","));
+    return this.dataService.getGenes(datasets.split(","));
   }
 
   @Post("/load")
-  async load(@Query("datasets") datasets: string = ""): Promise<void> {
-    return this.service.load(datasets.split(","));
+  async load(@Body("datasets") datasets: string = ""): Promise<void> {
+    return this.daemonService.load(datasets.split(","));
   }
 
-  // @Get("/plot")
-  // async getPlot(
-  //   @Query("dataset") dataset: string,
-  //   @Query("gene") gene: string,
-  //   @Query("groupBy") groupBy: string,
-  //   @Query("splitBy") splitBy: string,
-  // ): Promise<ChartResult> {
-  //   return this.service.render(dataset, gene, groupBy, splitBy, token);
-  // }
+  @Get("/plot")
+  async getPlot(
+    @Query("dataset") dataset: string,
+    @Query("gene") gene: string,
+    @Query("groupBy") groupBy: string,
+    @Query("splitBy") splitBy: string,
+  ): Promise<ChartResult> {
+    return this.plotService.render(dataset, gene, groupBy, splitBy);
+  }
 
   // @Page()
   // @Get("/")

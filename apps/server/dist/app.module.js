@@ -12,10 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
-const configuration_1 = __importDefault(require("./config/configuration"));
 const app_controller_1 = require("./app.controller");
-const app_service_1 = require("./app.service");
+const configuration_1 = __importDefault(require("./config/configuration"));
 const daemon_service_1 = require("./daemon.service");
+const data_service_1 = require("./data.service");
+const plot_service_1 = require("./plot.service");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -27,7 +28,7 @@ exports.AppModule = AppModule = __decorate([
             }),
         ],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService, daemon_service_1.DaemonService],
+        providers: [data_service_1.DataService, plot_service_1.PlotService, daemon_service_1.DaemonService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map
