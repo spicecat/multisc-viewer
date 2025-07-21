@@ -1,8 +1,28 @@
+node_modules
+
+# Output
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
+/build
+
+# OS
 .DS_Store
-.vscode/
-/node_modules
+Thumbs.db
 
+# Env
 .env
-datasets/
+.env.*
+!.env.example
+!.env.test
 
-ds-add/ds-add
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+.DS_Store
+.vscode
+datasets
+publications
