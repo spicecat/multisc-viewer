@@ -10,17 +10,17 @@ Compare Alzheimer disease (AD), Parkinson disease (PD), and control gene express
 ```bash
 $ git clone https://git.jasonxu.dev/JasonXu/plot-viewer.git
 $ cd plot-viewer
-$ yarn
+$ pnpm i
 ```
 
 ## Running the app
 
 ```bash
 # development
-$ yarn run start
+$ pnpm dev
 ```
 
-View app at [localhost:5000](http://localhost:5000)
+View app at [localhost:5000](http://localhost:5173)
 
 ## License
 

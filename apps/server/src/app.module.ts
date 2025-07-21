@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-// import { ServeStaticModule } from "@nestjs/serve-static";
+import { ServeStaticModule } from "@nestjs/serve-static";
 import { AppController } from "./app.controller";
 import configuration from "./config/configuration";
 import { DaemonService } from "./daemon.service";
@@ -16,10 +16,10 @@ import { PlotService } from "./plot.service";
     //   rootPath: "dist/client/assets",
     //   serveRoot: "/__app",
     // }),
-    // ServeStaticModule.forRoot({
-    //   rootPath: "src/client/public",
-    //   serveRoot: "/",
-    // }),
+    ServeStaticModule.forRoot({
+      rootPath: "../../viewer/build/client",
+      serveRoot: "/",
+    }),
   ],
   controllers: [AppController],
   providers: [DataService, PlotService, DaemonService],

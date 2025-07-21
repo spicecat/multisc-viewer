@@ -106,6 +106,7 @@ interface RenderResult {
 interface ChartResult {
   clustering: string;
   violin: string;
+  feature: string;
 }
 
 interface Column {

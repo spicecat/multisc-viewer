@@ -31,7 +31,7 @@
     { key: "author", label: "Author" },
     { key: "disease", label: "Disease" },
     { key: "cellType", label: "Cell Type" },
-    // { key: "study", label: "Study", url: true }, // TODO
+    // { key: "publication", label: "Publication", url: true }, // TODO
   ];
 </script>
 

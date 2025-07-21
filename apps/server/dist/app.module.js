@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
+const serve_static_1 = require("@nestjs/serve-static");
 const app_controller_1 = require("./app.controller");
 const configuration_1 = __importDefault(require("./config/configuration"));
 const daemon_service_1 = require("./daemon.service");
@@ -25,6 +26,10 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             config_1.ConfigModule.forRoot({
                 load: [configuration_1.default],
+            }),
+            serve_static_1.ServeStaticModule.forRoot({
+                rootPath: "../../viewer/build/client",
+                serveRoot: "/",
             }),
         ],
         controllers: [app_controller_1.AppController],
