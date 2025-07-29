@@ -24,5 +24,7 @@ vite.config.ts.timestamp-*
 
 .DS_Store
 .vscode
-datasets
-publications
+data/publications/*
+data/datasets/*
+data/plots/*
+test.http

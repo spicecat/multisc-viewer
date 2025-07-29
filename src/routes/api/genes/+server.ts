@@ -1,8 +1,7 @@
-// GET /api/genes?datasets=...
-import { json } from '@sveltejs/kit';
-import { dataService } from '$lib/server/data.service';
+import { getGenes } from '$lib/server/data';
+import { type RequestHandler, json } from '@sveltejs/kit';
 
-export async function GET({ url }) {
-  const datasets = url.searchParams.get('datasets')?.split(',') || [];
-  return json(dataService.getGenes(datasets));
-}
+export const GET: RequestHandler = async ({ url }) => {
+	const datasets = url.searchParams.get('datasets')?.split(',') || [];
+	return json(getGenes(datasets));
+};

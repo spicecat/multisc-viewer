@@ -1,22 +1,23 @@
-// Centralized, type-safe app configuration
-import { env } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
-export const CONFIG = {
-  publications: {
-    basePath: env.PUBLICATIONS_BASE_PATH ?? './publications',
-    metaFile: env.PUBLICATIONS_META_FILE ?? 'meta.json'
-  },
-  datasets: {
-    basePath: env.DATASETS_BASE_PATH ?? './datasets',
-    metaFile: env.DATASETS_META_FILE ?? 'meta.json',
-    requiredFiles: (env.DATASETS_REQUIRED_FILES ?? 'data.rds,genes.json').split(',')
-  },
-  daemon: {
-    server: env.DAEMON_SERVER ?? 'http://localhost',
-    ttl: Number(env.DAEMON_TTL ?? 3600),
-    ports: (env.DAEMON_PORTS ?? '5001,5002').split(',').map(Number)
-  },
-  plot: {
-    ttl: Number(env.PLOT_TTL ?? 3600)
-  }
-} as const;
+export const datasetsConfig = {
+	dir: env.DATASETS_DIR ?? 'data/datasets',
+	meta: env.DATASETS_META ?? 'meta.json',
+	requiredFiles: ['data.rds', 'genes.json', 'cluster.colors.rds', 'genotype.colors.rds']
+};
+
+export const publicationsConfig = {
+	dir: env.PUBLICATIONS_DIR ?? 'data/publications',
+	meta: env.PUBLICATIONS_META ?? 'meta.json'
+};
+
+export const daemonConfig = {
+	server: 'http://localhost',
+	ports: env.DAEMON_PORTS ? env.DAEMON_PORTS.split(',').map(Number) : [3000],
+	stdTTL: env.DATASET_TTL ? parseInt(env.DATASET_TTL, 10) : 60 * 60 // Default 1 hour
+};
+
+export const plotConfig = {
+	cacheDir: env.PLOT_DIR ?? 'data/plots',
+	stdTTL: env.PLOT_TTL ? parseInt(env.PLOT_TTL, 10) : 60 * 60 // Default 1 hour
+};
