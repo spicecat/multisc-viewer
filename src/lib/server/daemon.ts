@@ -34,7 +34,7 @@ const _unloadDataset = async (ds: string, daemon: Daemon) => {
 	daemonLoad.set(daemon, daemonLoad.get(daemon)! - datasets.get(ds)!.size);
 };
 
-export const loadDataset = async (ds: string): Promise<Daemon> => {
+const loadDataset = async (ds: string): Promise<Daemon> => {
 	const cacheDaemon = datasetCache.get<Daemon>(ds);
 	if (cacheDaemon) return cacheDaemon;
 	const [daemon] = [...daemonLoad.entries()].reduce((minDaemon, currDaemon) =>

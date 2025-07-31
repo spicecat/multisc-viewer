@@ -3,11 +3,9 @@ import type { Dataset, Gene, Publication } from '$lib/types/data';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 
-type DatasetsMeta = Omit<Dataset, 'size'>;
+type DatasetMeta = Omit<Dataset, 'size'>;
 
-interface PublicationMeta extends Omit<Publication, 'datasets'> {
-	datasets: string[];
-}
+type PublicationMeta = Omit<Publication, 'datasets'> & { datasets: string[] };
 
 const {
 	dir: datasetsDir,
@@ -19,10 +17,10 @@ const { dir: publicationsDir, meta: publicationsMeta } = publicationsConfig;
 
 export const datasets = new Map<string, Dataset>(
 	JSON.parse(readFileSync(`${datasetsDir}/${datasetsMeta}`, 'utf-8'))
-		.filter(({ id }: DatasetsMeta) =>
+		.filter(({ id }: DatasetMeta) =>
 			datasetsRequiredFiles.every((file: string) => existsSync(`${datasetsDir}/${id}/${file}`))
 		)
-		.map((ds: DatasetsMeta) => [
+		.map((ds: DatasetMeta) => [
 			ds.id,
 			{ ...ds, size: statSync(`${datasetsDir}/${ds.id}/data.rds`).size }
 		])

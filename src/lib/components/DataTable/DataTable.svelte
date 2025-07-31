@@ -8,6 +8,7 @@
 	import Radio from '@smui/radio';
 	import Select, { Option } from '@smui/select';
 	import type { Data } from '$lib/types/data';
+	import type { Columns } from '$lib/types/data-table';
 
 	let {
 		data,
@@ -16,7 +17,7 @@
 		selected = $bindable()
 	}: {
 		data: Data[];
-		columns: Column[];
+		columns: Columns;
 		isLoading?: boolean;
 		selected?: string | string[];
 	} = $props();

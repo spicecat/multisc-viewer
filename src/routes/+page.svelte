@@ -3,7 +3,6 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
-	let { datasets } = data;
 </script>
 
 <svelte:head>
@@ -37,5 +36,5 @@
 
 <section>
 	<h2>Datasets</h2>
-	<DatasetsSelector {datasets} />
+	<DatasetsSelector datasets={data.datasets} />
 </section>

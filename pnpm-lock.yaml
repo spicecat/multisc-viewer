@@ -23,15 +23,6 @@ importers:
       axios:
         specifier: ^1.11.0
         version: 1.11.0
-      eslint:
-        specifier: ^9.32.0
-        version: 9.32.0
-      eslint-config-prettier:
-        specifier: ^10.1.8
-        version: 10.1.8(eslint@9.32.0)
-      eslint-plugin-svelte:
-        specifier: ^3.11.0
-        version: 3.11.0(eslint@9.32.0)(svelte@5.37.1)(ts-node@10.9.2(@swc/core@1.12.7)(@types/node@24.0.14)(typescript@5.8.3))
       fuse.js:
         specifier: ^7.1.0
         version: 7.1.0
@@ -47,21 +38,9 @@ importers:
       node-cache:
         specifier: ^5.1.2
         version: 5.1.2
-      prettier:
-        specifier: ^3.6.2
-        version: 3.6.2
-      prettier-plugin-svelte:
-        specifier: ^3.4.0
-        version: 3.4.0(prettier@3.6.2)(svelte@5.37.1)
-      svelte-check:
-        specifier: ^4.3.0
-        version: 4.3.0(picomatch@4.0.3)(svelte@5.37.1)(typescript@5.8.3)
       svelte-material-ui:
-        specifier: 8.0.1
+        specifier: ^8.0.1
         version: 8.0.1
-      typescript-eslint:
-        specifier: ^8.38.0
-        version: 8.38.0(eslint@9.32.0)(typescript@5.8.3)
     devDependencies:
       '@smui/button':
         specifier: 8.0.1
@@ -129,15 +108,36 @@ importers:
       '@types/lodash.debounce':
         specifier: ^4.0.9
         version: 4.0.9
+      eslint:
+        specifier: ^9.32.0
+        version: 9.32.0
+      eslint-config-prettier:
+        specifier: ^10.1.8
+        version: 10.1.8(eslint@9.32.0)
+      eslint-plugin-svelte:
+        specifier: ^3.11.0
+        version: 3.11.0(eslint@9.32.0)(svelte@5.37.1)(ts-node@10.9.2(@swc/core@1.12.7)(@types/node@24.0.14)(typescript@5.8.3))
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
+      prettier-plugin-svelte:
+        specifier: ^3.4.0
+        version: 3.4.0(prettier@3.6.2)(svelte@5.37.1)
       sass-embedded:
         specifier: ^1.89.2
         version: 1.89.2
       svelte:
         specifier: ^5.37.1
         version: 5.37.1
+      svelte-check:
+        specifier: ^4.3.0
+        version: 4.3.0(picomatch@4.0.3)(svelte@5.37.1)(typescript@5.8.3)
       svelte-dnd-action:
         specifier: ^0.9.64
         version: 0.9.64(svelte@5.37.1)
+      typescript-eslint:
+        specifier: ^8.38.0
+        version: 8.38.0(eslint@9.32.0)(typescript@5.8.3)
       vite:
         specifier: ^7.0.6
         version: 7.0.6(@types/node@24.0.14)(sass-embedded@1.89.2)(terser@5.43.1)

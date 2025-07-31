@@ -1,5 +1,5 @@
 import { plotConfig } from '$lib/config';
-import type { PlotParams, PlotResult } from '$lib/types/plot';
+import type { Plot, PlotResults, PlotsParams } from '$lib/types/plot';
 import NodeCache from 'node-cache';
 import { existsSync, mkdirSync, rmSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
@@ -17,21 +17,24 @@ plotCache.on('expired', (key: string) => {
 	if (existsSync(dir)) rmSync(dir, { recursive: true, force: true });
 });
 
-const _cacheKey = ({ ds, gene, groupBy, splitBy }: PlotParams): string =>
-	`${ds}:${gene}:${groupBy}:${splitBy}`;
+const _cacheKeys = ({ datasets, gene, groupBy, splitBy }: PlotsParams): string[] =>
+	datasets.map((ds) => `${ds}:${gene}:${groupBy}:${splitBy}`);
 
-export const plot = async (params: PlotParams): Promise<PlotResult> => {
-	const key = _cacheKey(params);
-	const cachedResult = plotCache.get<PlotResult>(key);
-	if (cachedResult) return cachedResult;
-	await render(params);
-	const clusteringPath = `${cacheDir}/${params.ds}/${key}/umap.png`;
-	const violinPath = `${cacheDir}/${params.ds}/${key}/vln.png`;
-	const featurePath = `${cacheDir}/${params.ds}/${key}/feat.png`;
-	const clustering = 'data:image/png;base64,' + (await readFile(clusteringPath, 'base64'));
-	const violin = 'data:image/png;base64,' + (await readFile(violinPath, 'base64'));
-	const feature = 'data:image/png;base64,' + (await readFile(featurePath, 'base64'));
-	const result = { clustering, violin, feature };
-	plotCache.set(key, result);
-	return result;
+export const plot = async (params: PlotsParams): Promise<PlotResults> => {
+	const keys = _cacheKeys(params);
+	const plots = plotCache.mget<Plot>(keys);
+	await Promise.all(
+		params.datasets.map(async (ds) => {
+			if (plots[ds]) return;
+			const key = await render({ ds, ...params });
+			const clusteringPath = `${cacheDir}/${ds}/${key}/umap.png`;
+			const violinPath = `${cacheDir}/${ds}/${key}/vln.png`;
+			const featurePath = `${cacheDir}/${ds}/${key}/feat.png`;
+			const clustering = 'data:image/png;base64,' + (await readFile(clusteringPath, 'base64'));
+			const violin = 'data:image/png;base64,' + (await readFile(violinPath, 'base64'));
+			const feature = 'data:image/png;base64,' + (await readFile(featurePath, 'base64'));
+			plots[ds] = { clustering, violin, feature };
+		})
+	);
+	return plots;
 };
