@@ -12,8 +12,7 @@
 </script>
 
 <script lang="ts">
-	import { makeTitle } from '$lib/utils/utils';
-	import CircularProgress from '@smui/circular-progress';
+	import { ProgressRadial } from '@skeletonlabs/skeleton-svelte';
 
 	const {
 		dataset,
@@ -39,34 +38,30 @@
 </script>
 
 <div class="chart-column">
-	<h3 class="chart-title">
-		{makeTitle(dataset)}
+	<h3 class="mb-4 text-center h3">
+		{dataset}
 	</h3>
 
 	{#await plots}
-		<div class="loading-container">
-			<CircularProgress indeterminate />
+		<div class="flex min-h-48 items-center justify-center">
+			<ProgressRadial />
 		</div>
 	{:then plotData}
-		<div class="chart-images">
+		<div class="grid grid-cols-2 gap-2">
 			<button
-				class="chart-button"
+				class="btn"
 				onclick={() => (bigImg = plotData.clustering)}
 				aria-label="View clustering plot"
 			>
-				<img class="chart-image" src={plotData.clustering} alt="{dataset} clustering" />
+				<img class="w-full" src={plotData.clustering} alt="{dataset} clustering" />
 			</button>
 
-			<button
-				class="chart-button"
-				onclick={() => (bigImg = plotData.violin)}
-				aria-label="View violin plot"
-			>
-				<img class="chart-image" src={plotData.violin} alt="{dataset} violin" />
+			<button class="btn" onclick={() => (bigImg = plotData.violin)} aria-label="View violin plot">
+				<img class="w-full" src={plotData.violin} alt="{dataset} violin" />
 			</button>
 		</div>
 	{:catch error}
-		<div class="error-message">
+		<div class="alert variant-filled-error">
 			<p>Error: {error.message}</p>
 		</div>
 	{/await}

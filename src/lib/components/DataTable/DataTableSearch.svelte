@@ -1,6 +1,6 @@
 <script lang="ts">
-	import IconButton from '@smui/icon-button';
-	import TextField from '@smui/textfield';
+	import type { Columns, Select, Data } from '$lib/types/data-table';
+	import { Search } from '@lucide/svelte';
 	import Fuse, { type IFuseOptions } from 'fuse.js';
 	import DataTable from './DataTable.svelte';
 
@@ -8,15 +8,13 @@
 		label = '',
 		data,
 		columns,
-		isLoading,
-		selected = $bindable(),
+		select,
 		searchOptions = {}
 	}: {
 		label: string;
 		data: Data[];
-		columns: Column[];
-		isLoading?: boolean;
-		selected?: string | string[];
+		columns: Columns;
+		select: Select;
 		searchOptions?: IFuseOptions<Data>;
 	} = $props();
 
@@ -39,13 +37,10 @@
 	const filteredItems = $derived(query ? fuse.search(query).map(({ item }) => item) : data);
 </script>
 
-<div style="display: flex;flex-direction:column;">
-	<div>
-		<TextField bind:value={query} {label}>
-			{#snippet leadingIcon()}
-				<IconButton class="material-icons">search</IconButton>
-			{/snippet}
-		</TextField>
+<div class="input-group grid-cols-[auto_1fr_auto]">
+	<div class="ig-cell preset-tonal">
+		<Search size={16} />
 	</div>
-	<DataTable data={filteredItems} {columns} {isLoading} bind:selected />
+	<input class="ig-input" type="text" bind:value={query} placeholder={`Search ${label}...`} />
 </div>
+<DataTable data={filteredItems} {columns} {select} />

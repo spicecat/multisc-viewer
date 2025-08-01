@@ -1,6 +1,5 @@
 <script lang="ts">
-	import Radio from '@smui/radio';
-	import FormField from '@smui/form-field';
+	import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton-svelte';
 
 	let { groupBy = $bindable() }: { groupBy: Grouping } = $props();
 
@@ -10,11 +9,8 @@
 	];
 </script>
 
-<div>
+<RadioGroup>
 	{#each groupOptions as { value, label }}
-		<FormField>
-			<Radio bind:group={groupBy} {value} />
-			<span>{label}</span>
-		</FormField>
+		<RadioItem bind:group={groupBy} name="groupBy" {value}>{label}</RadioItem>
 	{/each}
-</div>
+</RadioGroup>

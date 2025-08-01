@@ -1,26 +1,27 @@
 <script lang="ts">
-	import DatasetsSelector from '$lib/components/DatasetsSelector.svelte';
+	import { enhance } from '$app/forms';
+	import DatasetsTable from '$lib/components/DataTable/DatasetsTable.svelte';
+	import PublicationsTable from '$lib/components/DataTable/PublicationsTable.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 </script>
 
 <svelte:head>
-	<title>MultiSC-Viewer — Home</title>
+	<title>Home</title>
 </svelte:head>
 
 <section>
-	<h1>MultiSC-Viewer</h1>
+	<h2 class="text-center h2">MultiSC-Viewer</h2>
 	<p>
 		MultiSC-Viewer is a web-based tool designed to compare and visualize gene expression in multiple
 		single cell/nucleus dataset side by side for any gene across different brain regions, disease
 		conditions, and species.
-		<a href="https://git.jasonxu.dev/JasonXu/plot-viewer/">Source</a>
 	</p>
 </section>
 
 <section>
-	<h2>Key Features</h2>
+	<h2 class="text-center h3">Features</h2>
 	<li>
 		<b>Multiple datasets visualization and comparison:</b> MultiSC-Viewer is the only tool current available
 		that supports a side-by-side comparative view of more than two datasets simultaneously.
@@ -32,9 +33,21 @@
 	</li>
 </section>
 
-<hr />
+<hr class="hr" />
 
 <section>
-	<h2>Datasets</h2>
-	<DatasetsSelector datasets={data.datasets} />
+	<h2 class="text-center h2">Publications</h2>
+	<PublicationsTable publications={data.publications} />
+</section>
+
+<hr class="hr" />
+
+<section>
+	<h2 class="text-center h2">Datasets</h2>
+	<form method="POST" action="?/plot" use:enhance>
+		<div>
+			<button type="submit" class="preset-filled btn">Plot</button>
+		</div>
+		<DatasetsTable datasets={data.datasets} />
+	</form>
 </section>

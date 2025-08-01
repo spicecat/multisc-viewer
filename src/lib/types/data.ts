@@ -11,17 +11,17 @@ export interface Dataset {
 	cellType: string;
 	size: number;
 	defaultGene?: Gene;
+	[key: string]: string | number | string[] | Gene | Author | undefined;
 }
 
 export interface Publication {
 	id: string;
+	title: string;
 	year: number;
 	author: Author[];
-	PMID: string;
 	journal: string;
-	title: string;
+	PMID: string;
 	abstract: string;
 	datasets: Dataset[];
+	[key: string]: string | number | Author[] | Dataset[] | undefined;
 }
-
-export type Data = Gene | Dataset | Publication;

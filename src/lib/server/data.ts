@@ -30,7 +30,7 @@ export const publications = new Map<string, Publication>(
 	JSON.parse(readFileSync(`${publicationsDir}/${publicationsMeta}`, 'utf-8')).map(
 		(pub: PublicationMeta) => [
 			pub.id,
-			{ ...pub, datasets: pub.datasets.map((id: string) => datasets.get(id)) }
+			{ ...pub, datasets: pub.datasets.map((id: string) => datasets.get(id)).filter(Boolean) }
 		]
 	)
 );

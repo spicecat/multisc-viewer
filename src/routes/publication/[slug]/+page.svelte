@@ -1,25 +1,29 @@
 <script lang="ts">
-	import Navbar from '$lib/components/Navbar.svelte';
-	import DatasetsSelector from '$lib/components/DatasetsSelector.svelte';
+	import { enhance } from '$app/forms';
+	import DatasetsTable from '$lib/components/DataTable/DatasetsTable.svelte';
+	import type { PageProps } from './$types';
 
-	const { publication }: PublicationProps = $props();
+	let { data }: PageProps = $props();
 </script>
 
 <svelte:head>
-	<title>MultiSC-Viewer Publication</title>
+	<title>{data.publication.title}</title>
 </svelte:head>
 
-<Navbar />
-<main style="margin:auto 10rem;">
-	<section>
-		<h1>{publication.title}</h1>
-		<p>{publication.abstract}</p>
-	</section>
+<section>
+	<h2 class="text-center h2">{data.publication.title}</h2>
+	<h3 class="h3">Abstract</h3>
+	<p>{data.publication.abstract}</p>
+</section>
 
-	<hr />
+<hr class="hr" />
 
-	<section>
-		<h1>Datasets</h1>
-		<DatasetsSelector datasets={publication.datasets} />
-	</section>
-</main>
+<section>
+	<h2 class="text-center h2">Datasets</h2>
+	<form method="POST" action="?/plot" use:enhance>
+		<div class="flex items-center gap-4">
+			<button type="submit" class="preset-filled btn">Plot</button>
+		</div>
+		<DatasetsTable datasets={data.publication.datasets} />
+	</form>
+</section>

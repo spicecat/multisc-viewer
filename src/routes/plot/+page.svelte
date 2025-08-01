@@ -2,13 +2,10 @@
 	import ChartDisplay from '$lib/components/ChartDisplay.svelte';
 	import GeneControlsDrawer from '$lib/components/GeneControls/GeneControlsDrawer.svelte';
 	import GeneControlsDrawerToggle from '$lib/components/GeneControls/GeneControlsDrawerToggle.svelte';
-	import Navbar from '$lib/components/Navbar.svelte';
-	import meta from '$meta';
-	import Button from '@smui/button';
-	import { AppContent, Scrim } from '@smui/drawer';
 	import html2canvas from 'html2canvas';
 	import { tick } from 'svelte';
 	import { dndzone } from 'svelte-dnd-action';
+	import type { Gene, Grouping, Dataset } from '$lib/types/data';
 
 	interface RenderResult {
 		clustering: string;
@@ -44,7 +41,7 @@
 			history.pushState(
 				{ selectedGene, groupBy },
 				'',
-				`/compare?datasets=${query.datasets}&gene=${selectedGene}&groupBy=${groupBy}&splitBy=${splitBy}`
+				`/plot?datasets=${query.datasets}&gene=${selectedGene}&groupBy=${groupBy}&splitBy=${splitBy}`
 			);
 	});
 
@@ -84,34 +81,24 @@
 	<title>MultiSC-Viewer - Compare</title>
 </svelte:head>
 
-<Navbar />
-<main style="display: inline-flex;gap: 1rem;">
-	<GeneControlsDrawer {genes} bind:selected={selectedGene} bind:groupBy {geneControlsOpen} />
-	<Scrim />
-	<AppContent>
-		<div style="align-items: center;display: flex;gap: 1rem;">
-			<GeneControlsDrawerToggle bind:geneControlsOpen />
-			<Button variant="raised" onclick={downloadBoard}>
-				{#if isDownloading}
-					Downloading...
-				{:else}
-					Download
-				{/if}
-			</Button>
-		</div>
-		<section
-			class="board"
-			bind:this={boardElement}
-			use:dndzone={{ items: dsOrder }}
-			onconsider={(evt) => (dsOrder = evt.detail.items)}
-			onfinalize={(evt) => (dsOrder = evt.detail.items)}
-		>
-			{#each dsOrder as { id: dataset } (dataset)}
-				<ChartDisplay {dataset} {config} {bigView} {bigViewCharts} />
-			{/each}
-		</section>
-	</AppContent>
-</main>
+<GeneControlsDrawer {genes} bind:selected={selectedGene} bind:groupBy {geneControlsOpen} />
+<div class="flex-1">
+	<div class="flex items-center gap-4">
+		<GeneControlsDrawerToggle bind:geneControlsOpen />
+		<button class="variant-filled btn" onclick={downloadBoard}>
+			{#if isDownloading}
+				<span>Downloading...</span>
+			{:else}
+				<span>Download</span>
+			{/if}
+		</button>
+	</div>
+	<div class="board" bind:this={boardElement} use:dndzone={{ items: dsOrder, flipDurationMs: 300 }}>
+		{#each dsOrder as { id: ds }, i (ds)}
+			<ChartDisplay {dataset} {config} {bigView} {bigViewCharts} />
+		{/each}
+	</div>
+</div>
 
 <style lang="scss">
 	.board {

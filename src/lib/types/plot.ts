@@ -11,7 +11,7 @@ export type PlotsParams = Omit<PlotParams, 'ds'> & {
 	datasets: string[];
 };
 
-export interface Plot  {
+export interface Plot {
 	clustering: string;
 	violin: string;
 	feature: string;
