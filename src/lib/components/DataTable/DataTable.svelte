@@ -9,7 +9,7 @@
 	}: {
 		data: Data[];
 		columns: Columns;
-		select: Select;
+		select?: Select;
 	} = $props();
 
 	let selected = $state<string | string[]>(select === 'checkbox' ? [] : '');
@@ -30,7 +30,7 @@
 								<input
 									type="checkbox"
 									class="checkbox"
-									name="selected"
+									checked={selected.length === data.length}
 									onchange={(e) => {
 										selected = e.currentTarget.checked
 											? data.map((item) => (typeof item === 'object' ? item.id : item))
@@ -77,7 +77,7 @@
 								typeof key === 'function' ? key(item) : typeof item === 'object' ? item[key] : item}
 							<td>
 								{#if href}
-									<a class="btn preset-tonal text-wrap" href={href(item)}>{d}</a>
+									<a class="btn preset-tonal text-wrap" href={href(item)}>{d} &rarr;</a>
 								{:else if Array.isArray(d)}
 									<div class="flex flex-wrap gap-1">
 										{#each d as chip}

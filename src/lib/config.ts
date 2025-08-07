@@ -11,13 +11,13 @@ export const publicationsConfig = {
 	meta: env.PUBLICATIONS_META ?? 'meta.json'
 };
 
-export const daemonConfig = {
-	server: 'http://localhost',
-	ports: env.DAEMON_PORTS ? env.DAEMON_PORTS.split(',').map(Number) : [3000],
-	stdTTL: env.DATASET_TTL ? parseInt(env.DATASET_TTL, 10) : 60 * 60 // Default 1 hour
-};
-
 export const plotConfig = {
 	cacheDir: env.PLOT_DIR ?? 'data/plots',
-	stdTTL: env.PLOT_TTL ? parseInt(env.PLOT_TTL, 10) : 60 * 60 // Default 1 hour
+	stdTTL: 60 * 60 // 1 hour
+};
+
+export const daemonConfig = {
+	server: 'http://localhost',
+	ports: env.DAEMON_PORTS ? JSON.parse(env.DAEMON_PORTS) as number[] : [8001],
+	stdTTL: 60 * 60 // 1 hour
 };

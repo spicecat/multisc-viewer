@@ -16,15 +16,12 @@
 			contentBase="card preset-filled p-2"
 		>
 			{#snippet trigger()}<a class="btn preset-tonal" href="/">
-					<House size={24} />
+					<House size={16} />
 				</a>{/snippet}
 			{#snippet content()}
 				All Datasets
 			{/snippet}
 		</Tooltip>
-		<a class="btn preset-tonal" href="/publication">
-			<span>Publications</span>
-		</a>
 	{/snippet}
 	{#snippet trail()}
 		<Tooltip
@@ -38,15 +35,16 @@
 					target="_blank"
 					rel="noreferrer"
 				>
-					<Code size={24} />
+					<Code size={16} />
 				</a>{/snippet}
 			{#snippet content()}
 				Source code
 			{/snippet}
 		</Tooltip>
 	{/snippet}
+	<span class="h5">MultiSC-Viewer</span>
 </AppBar>
 
-<main class="container mx-auto px-24">
+<main class="container mx-auto max-w-256 space-y-8 px-16">
 	{@render children()}
 </main>

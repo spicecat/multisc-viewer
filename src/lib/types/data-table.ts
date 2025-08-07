@@ -8,7 +8,7 @@ export type Columns = {
 	href?: (d: Data) => string;
 }[];
 
-export type Select = 'checkbox' | 'radio' | undefined;
+export type Select = 'checkbox' | 'radio';
 
 export const geneColumns: Columns = [{ key: '', label: 'Gene' }];
 

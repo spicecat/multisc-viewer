@@ -23,7 +23,7 @@ await Promise.all(
 			}, 0);
 			daemonLoad.set(daemon, load);
 		} catch (error) {
-			console.log(`Daemon ${daemon} is not responding.`);
+			console.log(`Daemon ${daemon} is not responding. ${error}`);
 		}
 	})
 );
@@ -34,9 +34,10 @@ const _unloadDataset = async (ds: string, daemon: Daemon) => {
 	daemonLoad.set(daemon, daemonLoad.get(daemon)! - datasets.get(ds)!.size);
 };
 
-const loadDataset = async (ds: string): Promise<Daemon> => {
+export const loadDataset = async (ds: string): Promise<Daemon> => {
 	const cacheDaemon = datasetCache.get<Daemon>(ds);
 	if (cacheDaemon) return cacheDaemon;
+	if (daemonLoad.size === 0) throw new Error('No daemons available');
 	const [daemon] = [...daemonLoad.entries()].reduce((minDaemon, currDaemon) =>
 		currDaemon[1] < minDaemon[1] ? currDaemon : minDaemon
 	);
@@ -50,5 +51,6 @@ const loadDataset = async (ds: string): Promise<Daemon> => {
 export const render = async (params: PlotParams): Promise<string> => {
 	const daemon = await loadDataset(params.ds);
 	const response = await axios.post(`${daemon}/render`, params);
+	console.log(response);
 	return response.data.key;
 };

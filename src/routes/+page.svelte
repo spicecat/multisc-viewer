@@ -22,15 +22,17 @@
 
 <section>
 	<h2 class="text-center h3">Features</h2>
-	<li>
-		<b>Multiple datasets visualization and comparison:</b> MultiSC-Viewer is the only tool current available
-		that supports a side-by-side comparative view of more than two datasets simultaneously.
-	</li>
-	<li>
-		<b>Interactive Data Visualization:</b> Utilize dynamic, interactive graphs for a real-time exploration
-		of datasets, facilitating a deeper understanding of cellular diversity and expression similarities
-		and differences across datasets.
-	</li>
+	<ul class="list-inside list-disc">
+		<li>
+			<b>Multiple datasets visualization and comparison:</b> MultiSC-Viewer is the only tool current
+			available that supports a side-by-side comparative view of more than two datasets simultaneously.
+		</li>
+		<li>
+			<b>Interactive Data Visualization:</b> Utilize dynamic, interactive graphs for a real-time exploration
+			of datasets, facilitating a deeper understanding of cellular diversity and expression similarities
+			and differences across datasets.
+		</li>
+	</ul>
 </section>
 
 <hr class="hr" />
@@ -46,7 +48,7 @@
 	<h2 class="text-center h2">Datasets</h2>
 	<form method="POST" action="?/plot" use:enhance>
 		<div>
-			<button type="submit" class="preset-filled btn">Plot</button>
+			<button type="submit" class="btn preset-filled">Plot</button>
 		</div>
 		<DatasetsTable datasets={data.datasets} />
 	</form>

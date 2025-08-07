@@ -26,14 +26,18 @@ export const plot = async (params: PlotsParams): Promise<PlotResults> => {
 	await Promise.all(
 		params.datasets.map(async (ds) => {
 			if (plots[ds]) return;
-			const key = await render({ ds, ...params });
-			const clusteringPath = `${cacheDir}/${ds}/${key}/umap.png`;
-			const violinPath = `${cacheDir}/${ds}/${key}/vln.png`;
-			const featurePath = `${cacheDir}/${ds}/${key}/feat.png`;
-			const clustering = 'data:image/png;base64,' + (await readFile(clusteringPath, 'base64'));
-			const violin = 'data:image/png;base64,' + (await readFile(violinPath, 'base64'));
-			const feature = 'data:image/png;base64,' + (await readFile(featurePath, 'base64'));
-			plots[ds] = { clustering, violin, feature };
+			try {
+				const key = await render({ ds, ...params });
+				const clusteringPath = `${cacheDir}/${ds}/${key}/umap.png`;
+				const violinPath = `${cacheDir}/${ds}/${key}/vln.png`;
+				const featurePath = `${cacheDir}/${ds}/${key}/feat.png`;
+				const clustering = 'data:image/png;base64,' + (await readFile(clusteringPath, 'base64'));
+				const violin = 'data:image/png;base64,' + (await readFile(violinPath, 'base64'));
+				const feature = 'data:image/png;base64,' + (await readFile(featurePath, 'base64'));
+				plots[ds] = { clustering, violin, feature };
+			} catch (error) {
+				console.error(`Error rendering ${ds}:`, (error as Error).message);
+			}
 		})
 	);
 	return plots;

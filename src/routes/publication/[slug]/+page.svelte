@@ -12,7 +12,8 @@
 
 <section>
 	<h2 class="text-center h2">{data.publication.title}</h2>
-	<h3 class="h3">Abstract</h3>
+</section>
+<section>
 	<p>{data.publication.abstract}</p>
 </section>
 
@@ -21,8 +22,8 @@
 <section>
 	<h2 class="text-center h2">Datasets</h2>
 	<form method="POST" action="?/plot" use:enhance>
-		<div class="flex items-center gap-4">
-			<button type="submit" class="preset-filled btn">Plot</button>
+		<div>
+			<button type="submit" class="btn preset-filled">Plot</button>
 		</div>
 		<DatasetsTable datasets={data.publication.datasets} />
 	</form>

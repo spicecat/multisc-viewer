@@ -14,7 +14,7 @@
 		label: string;
 		data: Data[];
 		columns: Columns;
-		select: Select;
+		select?: Select;
 		searchOptions?: IFuseOptions<Data>;
 	} = $props();
 
