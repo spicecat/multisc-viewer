@@ -1,22 +1,19 @@
-export type Grouping = 'Genotype' | 'CellType';
+export enum Grouping {
+	Genotype = 'Genotype',
+	CellType = 'CellType'
+}
+export enum PlotType {
+	UMAP = 'umap',
+	Violin = 'vln',
+	Feature = 'feat'
+}
 
 export interface PlotParams {
-	ds: string;
-	gene?: string;
-	groupBy?: Grouping;
-	splitBy?: Grouping;
-}
-
-export type PlotsParams = Omit<PlotParams, 'ds'> & {
 	datasets: string[];
-};
-
-export interface Plot {
-	clustering: string;
-	violin: string;
-	feature: string;
+	gene: string;
+	groupBy: Grouping;
+	splitBy: Grouping;
+	plotTypes: PlotType[];
 }
 
-export type PlotResults = {
-	[ds: string]: Plot;
-};
+export type PlotResults = Record<string, Promise<string>>; // Base64 encoded image

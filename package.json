@@ -8,7 +8,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"dev": "pm2-dev start ecosystem.config.cjs",
-		"dev:daemon": "Rscript -e \"plumber::pr_run(plumber::pr('data/daemon.r'),port=8001)\"",
+		"dev:daemon": "Rscript -e \"plumber::pr_run(plumber::pr('data/daemon.R'),port=8001)\"",
 		"dev:viewer": "vite dev",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
@@ -18,27 +18,26 @@
 		"stop": "pm2 stop ecosystem.config.cjs"
 	},
 	"dependencies": {
-		"@lucide/svelte": "^0.536.0",
-		"@skeletonlabs/skeleton": "^3.1.7",
-		"@skeletonlabs/skeleton-svelte": "^1.3.1",
+		"@lucide/svelte": "^0.539.0",
+		"@skeletonlabs/skeleton": "^3.1.8",
+		"@skeletonlabs/skeleton-svelte": "^1.4.0",
 		"axios": "^1.11.0",
 		"fuse.js": "^7.1.0",
 		"html2canvas": "^1.4.1",
 		"lodash.debounce": "^4.0.8",
 		"node-cache": "^5.1.2",
-		"pm2": "^6.0.8",
-		"svelte-dnd-action": "^0.9.64"
+		"pm2": "^6.0.8"
 	},
 	"devDependencies": {
-		"@eslint/compat": "^1.3.1",
-		"@eslint/js": "^9.32.0",
-		"@sveltejs/adapter-auto": "^6.0.1",
-		"@sveltejs/kit": "^2.27.1",
-		"@sveltejs/vite-plugin-svelte": "^6.1.0",
+		"@eslint/compat": "^1.3.2",
+		"@eslint/js": "^9.33.0",
+		"@sveltejs/adapter-auto": "^6.1.0",
+		"@sveltejs/kit": "^2.30.1",
+		"@sveltejs/vite-plugin-svelte": "^6.1.2",
 		"@tailwindcss/forms": "^0.5.10",
-		"@tailwindcss/vite": "^4.1.11",
+		"@tailwindcss/vite": "^4.1.12",
 		"@types/lodash.debounce": "^4.0.9",
-		"eslint": "^9.32.0",
+		"eslint": "^9.33.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.11.0",
 		"globals": "^16.3.0",
@@ -46,15 +45,17 @@
 		"prettier-plugin-svelte": "^3.4.0",
 		"prettier-plugin-tailwindcss": "^0.6.14",
 		"sass-embedded": "^1.90.0",
-		"svelte": "^5.38.0",
+		"svelte": "^5.38.1",
 		"svelte-check": "^4.3.1",
-		"tailwindcss": "^4.1.11",
+		"svelte-dnd-action": "^0.9.64",
+		"tailwindcss": "^4.1.12",
 		"typescript": "^5.9.2",
-		"typescript-eslint": "^8.39.0",
-		"vite": "^7.0.6"
+		"typescript-eslint": "^8.39.1",
+		"vite": "^7.1.2"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
+			"@tailwindcss/oxide",
 			"esbuild"
 		]
 	}

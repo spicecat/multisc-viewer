@@ -1,7 +1,7 @@
-import { datasetsConfig, publicationsConfig } from '$lib/config';
 import type { Dataset, Gene, Publication } from '$lib/types/data';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
+import { datasetsConfig, publicationsConfig } from './config';
 
 type DatasetMeta = Omit<Dataset, 'size'>;
 
@@ -15,7 +15,7 @@ const {
 
 const { dir: publicationsDir, meta: publicationsMeta } = publicationsConfig;
 
-export const datasets = new Map<string, Dataset>(
+export const datasets: Record<string, Dataset> = Object.fromEntries(
 	JSON.parse(readFileSync(`${datasetsDir}/${datasetsMeta}`, 'utf-8'))
 		.filter(({ id }: DatasetMeta) =>
 			datasetsRequiredFiles.every((file: string) => existsSync(`${datasetsDir}/${id}/${file}`))
@@ -26,11 +26,11 @@ export const datasets = new Map<string, Dataset>(
 		])
 );
 
-export const publications = new Map<string, Publication>(
+export const publications: Record<string, Publication> = Object.fromEntries(
 	JSON.parse(readFileSync(`${publicationsDir}/${publicationsMeta}`, 'utf-8')).map(
 		(pub: PublicationMeta) => [
 			pub.id,
-			{ ...pub, datasets: pub.datasets.map((id: string) => datasets.get(id)).filter(Boolean) }
+			{ ...pub, datasets: pub.datasets.map((id: string) => datasets[id]) }
 		]
 	)
 );

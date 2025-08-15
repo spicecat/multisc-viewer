@@ -8,7 +8,7 @@
 	let sourceTipOpen = $state(false);
 </script>
 
-<AppBar>
+<AppBar padding="p-1" toolbarClasses="items-center">
 	{#snippet lead()}
 		<Tooltip
 			open={homeTipOpen}
@@ -45,6 +45,6 @@
 	<span class="h5">MultiSC-Viewer</span>
 </AppBar>
 
-<main class="container mx-auto max-w-256 space-y-8 px-16">
+<main class="container mx-auto space-y-8 px-16">
 	{@render children()}
 </main>

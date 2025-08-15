@@ -13,11 +13,13 @@ export const publicationsConfig = {
 
 export const plotConfig = {
 	cacheDir: env.PLOT_DIR ?? 'data/plots',
-	stdTTL: 60 * 60 // 1 hour
+	plotName: env.PLOT_NAME ?? 'plot.png',
+	stdTTL: 4 * 60 * 60, // 4 hour
+	maxWaitTime: 4 * 60 * 1000 // 4 minutes
 };
 
 export const daemonConfig = {
 	server: 'http://localhost',
-	ports: env.DAEMON_PORTS ? JSON.parse(env.DAEMON_PORTS) as number[] : [8001],
-	stdTTL: 60 * 60 // 1 hour
+	ports: env.DAEMON_PORTS ? (JSON.parse(env.DAEMON_PORTS) as number[]) : [8001],
+	stdTTL: 4 * 60 * 60 // 4 hour
 };

@@ -10,6 +10,10 @@
 </svelte:head>
 
 <section>
-	<h1 class="text-center h1">Publications</h1>
-	<PublicationsTable publications={data.publications} />
+	{#await data.publications}
+		<p>Loading publications...</p>
+	{:then publications}
+		<h1 class="text-center h1">Publications</h1>
+		<PublicationsTable {publications} />
+	{/await}
 </section>

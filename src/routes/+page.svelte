@@ -11,7 +11,7 @@
 	<title>Home</title>
 </svelte:head>
 
-<section>
+<section class="mx-auto max-w-256">
 	<h2 class="text-center h2">MultiSC-Viewer</h2>
 	<p>
 		MultiSC-Viewer is a web-based tool designed to compare and visualize gene expression in multiple
@@ -20,7 +20,7 @@
 	</p>
 </section>
 
-<section>
+<section class="mx-auto max-w-256">
 	<h2 class="text-center h3">Features</h2>
 	<ul class="list-inside list-disc">
 		<li>
@@ -38,18 +38,26 @@
 <hr class="hr" />
 
 <section>
-	<h2 class="text-center h2">Publications</h2>
-	<PublicationsTable publications={data.publications} />
+	{#await data.publications}
+		<p>Loading publications...</p>
+	{:then publications}
+		<h2 class="text-center h2">Publications</h2>
+		<PublicationsTable {publications} />
+	{/await}
 </section>
 
 <hr class="hr" />
 
 <section>
-	<h2 class="text-center h2">Datasets</h2>
-	<form method="POST" action="?/plot" use:enhance>
-		<div>
-			<button type="submit" class="btn preset-filled">Plot</button>
-		</div>
-		<DatasetsTable datasets={data.datasets} />
-	</form>
+	{#await data.datasets}
+		<p>Loading datasets...</p>
+	{:then datasets}
+		<h2 class="text-center h2">Datasets</h2>
+		<form method="POST" action="?/plot" use:enhance>
+			<div>
+				<button type="submit" class="btn preset-filled">Plot</button>
+			</div>
+			<DatasetsTable {datasets} />
+		</form>
+	{/await}
 </section>

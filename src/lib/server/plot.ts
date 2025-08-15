@@ -1,44 +1,74 @@
-import { plotConfig } from '$lib/config';
-import type { Plot, PlotResults, PlotsParams } from '$lib/types/plot';
+import type { PlotParams, PlotResults, PlotType } from '$lib/types/plot';
 import NodeCache from 'node-cache';
-import { existsSync, mkdirSync, rmSync } from 'node:fs';
+import { mkdirSync, rmSync, watch } from 'node:fs';
 import { readFile } from 'node:fs/promises';
+import { basename, dirname, join, resolve } from 'node:path';
+import { plotConfig } from './config';
 import { render } from './daemon';
 
-const { cacheDir, stdTTL } = plotConfig;
+type PlotRequest = { resolve: (plotPath: string) => void; reject: (error: Error) => void };
 
-if (existsSync(cacheDir)) rmSync(cacheDir, { recursive: true, force: true });
+const { cacheDir, plotName, stdTTL, maxWaitTime } = plotConfig;
+
+// clear cache
+rmSync(cacheDir, { recursive: true, force: true });
 mkdirSync(cacheDir, { recursive: true });
 
 const plotCache = new NodeCache({ stdTTL });
-plotCache.on('expired', (key: string) => {
-	const [dataset, , ,] = key.split(':');
-	const dir = `${cacheDir}/${dataset}/${key}`;
-	if (existsSync(dir)) rmSync(dir, { recursive: true, force: true });
+plotCache.on('expired', async (_plotId: string, plotPath: string) =>
+	rmSync(plotPath, { recursive: true, force: true })
+);
+
+const requestCache = new NodeCache({ stdTTL: maxWaitTime });
+requestCache.on('expired', async (plotId: string, request: PlotRequest) =>
+	request.reject(new Error(`Timeout waiting for plot ${plotId}`))
+);
+
+watch(cacheDir, { recursive: true }, async (event, plotPath) => {
+	if (event !== 'rename' || !plotPath || basename(plotPath) !== plotName) return;
+	const plotId = dirname(plotPath);
+	plotPath = resolve(cacheDir, plotPath);
+	plotCache.set<string>(plotId, plotPath);
+	requestCache.get<PlotRequest>(plotId)?.resolve(plotPath);
 });
 
-const _cacheKeys = ({ datasets, gene, groupBy, splitBy }: PlotsParams): string[] =>
-	datasets.map((ds) => `${ds}:${gene}:${groupBy}:${splitBy}`);
+export const getPlotId = (
+	ds: string,
+	gene: string,
+	groupBy: string,
+	splitBy: string,
+	pt: PlotType
+): string => join(ds, gene, `${groupBy}:${splitBy}`, pt);
 
-export const plot = async (params: PlotsParams): Promise<PlotResults> => {
-	const keys = _cacheKeys(params);
-	const plots = plotCache.mget<Plot>(keys);
-	await Promise.all(
-		params.datasets.map(async (ds) => {
-			if (plots[ds]) return;
-			try {
-				const key = await render({ ds, ...params });
-				const clusteringPath = `${cacheDir}/${ds}/${key}/umap.png`;
-				const violinPath = `${cacheDir}/${ds}/${key}/vln.png`;
-				const featurePath = `${cacheDir}/${ds}/${key}/feat.png`;
-				const clustering = 'data:image/png;base64,' + (await readFile(clusteringPath, 'base64'));
-				const violin = 'data:image/png;base64,' + (await readFile(violinPath, 'base64'));
-				const feature = 'data:image/png;base64,' + (await readFile(featurePath, 'base64'));
-				plots[ds] = { clustering, violin, feature };
-			} catch (error) {
-				console.error(`Error rendering ${ds}:`, (error as Error).message);
-			}
-		})
+const getPlotIds = ({ datasets, gene, groupBy, splitBy, plotTypes }: PlotParams): Set<string> =>
+	new Set(
+		datasets.flatMap((ds) => plotTypes.map((pt) => getPlotId(ds, gene, groupBy, splitBy, pt)))
 	);
+
+const plotIdParts = (plotId: string) => {
+	const [ds, gene, grouping, pt] = plotId.split('/');
+	const [groupBy, splitBy] = grouping.split(':');
+	return { ds, gene, groupBy, splitBy, pt };
+};
+
+const queryPlots = (plotIds: Set<string>): PlotResults => {
+	const queryPlot = async (plotId: string): Promise<string> => {
+		const plotPath =
+			plotCache.get<string>(plotId) ??
+			(await new Promise<string>((resolve, reject) => {
+				requestCache.set<PlotRequest>(plotId, { resolve, reject });
+			}));
+			plotIds.delete(plotId);
+			const plotData = await readFile(plotPath, 'base64');
+		return 'data:image/png;base64,' + plotData;
+	};
+	return Object.fromEntries([...plotIds].map((plotId) => [plotId, queryPlot(plotId)]));
+};
+
+export const plot = (plotParams: PlotParams): PlotResults => {
+	const keys = getPlotIds(plotParams);
+	const plots = queryPlots(keys);
+	const missingDatasets = Array.from(new Set([...keys].map((plotId) => plotIdParts(plotId).ds)));
+	render({ ...plotParams, datasets: missingDatasets });
 	return plots;
 };

@@ -3,8 +3,8 @@ import { fail, redirect } from '@sveltejs/kit';
 import { datasets, publications } from '$lib/server/data';
 
 export const load: PageServerLoad = async () => ({
-	datasets: Array.from(datasets.values()),
-	publications: Array.from(publications.values())
+	datasets: Object.values(datasets),
+	publications: Object.values(publications)
 });
 
 export const actions = {

@@ -1,4 +1,4 @@
-const daemonPath = 'data/daemon.r';
+const daemonPath = 'data/daemon.R';
 
 const { argv } = process;
 const env = argv[argv.indexOf('--env') + 1] ?? 'development';
@@ -28,7 +28,7 @@ const multiscDaemons = multiscViewer.env.DAEMON_PORTS.map((port) => ({
 	name: `multisc-daemon-${port}`,
 	script: 'Rscript',
 	args: `-e "plumber::pr_run(plumber::pr('${daemonPath}'),port=${port})"`,
-	watch: 'daemon.r'
+	watch: 'daemon.R'
 }));
 
 module.exports = {
