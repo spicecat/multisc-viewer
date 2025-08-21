@@ -6,7 +6,7 @@
 	let pt = $derived(page.url.searchParams.getAll('pt'));
 </script>
 
-<label class="label">
+<label class="label flex gap-4">
 	<span class="label-text">Plots</span>
 	{#each Object.entries(PlotType) as [plotTypeKey, plotType] (`plot-type-${plotType}`)}
 		<label class="flex items-center space-x-2">

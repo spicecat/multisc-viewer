@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ url, params }) => {
 	const paramGene = url.searchParams.get('gene') ?? '';
 	const gene = genes.includes(paramGene) ? paramGene : (datasetsData[0]?.defaultGene ?? genes[0]);
 	const groupBy = (url.searchParams.get('groupBy') ?? Grouping.CellType) as Grouping;
-	const splitBy = (url.searchParams.get('splitBy') ?? Grouping.Genotype) as Grouping;
+	const splitBy = groupBy === Grouping.CellType ? Grouping.Genotype : Grouping.CellType;
 	const plotTypes = url.searchParams.getAll('pt') as PlotType[];
 	if (plotTypes.length === 0) plotTypes.push(...Object.values(PlotType));
 
@@ -59,17 +59,16 @@ export const actions = {
 		const datasets = data.getAll('datasets');
 		const gene = data.get('gene');
 		const groupBy = data.get('groupBy');
-		const splitBy = data.get('splitBy');
 		const plotTypes = data.getAll('pt');
 		if (datasets.length === 0) return fail(400, { error: 'No datasets selected' });
 		const searchParams = new URLSearchParams();
 		datasets.forEach((ds) => searchParams.append('ds', ds.toString()));
 		if (gene) searchParams.set('gene', gene.toString());
 		if (groupBy) searchParams.set('groupBy', groupBy.toString());
-		if (splitBy) searchParams.set('splitBy', splitBy.toString());
 		plotTypes.forEach((pt) => searchParams.append('pt', pt.toString()));
-		if (publicationId)
-			redirect(303, `/plot/${publicationId.toString()}?${searchParams.toString()}`);
-		else redirect(303, `/plot?${searchParams.toString()}`);
+		redirect(
+			303,
+			`/plot${publicationId ? '/' + publicationId.toString() : ''}?${searchParams.toString()}`
+		);
 	}
 } satisfies Actions;

@@ -18,13 +18,18 @@
 	use:enhance={() =>
 		async ({ update }) =>
 			update({ invalidateAll: true })}
+	class="space-y-4"
 >
 	<input type="hidden" name="publicationId" value={publicationId} />
+	{#if genes}
+		<div class="flex gap-4">
+			<Groupings />
+			<PlotTypes />
+		</div>
+	{/if}
 	<div class="flex gap-4">
 		{#if genes}
 			<div class="space-y-2">
-				<Groupings />
-				<PlotTypes />
 				<GenesTable {genes} />
 			</div>
 		{/if}

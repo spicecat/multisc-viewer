@@ -7,7 +7,7 @@
 
 <label class="label">
 	<span class="label-text">Group By</span>
-	<select class="select">
+	<select class="select" name="groupBy">
 		{#each Object.entries(Grouping) as [groupingKey, grouping] (`grouping-${grouping}`)}
 			<option value={grouping} selected={grouping === groupBy}>{groupingKey}</option>
 		{/each}
