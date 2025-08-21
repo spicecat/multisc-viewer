@@ -2,7 +2,6 @@
 	import { page } from '$app/state';
 	import { PlotType } from '$lib/types/plot';
 
-	let publicationId = $derived(page.params.publicationId);
 	let pt = $derived(page.url.searchParams.getAll('pt'));
 </script>
 
