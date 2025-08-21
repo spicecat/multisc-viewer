@@ -1,21 +1,24 @@
 <script lang="ts">
-	import type { Columns, Select, Data } from '$lib/types/data-table';
+	import type { Columns, Data, Select } from '$lib/types/data-table';
 	import { Search } from '@lucide/svelte';
 	import Fuse, { type IFuseOptions } from 'fuse.js';
+	import type { Snippet } from 'svelte';
 	import DataTable from './DataTable.svelte';
 
 	let {
-		label = '',
+		name = '',
 		data,
 		columns,
 		select,
-		searchOptions = {}
+		searchOptions = {},
+		children
 	}: {
-		label: string;
+		name: string;
 		data: Data[];
 		columns: Columns;
 		select?: Select;
 		searchOptions?: IFuseOptions<Data>;
+		children?: Snippet;
 	} = $props();
 
 	const defaultSearchOptions = $derived({
@@ -34,13 +37,16 @@
 
 	let query = $state('');
 
-	const filteredItems = $derived(query ? fuse.search(query).map(({ item }) => item) : data);
+	const items = $derived(query ? fuse.search(query).map(({ item }) => item) : data);
 </script>
 
-<div class="input-group grid-cols-[auto_1fr_auto]">
-	<div class="ig-cell preset-tonal">
-		<Search size={16} />
+<div class="space-y-2">
+	<div class="input-group grid-cols-[auto_1fr_auto]">
+		<div class="ig-cell preset-tonal">
+			<Search size={16} />
+		</div>
+		<input class="ig-input" type="text" bind:value={query} placeholder={`Search ${name}...`} />
 	</div>
-	<input class="ig-input" type="text" bind:value={query} placeholder={`Search ${label}...`} />
+	{@render children?.()}
+	<DataTable {name} data={items} {columns} {select} />
 </div>
-<DataTable data={filteredItems} {columns} {select} />

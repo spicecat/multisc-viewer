@@ -19,7 +19,7 @@
 					<House size={16} />
 				</a>{/snippet}
 			{#snippet content()}
-				All Datasets
+				Home
 			{/snippet}
 		</Tooltip>
 	{/snippet}
@@ -38,13 +38,13 @@
 					<Code size={16} />
 				</a>{/snippet}
 			{#snippet content()}
-				Source code
+				Source
 			{/snippet}
 		</Tooltip>
 	{/snippet}
-	<span class="h5">MultiSC-Viewer</span>
+	<span class="text-lg font-bold">MultiSC-Viewer</span>
 </AppBar>
 
-<main class="container mx-auto space-y-8 px-16">
+<main class="container mx-auto space-y-8">
 	{@render children()}
 </main>

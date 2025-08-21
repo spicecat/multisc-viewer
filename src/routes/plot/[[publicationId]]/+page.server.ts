@@ -1,11 +1,11 @@
 import { datasets, getGenes, publications } from '$lib/server/data';
 import { getPlotId, plot } from '$lib/server/plot';
 import { Grouping, PlotType } from '$lib/types/plot';
-import { error, redirect } from '@sveltejs/kit';
-import type { PageServerLoad } from '../$types';
+import { error, fail, redirect } from '@sveltejs/kit';
+import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url, params }) => {
-	const publication = publications[params.publicationId];
+	const publication = publications[params.publicationId ?? ''];
 	if (params.publicationId && !publication)
 		error(404, `Publication ${params.publicationId} not found`);
 
@@ -31,7 +31,7 @@ export const load: PageServerLoad = async ({ url, params }) => {
 	plotTypes.forEach((pt) => searchParams.append('pt', pt));
 
 	if (searchParams.toString() !== url.searchParams.toString())
-		throw redirect(303, `${url.pathname}?${searchParams.toString()}`);
+		throw redirect(301, `${url.pathname}?${searchParams.toString()}`);
 
 	const plotIds = Object.fromEntries(
 		dsList.map((ds) => [
@@ -51,3 +51,19 @@ export const load: PageServerLoad = async ({ url, params }) => {
 		searchParams: searchParams.toString()
 	};
 };
+
+export const actions = {
+	plot: async ({ request }) => {
+		const data = await request.formData();
+		const publicationId = data.get('publicationId');
+		const datasets = data.getAll('datasets');
+		const gene = data.get('gene');
+		if (datasets.length === 0) return fail(400, { error: 'No datasets selected' });
+		const urlParams = new URLSearchParams();
+		datasets.forEach((ds) => urlParams.append('ds', ds.toString()));
+		if (gene) urlParams.set('gene', gene.toString());
+		console.log(123, data.get('publicationId'), `/plot/?${urlParams.toString()}`);
+		if (publicationId) redirect(303, `/plot/${publicationId.toString()}?${urlParams.toString()}`);
+		else redirect(303, `/plot?${urlParams.toString()}`);
+	}
+} satisfies Actions;

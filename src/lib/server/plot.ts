@@ -1,4 +1,5 @@
 import type { PlotParams, PlotResults, PlotType } from '$lib/types/plot';
+import { uniq } from 'lodash-es';
 import NodeCache from 'node-cache';
 import { mkdirSync, rmSync, watch } from 'node:fs';
 import { readFile } from 'node:fs/promises';
@@ -58,8 +59,8 @@ const queryPlots = (plotIds: Set<string>): PlotResults => {
 			(await new Promise<string>((resolve, reject) => {
 				requestCache.set<PlotRequest>(plotId, { resolve, reject });
 			}));
-			plotIds.delete(plotId);
-			const plotData = await readFile(plotPath, 'base64');
+		plotIds.delete(plotId);
+		const plotData = await readFile(plotPath, 'base64');
 		return 'data:image/png;base64,' + plotData;
 	};
 	return Object.fromEntries([...plotIds].map((plotId) => [plotId, queryPlot(plotId)]));
@@ -68,7 +69,7 @@ const queryPlots = (plotIds: Set<string>): PlotResults => {
 export const plot = (plotParams: PlotParams): PlotResults => {
 	const keys = getPlotIds(plotParams);
 	const plots = queryPlots(keys);
-	const missingDatasets = Array.from(new Set([...keys].map((plotId) => plotIdParts(plotId).ds)));
+	const missingDatasets = uniq([...keys].map((plotId) => plotIdParts(plotId).ds));
 	render({ ...plotParams, datasets: missingDatasets });
 	return plots;
 };

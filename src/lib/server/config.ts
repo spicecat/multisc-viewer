@@ -20,6 +20,6 @@ export const plotConfig = {
 
 export const daemonConfig = {
 	server: 'http://localhost',
-	ports: env.DAEMON_PORTS ? (JSON.parse(env.DAEMON_PORTS) as number[]) : [8001],
+	ports: env.DAEMON_PORTS ? (JSON.parse(env.DAEMON_PORTS) as number[]) : [8001, 8002],
 	stdTTL: 4 * 60 * 60 // 4 hour
 };

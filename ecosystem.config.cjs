@@ -16,11 +16,11 @@ const multiscViewer = {
 		PUBLICATIONS_DIR: 'data/publications',
 		PUBLICATIONS_META: 'meta.json',
 		PLOT_DIR: 'data/plots',
-		DAEMON_PORTS: [8001]
+		DAEMON_PORTS: [8001, 8002]
 	},
 	env_production: {
 		NODE_ENV: 'production',
-		DAEMON_PORTS: [8001]
+		DAEMON_PORTS: [8001, 8002, 8003, 8004]
 	}
 };
 

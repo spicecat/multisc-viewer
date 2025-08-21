@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import DatasetsTable from '$lib/components/DataTable/DatasetsTable.svelte';
 	import PublicationsTable from '$lib/components/DataTable/PublicationsTable.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	let { datasets, publications } = data;
 </script>
 
 <svelte:head>
@@ -36,28 +36,6 @@
 </section>
 
 <hr class="hr" />
-
-<section>
-	{#await data.publications}
-		<p>Loading publications...</p>
-	{:then publications}
-		<h2 class="text-center h2">Publications</h2>
-		<PublicationsTable {publications} />
-	{/await}
-</section>
-
+<PublicationsTable {publications} />
 <hr class="hr" />
-
-<section>
-	{#await data.datasets}
-		<p>Loading datasets...</p>
-	{:then datasets}
-		<h2 class="text-center h2">Datasets</h2>
-		<form method="POST" action="?/plot" use:enhance>
-			<div>
-				<button type="submit" class="btn preset-filled">Plot</button>
-			</div>
-			<DatasetsTable {datasets} />
-		</form>
-	{/await}
-</section>
+<DatasetsTable {datasets} />

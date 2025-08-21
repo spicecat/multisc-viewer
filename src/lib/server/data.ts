@@ -1,3 +1,4 @@
+import { uniq } from 'lodash-es';
 import type { Dataset, Gene, Publication } from '$lib/types/data';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
@@ -30,7 +31,10 @@ export const publications: Record<string, Publication> = Object.fromEntries(
 	JSON.parse(readFileSync(`${publicationsDir}/${publicationsMeta}`, 'utf-8')).map(
 		(pub: PublicationMeta) => [
 			pub.id,
-			{ ...pub, datasets: pub.datasets.map((id: string) => datasets[id]) }
+			{
+				...pub,
+				datasets: pub.datasets.filter((id) => id in datasets).map((id: string) => datasets[id])
+			}
 		]
 	)
 );
@@ -41,5 +45,5 @@ export const getGenes = async (datasets: string[]): Promise<Gene[]> => {
 			JSON.parse(await readFile(`${datasetsDir}/${id}/genes.json`, 'utf-8'))
 		)
 	);
-	return Array.from(new Set(genes.flat())).toSorted();
+	return uniq(genes.flat()).toSorted();
 };

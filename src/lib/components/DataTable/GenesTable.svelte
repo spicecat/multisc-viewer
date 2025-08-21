@@ -1,13 +1,10 @@
 <script lang="ts">
+	import type { Gene } from '$lib/types/data';
+	import { type GeneData, geneColumns } from '$lib/types/data-table';
 	import DataTableSearch from './DataTableSearch.svelte';
 
-	let {
-		genes,
-		isLoading,
-		selected = $bindable()
-	}: { genes: Gene[]; isLoading: boolean; selected: string } = $props();
-
-	const geneColumns: Column[] = [{ key: '', label: 'Gene' }];
+	let { genes }: { genes: Gene[] } = $props();
+	let data: GeneData[] = $derived(genes.map((gene) => ({ id: gene })));
 </script>
 
-<DataTableSearch label="Gene" data={genes} columns={geneColumns} {isLoading} bind:selected />
+<DataTableSearch name="gene" {data} columns={geneColumns} select="radio" />
