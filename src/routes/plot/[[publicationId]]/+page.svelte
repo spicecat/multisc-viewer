@@ -1,6 +1,5 @@
 <script lang="ts">
-	import DatasetsTable from '$lib/components/DataTable/DatasetsTable.svelte';
-	import PlotControls from '$lib/components/PlotControls/PlotControls.svelte';
+	import PlotForm from '$lib/components/PlotForm/PlotForm.svelte';
 	import { ProgressRing } from '@skeletonlabs/skeleton-svelte';
 	import { dndzone } from 'svelte-dnd-action';
 	import type { PageProps } from './$types';
@@ -18,12 +17,11 @@
 		<h2 class="text-center h2">{data.publication.title}</h2>
 	</section>
 {/if}
-
 <section
 	use:dndzone={{ items: datasets }}
 	onconsider={(e) => (datasets = e.detail.items)}
 	onfinalize={(e) => (datasets = e.detail.items)}
-	class="flex justify-center gap-2 overflow-x-scroll"
+	class="flex justify-center-safe gap-2 overflow-scroll"
 >
 	{#each datasets as ds (`ds-${ds.id}`)}
 		<div class="card preset-filled-surface-500 text-center">
@@ -44,16 +42,7 @@
 	{/each}
 </section>
 
-<form method="POST" action="?/plot">
-	<hr class="hr" />
-	<section class="size-fit">
-		<h2 class="text-center h2">Plot</h2>
-		<div class="size-fit">
-			<button type="submit" class="btn preset-filled">Plot</button>
-		</div>
-		<div class="flex gap-4">
-			<PlotControls genes={data.genes} />
-			<DatasetsTable datasets={data.publication?.datasets ?? data.datasets} />
-		</div>
-	</section>
-</form>
+<hr class="hr" />
+<section class="size-fit">
+	<PlotForm datasets={data.publication?.datasets ?? data.datasets} genes={data.genes} />
+</section>

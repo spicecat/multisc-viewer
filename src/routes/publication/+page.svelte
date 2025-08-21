@@ -10,4 +10,7 @@
 	<title>Publications</title>
 </svelte:head>
 
-<PublicationsTable {publications} />
+<section class="mx-auto size-fit">
+	<h2 class="text-center h2">Publications</h2>
+	<PublicationsTable {publications} />
+</section>

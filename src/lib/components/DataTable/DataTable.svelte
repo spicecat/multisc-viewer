@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Columns, Data, Select } from '$lib/types/data-table';
+	import type { Columns, Data } from '$lib/types/data-table';
 	import { Pagination, Progress } from '@skeletonlabs/skeleton-svelte';
 
 	let {
@@ -11,14 +11,19 @@
 		name: string;
 		data: Data[];
 		columns: Columns;
-		select?: Select;
+		select?: string | string[];
 	} = $props();
 
-	let selected = $state<string | string[]>(select === 'checkbox' ? [] : '');
+	let selected = $state<string | string[] | undefined>(select);
 
 	let page = $state(1);
 	let pageSize = $state(10);
 	const slice = $derived(data.slice((page - 1) * pageSize, page * pageSize));
+
+	$effect(() => {
+		const totalPages = Math.ceil(data.length / pageSize);
+		if (page > totalPages) page = Math.max(1, totalPages);
+	});
 </script>
 
 <div class="table-wrap">
@@ -27,16 +32,21 @@
 			<tr>
 				{#if select}
 					<th>
-						{#if select === 'checkbox'}
-							<input
-								type="checkbox"
-								class="checkbox"
-								checked={selected.length === data.length}
-								onchange={(e) => {
-									selected = e.currentTarget.checked ? data.map((item) => item.id) : [];
-								}}
-							/>
-						{/if}
+						<label class="flex items-center space-x-2">
+							{#if Array.isArray(selected)}
+								<input
+									type="checkbox"
+									class="checkbox"
+									checked={selected.length === data.length}
+									onchange={(e) => {
+										selected = e.currentTarget.checked ? data.map((item) => item.id) : [];
+									}}
+								/>
+								<p class="font-bold">{selected.length}</p>
+							{:else}
+								<p class="font-bold">{selected}</p>
+							{/if}
+						</label>
 					</th>
 				{/if}
 				{#each columns as { label } (`label-${label}`)}
@@ -51,11 +61,11 @@
 				<Progress value={null} />
 			{:then}
 				{#each slice as item (`item-${item.id}`)}
-					{@const id = typeof item === 'object' ? item.id : item}
+					{@const id = item.id}
 					<tr>
 						{#if select}
 							<td>
-								{#if select === 'checkbox'}
+								{#if Array.isArray(select)}
 									<input type="checkbox" class="checkbox" {name} value={id} bind:group={selected} />
 								{:else}
 									<input type="radio" class="radio" {name} value={id} bind:group={selected} />

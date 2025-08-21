@@ -1,6 +1,6 @@
 <script lang="ts">
-	import DatasetsTable from '$lib/components/DataTable/DatasetsTable.svelte';
 	import PublicationsTable from '$lib/components/DataTable/PublicationsTable.svelte';
+	import PlotForm from '$lib/components/PlotForm/PlotForm.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -36,6 +36,12 @@
 </section>
 
 <hr class="hr" />
-<PublicationsTable {publications} />
+<section class="mx-auto size-fit">
+	<h2 class="text-center h2">Publications</h2>
+	<PublicationsTable {publications} />
+</section>
 <hr class="hr" />
-<DatasetsTable {datasets} />
+<section class="mx-auto size-fit">
+	<h2 class="text-center h2">All Datasets</h2>
+	<PlotForm {datasets} />
+</section>

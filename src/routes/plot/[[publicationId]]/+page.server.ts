@@ -58,12 +58,18 @@ export const actions = {
 		const publicationId = data.get('publicationId');
 		const datasets = data.getAll('datasets');
 		const gene = data.get('gene');
+		const groupBy = data.get('groupBy');
+		const splitBy = data.get('splitBy');
+		const plotTypes = data.getAll('pt');
 		if (datasets.length === 0) return fail(400, { error: 'No datasets selected' });
-		const urlParams = new URLSearchParams();
-		datasets.forEach((ds) => urlParams.append('ds', ds.toString()));
-		if (gene) urlParams.set('gene', gene.toString());
-		console.log(123, data.get('publicationId'), `/plot/?${urlParams.toString()}`);
-		if (publicationId) redirect(303, `/plot/${publicationId.toString()}?${urlParams.toString()}`);
-		else redirect(303, `/plot?${urlParams.toString()}`);
+		const searchParams = new URLSearchParams();
+		datasets.forEach((ds) => searchParams.append('ds', ds.toString()));
+		if (gene) searchParams.set('gene', gene.toString());
+		if (groupBy) searchParams.set('groupBy', groupBy.toString());
+		if (splitBy) searchParams.set('splitBy', splitBy.toString());
+		plotTypes.forEach((pt) => searchParams.append('pt', pt.toString()));
+		if (publicationId)
+			redirect(303, `/plot/${publicationId.toString()}?${searchParams.toString()}`);
+		else redirect(303, `/plot?${searchParams.toString()}`);
 	}
 } satisfies Actions;

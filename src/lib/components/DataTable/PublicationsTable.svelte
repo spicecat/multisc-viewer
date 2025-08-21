@@ -14,7 +14,4 @@
 	);
 </script>
 
-<section class="mx-auto size-fit">
-	<h2 class="text-center h2">Publications</h2>
-	<DataTableSearch name="publications" {data} columns={publicationColumns} />
-</section>
+<DataTableSearch name="publications" {data} columns={publicationColumns} />

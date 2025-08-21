@@ -23,8 +23,6 @@ export type Columns = {
 	href?: string;
 }[];
 
-export type Select = 'checkbox' | 'radio';
-
 export const geneColumns: Columns = [{ key: 'id', label: 'Gene' }];
 
 export const datasetColumns = [
