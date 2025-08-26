@@ -1,0 +1,157 @@
+[
+	{
+		"id": "Yamada",
+		"title": "Yamada PD PDD DLB, Human Substantia Nigra",
+		"year": 2025,
+		"authors": ["Shinnosuke Yamada"],
+		"PMID": "NA",
+		"region": ["Human", "Brain", "Midbrain", "Substantia Nigra"],
+		"disease": ["PD", "PDD", "DLB"],
+		"cellType": "Neuron",
+		"defaultGene": "APOE"
+	},
+	{
+		"id": "Wang",
+		"title": "Wang PD PDD, Human Substantia Nigra",
+		"year": 2022,
+		"authors": ["Qian Wang"],
+		"PMID": "38198537",
+		"region": ["Human", "Brain", "Midbrain", "Substantia Nigra"],
+		"disease": ["PD", "PDD"],
+		"cellType": "Neuron",
+		"defaultGene": "APOE"
+	},
+	{
+		"id": "Kamath",
+		"title": "Kamath PD, Human Midbrain",
+		"year": 2022,
+		"authors": ["Tushar Kamath"],
+		"PMID": "35513515",
+		"region": ["Human", "Brain", "Midbrain"],
+		"disease": ["PD"],
+		"cellType": "Neuron",
+		"defaultGene": "APOE"
+	},
+	{
+		"id": "Martirosyan",
+		"title": "Martirosyan PD, Human Substantia Nigra",
+		"year": 2024,
+		"authors": ["Araks Martirosyan"],
+		"PMID": "38245794",
+		"region": ["Human", "Brain", "Midbrain", "Substantia Nigra"],
+		"species": "Human",
+		"disease": ["PD"],
+		"cellType": "Neuron",
+		"defaultGene": "APOE"
+	},
+	{
+		"id": "Human_2019_Grubman_AD_ec_Astrocyte",
+		"title": "Grubman AD, Human Entorhinal Cortex",
+		"year": 2019,
+		"authors": ["Grubman"],
+		"PMID": "31768052",
+		"region": ["Human", "Brain", "Temporal Lobe", "Entorhinal Cortex"],
+		"disease": ["AD"],
+		"cellType": "Astrocyte",
+		"defaultGene": "APOE"
+	},
+	{
+		"id": "Human_2020_Lau_AD_pfc_Astrocyte",
+		"title": "Lau AD, Human Prefrontal Cortex",
+		"year": 2020,
+		"authors": ["Lau"],
+		"PMID": "32989152",
+		"region": ["Human", "Brain", "Frontal Lobe", "Prefrontal Cortex"],
+		"disease": ["AD"],
+		"cellType": "Astrocyte",
+		"defaultGene": "APOE"
+	},
+	{
+		"id": "Human_2020_Lee_HD_pu_Astrocyte",
+		"title": "Lee HD, Human Putamen",
+		"year": 2020,
+		"authors": ["Lee"],
+		"PMID": "32681824",
+		"region": ["Human", "Brain", "Basal Ganglia", "Putamen"],
+		"disease": ["HD"],
+		"cellType": "Astrocyte",
+		"defaultGene": "APOE"
+	},
+	{
+		"id": "Human_2020_Lee_HD_cd_Astrocyte",
+		"title": "Lee HD, Human Caudate",
+		"year": 2020,
+		"authors": ["Lee"],
+		"PMID": "32681824",
+		"region": ["Human", "Brain", "Basal Ganglia", "Caudate"],
+		"disease": ["HD"],
+		"cellType": "Astrocyte",
+		"defaultGene": "APOE"
+	},
+	{
+		"id": "Human_2021_Feleke_LBD_acc_Astrocyte",
+		"title": "Feleke LBD, Human Anterior Cingulate Cortex",
+		"year": 2021,
+		"authors": ["Feleke"],
+		"PMID": "34309761",
+		"region": ["Human", "Brain", "Frontal Lobe", "Anterior Cingulate Cortex"],
+		"disease": ["PD", "PDD", "DLB"],
+		"cellType": "Astrocyte",
+		"defaultGene": "APOE"
+	},
+	{
+		"id": "Human_2023_Xu_ADPD_pu_Astrocyte",
+		"title": "Xu AD/PD, Human Putamen",
+		"year": 2023,
+		"authors": ["Xu"],
+		"PMID": "36993867",
+		"region": ["Human", "Brain", "Basal Ganglia", "Putamen"],
+		"disease": ["AD", "PD"],
+		"cellType": "Astrocyte",
+		"defaultGene": "APOE"
+	},
+	{
+		"id": "Human_2023_Zhou_NHD_oc_Astrocyte",
+		"title": "Zhou NHD, Human Occipital Cortex",
+		"year": 2023,
+		"authors": ["Zhou"],
+		"PMID": "36658241",
+		"region": ["Human", "Brain", "Occipital Lobe", "Occipital Cortex"],
+		"disease": ["NHD"],
+		"cellType": "Astrocyte",
+		"defaultGene": "APOE"
+	},
+	{
+		"id": "Human_2024_Gabitto_AD_mtg_Astrocyte",
+		"title": "Gabitto AD, Human Middle Temporal Gyrus",
+		"year": 2024,
+		"authors": ["Gabitto"],
+		"PMID": "39402379",
+		"region": ["Human", "Brain", "Temporal Lobe", "Middle Temporal Gyrus"],
+		"disease": ["Dementia"],
+		"cellType": "Astrocyte",
+		"defaultGene": "APOE"
+	},
+	{
+		"id": "He_Monkey_Putamen_Neuron",
+		"title": "He, Monkey Putamen",
+		"year": 2021,
+		"authors": ["He"],
+		"PMID": "34727523",
+		"region": ["Monkey", "Brain", "Basal Ganglia", "Putamen"],
+		"disease": ["NA"],
+		"cellType": "Neuron",
+		"defaultGene": "APOE"
+	},
+	{
+		"id": "Saunders_Mouse_Striatum_Neuron",
+		"title": "Saunders, Mouse Striatum",
+		"year": 2018,
+		"authors": ["Saunders"],
+		"PMID": "30096299",
+		"region": ["Mouse", "Brain", "Basal Ganglia", "Putamen/Caudate"],
+		"disease": ["NA"],
+		"cellType": "Neuron",
+		"defaultGene": "APOE"
+	}
+]
