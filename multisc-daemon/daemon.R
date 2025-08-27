@@ -142,7 +142,7 @@ function(datasets) {
   }), datasets)
 }
 
-#* Render plots for a dataset
+#* Render plots for datasets
 #* @serializer unboxedJSON
 #* @post /render
 #* @param datasets:[str]* Dataset names

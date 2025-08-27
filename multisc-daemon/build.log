@@ -1,0 +1,227 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 735B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/rstudio/plumber:latest
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/4] FROM docker.io/rstudio/plumber:latest@sha256:f3b344615127d7638d8a6dda943b81836de27e6da827410f18ef19123b64448e
+#4 CACHED
+
+#5 [internal] load build context
+#5 transferring context: 1.33kB done
+#5 DONE 0.1s
+
+#6 [2/4] RUN apt-get update -qq 	&& apt-get install -y --no-install-recommends 	libeigen3-dev 	libglpk40 	libxml2 	&& rm -rf /var/lib/apt/lists/*
+#6 7.830 Reading package lists...
+#6 8.884 Building dependency tree...
+#6 9.152 Reading state information...
+#6 9.718 The following additional packages will be installed:
+#6 9.720   libamd3 libcolamd3 libltdl7 libpkgconf3 libsuitesparseconfig7 libxml2-dev
+#6 9.720   pkg-config pkgconf pkgconf-bin
+#6 9.723 Suggested packages:
+#6 9.723   libeigen3-doc libmpfrc++-dev libiodbc2-dev default-libmysqlclient-dev
+#6 9.825 The following NEW packages will be installed:
+#6 9.827   libamd3 libcolamd3 libeigen3-dev libglpk40 libltdl7 libpkgconf3
+#6 9.829   libsuitesparseconfig7 pkg-config pkgconf pkgconf-bin
+#6 9.834 The following packages will be upgraded:
+#6 9.835   libxml2 libxml2-dev
+#6 10.23 2 upgraded, 10 newly installed, 0 to remove and 34 not upgraded.
+#6 10.23 Need to get 3,144 kB of archives.
+#6 10.23 After this operation, 10.8 MB of additional disk space will be used.
+#6 10.23 Get:1 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libxml2-dev amd64 2.9.14+dfsg-1.3ubuntu3.4 [781 kB]
+#6 11.06 Get:2 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libxml2 amd64 2.9.14+dfsg-1.3ubuntu3.4 [762 kB]
+#6 11.28 Get:3 http://archive.ubuntu.com/ubuntu noble/main amd64 libsuitesparseconfig7 amd64 1:7.6.1+dfsg-1build1 [12.9 kB]
+#6 11.28 Get:4 http://archive.ubuntu.com/ubuntu noble/universe amd64 libamd3 amd64 1:7.6.1+dfsg-1build1 [27.2 kB]
+#6 11.28 Get:5 http://archive.ubuntu.com/ubuntu noble/main amd64 libcolamd3 amd64 1:7.6.1+dfsg-1build1 [19.4 kB]
+#6 11.28 Get:6 http://archive.ubuntu.com/ubuntu noble/main amd64 libltdl7 amd64 2.4.7-7build1 [40.3 kB]
+#6 11.28 Get:7 http://archive.ubuntu.com/ubuntu noble/universe amd64 libglpk40 amd64 5.0-1build2 [369 kB]
+#6 11.29 Get:8 http://archive.ubuntu.com/ubuntu noble/main amd64 libpkgconf3 amd64 1.8.1-2build1 [30.7 kB]
+#6 11.29 Get:9 http://archive.ubuntu.com/ubuntu noble/main amd64 pkgconf-bin amd64 1.8.1-2build1 [20.7 kB]
+#6 11.29 Get:10 http://archive.ubuntu.com/ubuntu noble/main amd64 pkgconf amd64 1.8.1-2build1 [16.8 kB]
+#6 11.29 Get:11 http://archive.ubuntu.com/ubuntu noble/main amd64 pkg-config amd64 1.8.1-2build1 [7,264 B]
+#6 11.40 Get:12 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 libeigen3-dev all 3.4.0-4build0.1 [1,057 kB]
+#6 14.25 debconf: delaying package configuration, since apt-utils is not installed
+#6 14.33 Fetched 3,144 kB in 4s (753 kB/s)
+#6 14.37 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 16069 files and directories currently installed.)
+#6 14.42 Preparing to unpack .../00-libxml2-dev_2.9.14+dfsg-1.3ubuntu3.4_amd64.deb ...
+#6 14.45 Unpacking libxml2-dev:amd64 (2.9.14+dfsg-1.3ubuntu3.4) over (2.9.14+dfsg-1.3ubuntu3.3) ...
+#6 14.84 Preparing to unpack .../01-libxml2_2.9.14+dfsg-1.3ubuntu3.4_amd64.deb ...
+#6 14.87 Unpacking libxml2:amd64 (2.9.14+dfsg-1.3ubuntu3.4) over (2.9.14+dfsg-1.3ubuntu3.3) ...
+#6 14.97 Selecting previously unselected package libsuitesparseconfig7:amd64.
+#6 14.98 Preparing to unpack .../02-libsuitesparseconfig7_1%3a7.6.1+dfsg-1build1_amd64.deb ...
+#6 14.99 Unpacking libsuitesparseconfig7:amd64 (1:7.6.1+dfsg-1build1) ...
+#6 15.04 Selecting previously unselected package libamd3:amd64.
+#6 15.05 Preparing to unpack .../03-libamd3_1%3a7.6.1+dfsg-1build1_amd64.deb ...
+#6 15.05 Unpacking libamd3:amd64 (1:7.6.1+dfsg-1build1) ...
+#6 15.11 Selecting previously unselected package libcolamd3:amd64.
+#6 15.12 Preparing to unpack .../04-libcolamd3_1%3a7.6.1+dfsg-1build1_amd64.deb ...
+#6 15.13 Unpacking libcolamd3:amd64 (1:7.6.1+dfsg-1build1) ...
+#6 15.18 Selecting previously unselected package libltdl7:amd64.
+#6 15.18 Preparing to unpack .../05-libltdl7_2.4.7-7build1_amd64.deb ...
+#6 15.19 Unpacking libltdl7:amd64 (2.4.7-7build1) ...
+#6 15.25 Selecting previously unselected package libglpk40:amd64.
+#6 15.25 Preparing to unpack .../06-libglpk40_5.0-1build2_amd64.deb ...
+#6 15.26 Unpacking libglpk40:amd64 (5.0-1build2) ...
+#6 15.31 Selecting previously unselected package libpkgconf3:amd64.
+#6 15.32 Preparing to unpack .../07-libpkgconf3_1.8.1-2build1_amd64.deb ...
+#6 15.33 Unpacking libpkgconf3:amd64 (1.8.1-2build1) ...
+#6 15.37 Selecting previously unselected package pkgconf-bin.
+#6 15.37 Preparing to unpack .../08-pkgconf-bin_1.8.1-2build1_amd64.deb ...
+#6 15.38 Unpacking pkgconf-bin (1.8.1-2build1) ...
+#6 15.43 Selecting previously unselected package pkgconf:amd64.
+#6 15.43 Preparing to unpack .../09-pkgconf_1.8.1-2build1_amd64.deb ...
+#6 15.44 Unpacking pkgconf:amd64 (1.8.1-2build1) ...
+#6 15.49 Selecting previously unselected package pkg-config:amd64.
+#6 15.50 Preparing to unpack .../10-pkg-config_1.8.1-2build1_amd64.deb ...
+#6 15.51 Unpacking pkg-config:amd64 (1.8.1-2build1) ...
+#6 15.55 Selecting previously unselected package libeigen3-dev.
+#6 15.55 Preparing to unpack .../11-libeigen3-dev_3.4.0-4build0.1_all.deb ...
+#6 15.56 Unpacking libeigen3-dev (3.4.0-4build0.1) ...
+#6 15.73 Setting up libpkgconf3:amd64 (1.8.1-2build1) ...
+#6 15.75 Setting up pkgconf-bin (1.8.1-2build1) ...
+#6 15.77 Setting up libltdl7:amd64 (2.4.7-7build1) ...
+#6 15.79 Setting up libsuitesparseconfig7:amd64 (1:7.6.1+dfsg-1build1) ...
+#6 15.81 Setting up libxml2:amd64 (2.9.14+dfsg-1.3ubuntu3.4) ...
+#6 15.83 Setting up libamd3:amd64 (1:7.6.1+dfsg-1build1) ...
+#6 15.85 Setting up libcolamd3:amd64 (1:7.6.1+dfsg-1build1) ...
+#6 15.88 Setting up pkgconf:amd64 (1.8.1-2build1) ...
+#6 15.90 Setting up libxml2-dev:amd64 (2.9.14+dfsg-1.3ubuntu3.4) ...
+#6 15.92 Setting up libglpk40:amd64 (5.0-1build2) ...
+#6 15.95 Setting up libeigen3-dev (3.4.0-4build0.1) ...
+#6 15.97 Setting up pkg-config:amd64 (1.8.1-2build1) ...
+#6 15.99 Processing triggers for libc-bin (2.39-0ubuntu8.4) ...
+#6 DONE 16.5s
+
+#7 [3/4] RUN install2.r 	--ncpus -1 --error --skipinstalled 	--repos 'https://cloud.r-project.org' 	--repos 'https://satijalab.r-universe.dev' 	--repos 'https://bnprks.r-universe.dev' 	Seurat 	rjson 	&& rm -rf /tmp/downloaded_packages/ /tmp/*.rds
+#7 8.004 also installing the dependencies ‘sys’, ‘evaluate’, ‘highr’, ‘xfun’, ‘tinytex’, ‘bitops’, ‘fs’, ‘dotCall64’, ‘askpass’, ‘knitr’, ‘rmarkdown’, ‘yaml’, ‘tidyselect’, ‘rprojroot’, ‘gtools’, ‘caTools’, ‘plyr’, ‘jquerylib’, ‘memoise’, ‘sass’, ‘tensor’, ‘utf8’, ‘BH’, ‘sitmo’, ‘sp’, ‘spam’, ‘gtable’, ‘data.table’, ‘stringr’, ‘digest’, ‘globals’, ‘listenv’, ‘parallelly’, ‘isoband’, ‘vctrs’, ‘withr’, ‘openssl’, ‘pkgconfig’, ‘cpp11’, ‘zoo’, ‘htmltools’, ‘farver’, ‘viridisLite’, ‘base64enc’, ‘htmlwidgets’, ‘tidyr’, ‘dplyr’, ‘lazyeval’, ‘crosstalk’, ‘purrr’, ‘RcppTOML’, ‘here’, ‘rappdirs’, ‘gplots’, ‘labeling’, ‘reshape2’, ‘gridExtra’, ‘RcppArmadillo’, ‘xtable’, ‘fontawesome’, ‘sourcetools’, ‘commonmark’, ‘bslib’, ‘cachem’, ‘spatstat.data’, ‘spatstat.univar’, ‘spatstat.random’, ‘spatstat.utils’, ‘spatstat.sparse’, ‘goftest’, ‘abind’, ‘deldir’, ‘polyclip’, ‘pillar’, ‘FNN’, ‘dqrng’, ‘SeuratObject’, ‘cowplot’, ‘fastDummies’, ‘fitdistrplus’, ‘future’, ‘future.apply’, ‘generics’, ‘ggplot2’, ‘ggrepel’, ‘ggridges’, ‘httr’, ‘ica’, ‘igraph’, ‘irlba’, ‘leidenbase’, ‘lmtest’, ‘matrixStats’, ‘miniUI’, ‘patchwork’, ‘pbapply’, ‘plotly’, ‘png’, ‘progressr’, ‘RANN’, ‘RColorBrewer’, ‘RcppAnnoy’, ‘RcppHNSW’, ‘reticulate’, ‘ROCR’, ‘RSpectra’, ‘Rtsne’, ‘scales’, ‘scattermore’, ‘sctransform’, ‘shiny’, ‘spatstat.explore’, ‘spatstat.geom’, ‘tibble’, ‘uwot’, ‘RcppEigen’, ‘RcppProgress’
+#7 8.004 
+#7 8.137 trying URL 'https://cloud.r-project.org/src/contrib/sys_3.4.3.tar.gz'
+#7 8.137 trying URL 'https://cloud.r-project.org/src/contrib/evaluate_1.0.4.tar.gz'
+#7 8.137 trying URL 'https://cloud.r-project.org/src/contrib/highr_0.11.tar.gz'
+#7 8.137 trying URL 'https://cloud.r-project.org/src/contrib/xfun_0.53.tar.gz'
+#7 8.137 trying URL 'https://cloud.r-project.org/src/contrib/tinytex_0.57.tar.gz'
+#7 8.137 trying URL 'https://cloud.r-project.org/src/contrib/bitops_1.0-9.tar.gz'
+#7 8.137 trying URL 'https://cloud.r-project.org/src/contrib/fs_1.6.6.tar.gz'
+#7 8.137 trying URL 'https://cloud.r-project.org/src/contrib/dotCall64_1.2.tar.gz'
+#7 8.137 trying URL 'https://cloud.r-project.org/src/contrib/askpass_1.2.1.tar.gz'
+#7 8.137 trying URL 'https://cloud.r-project.org/src/contrib/knitr_1.50.tar.gz'
+#7 8.137 trying URL 'https://cloud.r-project.org/src/contrib/rmarkdown_2.29.tar.gz'
+#7 8.137 trying URL 'https://cloud.r-project.org/src/contrib/yaml_2.3.10.tar.gz'
+#7 8.137 trying URL 'https://cloud.r-project.org/src/contrib/tidyselect_1.2.1.tar.gz'
+#7 8.137 trying URL 'https://cloud.r-project.org/src/contrib/rprojroot_2.1.1.tar.gz'
+#7 8.137 trying URL 'https://cloud.r-project.org/src/contrib/gtools_3.9.5.tar.gz'
+#7 13.61 trying URL 'https://cloud.r-project.org/src/contrib/caTools_1.18.3.tar.gz'
+#7 13.61 trying URL 'https://cloud.r-project.org/src/contrib/plyr_1.8.9.tar.gz'
+#7 13.66 trying URL 'https://cloud.r-project.org/src/contrib/jquerylib_0.1.4.tar.gz'
+#7 13.81 trying URL 'https://cloud.r-project.org/src/contrib/memoise_2.0.1.tar.gz'
+#7 13.82 trying URL 'https://cloud.r-project.org/src/contrib/sass_0.4.10.tar.gz'
+#7 13.82 trying URL 'https://cloud.r-project.org/src/contrib/tensor_1.5.1.tar.gz'
+#7 13.87 trying URL 'https://cloud.r-project.org/src/contrib/utf8_1.2.6.tar.gz'
+#7 13.87 trying URL 'https://cloud.r-project.org/src/contrib/BH_1.87.0-1.tar.gz'
+#7 13.88 trying URL 'https://cloud.r-project.org/src/contrib/sitmo_2.0.2.tar.gz'
+#7 13.89 trying URL 'https://cloud.r-project.org/src/contrib/sp_2.2-0.tar.gz'
+#7 13.89 trying URL 'https://cloud.r-project.org/src/contrib/spam_2.11-1.tar.gz'
+#7 13.92 trying URL 'https://cloud.r-project.org/src/contrib/gtable_0.3.6.tar.gz'
+#7 14.03 trying URL 'https://cloud.r-project.org/src/contrib/data.table_1.17.8.tar.gz'
+#7 14.04 trying URL 'https://cloud.r-project.org/src/contrib/stringr_1.5.1.tar.gz'
+#7 14.09 trying URL 'https://cloud.r-project.org/src/contrib/digest_0.6.37.tar.gz'
+#7 14.12 trying URL 'https://cloud.r-project.org/src/contrib/globals_0.18.0.tar.gz'
+#7 14.21 trying URL 'https://cloud.r-project.org/src/contrib/listenv_0.9.1.tar.gz'
+#7 14.28 trying URL 'https://cloud.r-project.org/src/contrib/parallelly_1.45.1.tar.gz'
+#7 14.30 trying URL 'https://cloud.r-project.org/src/contrib/isoband_0.2.7.tar.gz'
+#7 14.30 trying URL 'https://cloud.r-project.org/src/contrib/vctrs_0.6.5.tar.gz'
+#7 14.38 trying URL 'https://cloud.r-project.org/src/contrib/withr_3.0.2.tar.gz'
+#7 14.71 trying URL 'https://cloud.r-project.org/src/contrib/openssl_2.3.3.tar.gz'
+#7 14.82 trying URL 'https://cloud.r-project.org/src/contrib/pkgconfig_2.0.3.tar.gz'
+#7 14.96 trying URL 'https://cloud.r-project.org/src/contrib/cpp11_0.5.2.tar.gz'
+#7 14.98 trying URL 'https://cloud.r-project.org/src/contrib/zoo_1.8-14.tar.gz'
+#7 14.99 trying URL 'https://cloud.r-project.org/src/contrib/htmltools_0.5.8.1.tar.gz'
+#7 15.12 trying URL 'https://cloud.r-project.org/src/contrib/farver_2.1.2.tar.gz'
+#7 15.15 trying URL 'https://cloud.r-project.org/src/contrib/viridisLite_0.4.2.tar.gz'
+#7 15.38 trying URL 'https://cloud.r-project.org/src/contrib/base64enc_0.1-3.tar.gz'
+#7 15.63 trying URL 'https://cloud.r-project.org/src/contrib/htmlwidgets_1.6.4.tar.gz'
+#7 15.78 trying URL 'https://cloud.r-project.org/src/contrib/tidyr_1.3.1.tar.gz'
+#7 15.79 trying URL 'https://cloud.r-project.org/src/contrib/dplyr_1.1.4.tar.gz'
+#7 16.20 trying URL 'https://cloud.r-project.org/src/contrib/lazyeval_0.2.2.tar.gz'
+#7 16.25 trying URL 'https://cloud.r-project.org/src/contrib/crosstalk_1.2.2.tar.gz'
+#7 16.64 trying URL 'https://cloud.r-project.org/src/contrib/purrr_1.1.0.tar.gz'
+#7 16.69 trying URL 'https://cloud.r-project.org/src/contrib/RcppTOML_0.2.3.tar.gz'
+#7 16.69 trying URL 'https://cloud.r-project.org/src/contrib/here_1.0.1.tar.gz'
+#7 16.79 trying URL 'https://cloud.r-project.org/src/contrib/rappdirs_0.3.3.tar.gz'
+#7 17.11 trying URL 'https://cloud.r-project.org/src/contrib/gplots_3.2.0.tar.gz'
+#7 17.27 trying URL 'https://cloud.r-project.org/src/contrib/labeling_0.4.3.tar.gz'
+#7 17.29 trying URL 'https://cloud.r-project.org/src/contrib/reshape2_1.4.4.tar.gz'
+#7 17.33 trying URL 'https://cloud.r-project.org/src/contrib/gridExtra_2.3.tar.gz'
+#7 17.37 trying URL 'https://cloud.r-project.org/src/contrib/RcppArmadillo_14.6.3-1.tar.gz'
+#7 17.42 trying URL 'https://cloud.r-project.org/src/contrib/xtable_1.8-4.tar.gz'
+#7 17.61 trying URL 'https://cloud.r-project.org/src/contrib/fontawesome_0.5.3.tar.gz'
+#7 17.64 trying URL 'https://cloud.r-project.org/src/contrib/sourcetools_0.1.7-1.tar.gz'
+#7 17.68 trying URL 'https://cloud.r-project.org/src/contrib/commonmark_2.0.0.tar.gz'
+#7 17.68 trying URL 'https://cloud.r-project.org/src/contrib/bslib_0.9.0.tar.gz'
+#7 17.72 trying URL 'https://cloud.r-project.org/src/contrib/cachem_1.1.0.tar.gz'
+#7 17.86 trying URL 'https://cloud.r-project.org/src/contrib/spatstat.data_3.1-8.tar.gz'
+#7 18.05 trying URL 'https://cloud.r-project.org/src/contrib/spatstat.univar_3.1-4.tar.gz'
+#7 19.51 trying URL 'https://cloud.r-project.org/src/contrib/spatstat.random_3.4-1.tar.gz'
+#7 19.88 trying URL 'https://cloud.r-project.org/src/contrib/spatstat.utils_3.1-5.tar.gz'
+#7 19.88 trying URL 'https://cloud.r-project.org/src/contrib/spatstat.sparse_3.1-0.tar.gz'
+#7 20.79 trying URL 'https://cloud.r-project.org/src/contrib/goftest_1.2-3.tar.gz'
+#7 20.79 trying URL 'https://cloud.r-project.org/src/contrib/abind_1.4-8.tar.gz'
+#7 20.79 trying URL 'https://cloud.r-project.org/src/contrib/deldir_2.0-4.tar.gz'
+#7 20.95 trying URL 'https://cloud.r-project.org/src/contrib/polyclip_1.10-7.tar.gz'
+#7 21.06 trying URL 'https://cloud.r-project.org/src/contrib/pillar_1.11.0.tar.gz'
+#7 21.17 trying URL 'https://cloud.r-project.org/src/contrib/FNN_1.1.4.1.tar.gz'
+#7 21.17 trying URL 'https://cloud.r-project.org/src/contrib/dqrng_0.4.1.tar.gz'
+#7 21.17 trying URL 'https://cloud.r-project.org/src/contrib/SeuratObject_5.1.0.tar.gz'
+#7 21.18 trying URL 'https://cloud.r-project.org/src/contrib/cowplot_1.2.0.tar.gz'
+#7 21.39 trying URL 'https://cloud.r-project.org/src/contrib/fastDummies_1.7.5.tar.gz'
+#7 21.59 trying URL 'https://cloud.r-project.org/src/contrib/fitdistrplus_1.2-4.tar.gz'
+#7 21.59 trying URL 'https://cloud.r-project.org/src/contrib/future_1.67.0.tar.gz'
+#7 22.01 trying URL 'https://cloud.r-project.org/src/contrib/future.apply_1.20.0.tar.gz'
+#7 22.02 trying URL 'https://cloud.r-project.org/src/contrib/generics_0.1.4.tar.gz'
+#7 22.02 trying URL 'https://cloud.r-project.org/src/contrib/ggplot2_3.5.2.tar.gz'
+#7 22.03 trying URL 'https://cloud.r-project.org/src/contrib/ggrepel_0.9.6.tar.gz'
+#7 22.19 trying URL 'https://cloud.r-project.org/src/contrib/ggridges_0.5.7.tar.gz'
+#7 22.34 trying URL 'https://cloud.r-project.org/src/contrib/httr_1.4.7.tar.gz'
+#7 22.42 trying URL 'https://cloud.r-project.org/src/contrib/ica_1.0-3.tar.gz'
+#7 22.44 trying URL 'https://cloud.r-project.org/src/contrib/igraph_2.1.4.tar.gz'
+#7 22.46 trying URL 'https://cloud.r-project.org/src/contrib/irlba_2.3.5.1.tar.gz'
+#7 22.89 trying URL 'https://cloud.r-project.org/src/contrib/leidenbase_0.1.35.tar.gz'
+#7 22.98 trying URL 'https://cloud.r-project.org/src/contrib/lmtest_0.9-40.tar.gz'
+#7 23.16 trying URL 'https://cloud.r-project.org/src/contrib/matrixStats_1.5.0.tar.gz'
+#7 23.17 trying URL 'https://cloud.r-project.org/src/contrib/miniUI_0.1.2.tar.gz'
+#7 23.19 trying URL 'https://cloud.r-project.org/src/contrib/patchwork_1.3.2.tar.gz'
+#7 23.45 trying URL 'https://cloud.r-project.org/src/contrib/pbapply_1.7-4.tar.gz'
+#7 23.49 trying URL 'https://cloud.r-project.org/src/contrib/plotly_4.11.0.tar.gz'
+#7 23.49 trying URL 'https://cloud.r-project.org/src/contrib/png_0.1-8.tar.gz'
+#7 23.91 trying URL 'https://cloud.r-project.org/src/contrib/progressr_0.15.1.tar.gz'
+#7 24.29 trying URL 'https://cloud.r-project.org/src/contrib/RANN_2.6.2.tar.gz'
+#7 24.30 trying URL 'https://cloud.r-project.org/src/contrib/RColorBrewer_1.1-3.tar.gz'
+#7 24.40 trying URL 'https://cloud.r-project.org/src/contrib/RcppAnnoy_0.0.22.tar.gz'
+#7 24.59 trying URL 'https://cloud.r-project.org/src/contrib/RcppHNSW_0.6.0.tar.gz'
+#7 24.60 trying URL 'https://cloud.r-project.org/src/contrib/reticulate_1.43.0.tar.gz'
+#7 24.73 trying URL 'https://cloud.r-project.org/src/contrib/ROCR_1.0-11.tar.gz'
+#7 24.94 trying URL 'https://cloud.r-project.org/src/contrib/RSpectra_0.16-2.tar.gz'
+#7 25.84 trying URL 'https://cloud.r-project.org/src/contrib/Rtsne_0.17.tar.gz'
+#7 25.84 trying URL 'https://cloud.r-project.org/src/contrib/scales_1.4.0.tar.gz'
+#7 25.87 trying URL 'https://cloud.r-project.org/src/contrib/scattermore_1.2.tar.gz'
+#7 26.18 trying URL 'https://cloud.r-project.org/src/contrib/sctransform_0.4.2.tar.gz'
+#7 26.44 trying URL 'https://cloud.r-project.org/src/contrib/shiny_1.11.1.tar.gz'
+#7 26.46 trying URL 'https://cloud.r-project.org/src/contrib/spatstat.explore_3.5-2.tar.gz'
+#7 26.48 trying URL 'https://cloud.r-project.org/src/contrib/spatstat.geom_3.5-0.tar.gz'
+#7 26.85 trying URL 'https://cloud.r-project.org/src/contrib/tibble_3.3.0.tar.gz'
+#7 26.95 trying URL 'https://cloud.r-project.org/src/contrib/uwot_0.2.3.tar.gz'
+#7 27.07 trying URL 'https://cloud.r-project.org/src/contrib/RcppEigen_0.3.4.0.2.tar.gz'
+#7 27.08 trying URL 'https://cloud.r-project.org/src/contrib/RcppProgress_0.4.2.tar.gz'
+#7 27.08 trying URL 'https://cloud.r-project.org/src/contrib/Seurat_5.3.0.tar.gz'
+#7 27.23 trying URL 'https://cloud.r-project.org/src/contrib/rjson_0.2.23.tar.gz'
+#7 31.31 begin installing package ‘sys’
+#7 31.31 begin installing package ‘xfun’
+#7 31.31 begin installing package ‘bitops’
+#7 31.31 begin installing package ‘evaluate’

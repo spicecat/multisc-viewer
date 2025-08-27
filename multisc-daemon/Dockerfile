@@ -1,11 +1,26 @@
-FROM rstudio/plumber:v1.3.0
-WORKDIR /app
-RUN install2.r --error plumber Seurat rjson
-ENV DATASETS_DIR=/data/datasets \
-	PLOT_CACHE_DIR=/data/plots/cache \
-	PORT=8001
+FROM rstudio/plumber:latest
 
-COPY daemon.R ./
+LABEL org.opencontainers.image.title="multisc-daemon" \
+	org.opencontainers.image.description="Plotting daemon for Multisc-Viewer"
 
-EXPOSE 8001
-CMD ["R","-e","plumber::pr_run(plumber::pr('daemon.R'),port=as.integer(Sys.getenv('PORT','8001')))" ]
+RUN apt-get update -qq \
+	&& apt-get install -y --no-install-recommends \
+	libeigen3-dev \
+	libglpk40 \
+	libxml2 \
+	&& rm -rf /var/lib/apt/lists/*
+
+RUN install2.r \
+	--ncpus -1 --error --skipinstalled \
+	--repos 'https://cloud.r-project.org' \
+	--repos 'https://satijalab.r-universe.dev' \
+	--repos 'https://bnprks.r-universe.dev' \
+	Seurat \
+	rjson \
+	# BPCells \
+	# presto \
+	# glmGamPoi \
+	&& rm -rf /tmp/downloaded_packages/ /tmp/*.rds
+
+COPY . /api
+CMD ["/api/plumber.R"]

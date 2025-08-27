@@ -1,4 +1,4 @@
-FROM node:22-alpine
+FROM node:current-alpine
 WORKDIR /app
 COPY package.json pnpm-lock.yaml* ./
 RUN npm install -g pnpm@9 && pnpm install --frozen-lockfile
