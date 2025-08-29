@@ -12,6 +12,7 @@ data_file <- Sys.getenv("DATA_FILE", "data.rds")
 genotype_color_file <- Sys.getenv("GENOTYPE_COLOR_FILE", "genotype.colors.rds")
 cluster_color_file <- Sys.getenv("CLUSTER_COLOR_FILE", "cluster.colors.rds")
 dir.create(plot_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(plot_dir, recursive = TRUE, showWarnings = FALSE)
 
 # --- Global State ---
 dataset_data <- list()
@@ -72,7 +73,9 @@ render_plot <- function(ds, gene, group_by, split_by, pt) {
   )
   plot_path <- file.path(
     plot_dir,
+    plot_dir,
     plot_id,
+    plot_file
     plot_file
   )
   dir.create(dirname(plot_path), recursive = TRUE, showWarnings = FALSE)
@@ -141,6 +144,7 @@ function(datasets) {
 #* @param datasets:[str]* Dataset names to unload
 function(datasets) {
   loaded_datasets <<- dataset_data[!names(dataset_data) %in% datasets]
+  loaded_datasets <<- dataset_data[!names(dataset_data) %in% datasets]
   get_datasets()
 }
 
@@ -161,6 +165,7 @@ function(datasets) {
   }), datasets)
 }
 
+#* Render plots for datasets
 #* Render plots for datasets
 #* @serializer unboxedJSON
 #* @post /render

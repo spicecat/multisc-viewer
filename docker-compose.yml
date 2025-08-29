@@ -1,18 +1,24 @@
 name: multisc-viewer
 
 services:
-    multisc-daemon:
-        build: ./multisc-daemon
-        volumes:
-            - data:/data
-    multisc-viewer:
-        build: ./multisc-viewer
-        ports:
-            - "8080:80"
-        volumes:
-            - data:/data:ro
-        depends_on:
-            - multisc-daemon
+  data:
+    build: ./data
+    volumes:
+      - data:/data
+  multisc-daemon:
+    build: ./multisc-daemon
+    volumes:
+      - data:/data
+    depends_on:
+      - data
+  multisc-viewer:
+    build: ./multisc-viewer
+    ports:
+      - "4173:443"
+    volumes:
+      - data:/data:ro
+    depends_on:
+      - data
 volumes:
-    data:
-        driver: local
+  data:
+    driver: local
