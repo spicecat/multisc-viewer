@@ -5,13 +5,13 @@ suppressPackageStartupMessages({
 })
 
 # --- Configuration ---
-datasets_dir <- Sys.getenv("DATASETS_DIR", "datasets")
-cache_dir <- Sys.getenv("PLOT_CACHE_DIR", "plots")
-plot_name <- Sys.getenv("PLOT_NAME", "plot.png")
+datasets_dir <- Sys.getenv("DATASETS_DIR", "data/datasets")
+plot_dir <- Sys.getenv("PLOT_DIR", "data/plots")
+plot_file <- Sys.getenv("PLOT_FILE", "plot.png")
 data_file <- Sys.getenv("DATA_FILE", "data.rds")
 genotype_color_file <- Sys.getenv("GENOTYPE_COLOR_FILE", "genotype.colors.rds")
 cluster_color_file <- Sys.getenv("CLUSTER_COLOR_FILE", "cluster.colors.rds")
-dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(plot_dir, recursive = TRUE, showWarnings = FALSE)
 
 # --- Global State ---
 dataset_data <- list()
@@ -60,9 +60,9 @@ render_plot <- function(ds, gene, group_by, split_by, pt) {
     sep = "/"
   )
   plot_path <- file.path(
-    cache_dir,
+    plot_dir,
     plot_id,
-    plot_name
+    plot_file
   )
   dir.create(dirname(plot_path), recursive = TRUE, showWarnings = FALSE)
   print(paste("Rendering plot:", plot_id))
@@ -121,7 +121,7 @@ function() {
 #* @post /unload
 #* @param datasets:[str]* Dataset names to unload
 function(datasets) {
-  loaded_datasets <- dataset_data[!names(dataset_data) %in% datasets]
+  loaded_datasets <<- dataset_data[!names(dataset_data) %in% datasets]
   get_datasets()
 }
 
