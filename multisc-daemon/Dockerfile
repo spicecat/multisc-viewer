@@ -1,11 +1,24 @@
-FROM rstudio/plumber:v1.3.0
-WORKDIR /app
-RUN install2.r --error plumber Seurat rjson
-ENV DATASETS_DIR=/data/datasets \
-	PLOT_CACHE_DIR=/data/plots/cache \
-	PORT=8001
+FROM rocker/r-base:latest AS builder
 
-COPY daemon.R ./
+LABEL org.opencontainers.image.title="multisc-daemon" \
+	org.opencontainers.image.description="Plotting daemon for Multisc-Viewer"
 
-EXPOSE 8001
-CMD ["R","-e","plumber::pr_run(plumber::pr('daemon.R'),port=as.integer(Sys.getenv('PORT','8001')))" ]
+RUN apt-get update -qq \
+	&& apt-get install -y --no-install-recommends \
+	libglpk40 libhdf5-dev libsodium-dev \
+	libcurl4-openssl-dev libssl-dev libxml2-dev \
+	libgit2-dev \
+	&& rm -rf /var/lib/apt/lists/*
+
+RUN install2.r --error --skipinstalled pak
+
+RUN R -q -e 'pak::pkg_install(c("plumber", "Seurat", "rjson"))'
+RUN R -q -e 'pak::pkg_install(c("readr", "hexbin", "glmGamPoi", "immunogenomics/presto", "url::https://bnprks.r-universe.dev/src/contrib/BPCells_0.3.1.tar.gz"))'
+
+RUN rm -rf /tmp/downloaded_packages/ /tmp/*.rds
+
+COPY . /api
+WORKDIR /api
+ENV plumber.port=8000 DATASETS_DIR=/data/datasets PLOT_DIR=/data/plots
+EXPOSE 8000
+CMD ["Rscript", "plumber.R"]

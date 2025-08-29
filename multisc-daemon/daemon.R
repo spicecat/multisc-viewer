@@ -5,17 +5,18 @@ suppressPackageStartupMessages({
 })
 
 # --- Configuration ---
-datasets_dir <- Sys.getenv("DATASETS_DIR", "datasets")
-cache_dir <- Sys.getenv("PLOT_CACHE_DIR", "plots")
-plot_name <- Sys.getenv("PLOT_NAME", "plot.png")
+datasets_dir <- Sys.getenv("DATASETS_DIR", "../data/datasets")
+plot_dir <- Sys.getenv("PLOT_DIR", "../data/plots")
+plot_file <- Sys.getenv("PLOT_FILE", "plot.png")
 data_file <- Sys.getenv("DATA_FILE", "data.rds")
 genotype_color_file <- Sys.getenv("GENOTYPE_COLOR_FILE", "genotype.colors.rds")
 cluster_color_file <- Sys.getenv("CLUSTER_COLOR_FILE", "cluster.colors.rds")
-dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(plot_dir, recursive = TRUE, showWarnings = FALSE)
 
 # --- Global State ---
 dataset_data <- list()
 dataset_status <- list()
+dataset_genes <- list()
 
 # --- Helpers ---
 get_datasets <- function() {
@@ -29,10 +30,20 @@ get_datasets <- function() {
 
 load_dataset <- function(ds) {
   if (!ds %in% names(dataset_data)) {
-    dataset_data[[ds]] <<- readRDS(file.path(datasets_dir, ds, data_file))
-    print(paste("Loaded dataset:", ds))
+    dataset_data[[ds]] <<- readRDS(dataset_pafile.path(datasets_dir, ds, data_file)th)
+    if ("RNA" %in% names(dataset_data[[ds]]@assays)) {
+      dataset_genes[[ds]] <<- sort(unique(rownames(dataset_data[[ds]]@assays$RNA@counts)))
+    } else {
+      dataset_genes[[ds]] <<- character()
+    }
+    print(paste("Loaded dataset:", ds, "genes:", length(dataset_genes[[ds]])))
   }
   TRUE
+}
+
+get_genes <- function(datasets) {
+  lapply(datasets, load_dataset)
+  sort(unique(unlist(dataset_genes[datasets])))
 }
 
 get_colors <- function(ds, group_by) {
@@ -60,9 +71,9 @@ render_plot <- function(ds, gene, group_by, split_by, pt) {
     sep = "/"
   )
   plot_path <- file.path(
-    cache_dir,
+    plot_dir,
     plot_id,
-    plot_name
+    plot_file
   )
   dir.create(dirname(plot_path), recursive = TRUE, showWarnings = FALSE)
   print(paste("Rendering plot:", plot_id))
@@ -117,11 +128,19 @@ function() {
   get_datasets()
 }
 
+#* Get genes for datasets
+#* @serializer unboxedJSON
+#* @get /genes
+#* @param datasets:[str]* Dataset names
+function(datasets) {
+  get_genes(datasets)
+}
+
 #* Unload a dataset
 #* @post /unload
 #* @param datasets:[str]* Dataset names to unload
 function(datasets) {
-  loaded_datasets <- dataset_data[!names(dataset_data) %in% datasets]
+  loaded_datasets <<- dataset_data[!names(dataset_data) %in% datasets]
   get_datasets()
 }
 
@@ -142,7 +161,7 @@ function(datasets) {
   }), datasets)
 }
 
-#* Render plots for a dataset
+#* Render plots for datasets
 #* @serializer unboxedJSON
 #* @post /render
 #* @param datasets:[str]* Dataset names
