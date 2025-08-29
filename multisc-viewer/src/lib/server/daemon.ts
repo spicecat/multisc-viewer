@@ -12,7 +12,7 @@ import { datasets } from './data';
 
 type Daemon = AxiosInstance;
 
-const { server, ports, stdTTL } = daemonConfig;
+const { server, ports, timeout, stdTTL } = daemonConfig;
 
 const datasetCache = new NodeCache({ stdTTL }); // Dataset to daemon
 datasetCache.on('expired', (ds: string, daemon: Daemon) => _unloadDataset(ds, daemon));
@@ -24,7 +24,7 @@ await Promise.all(
 	ports.map(async (port) => {
 		const daemon: Daemon = axios.create({ baseURL: `${server}:${port}` });
 		try {
-			const { data } = await daemon.get<StatusResponse>('/status');
+			const { data } = await daemon.get<StatusResponse>('/status', { timeout });
 			const load = data.datasets.reduce((l: number, ds: string) => {
 				datasetCache.set(ds, daemon);
 				return datasets[ds].size + l;
@@ -33,10 +33,10 @@ await Promise.all(
 			console.log(`Registered ${daemon.getUri()} with datasets ${data.datasets}, load ${load}.`);
 		} catch (error) {
 			console.log(`Daemon ${daemon.getUri()} is not responding. ${error}`);
+			daemonLoad.set(daemon, 0);
 		}
 	})
 );
-
 const _unloadDataset = async (ds: string, daemon: Daemon) => {
 	const { data } = await daemon.post<UnloadResponse>('/unload', { datasets: [ds] });
 	datasetCache.del(ds);
