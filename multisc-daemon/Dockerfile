@@ -5,15 +5,14 @@ LABEL org.opencontainers.image.title="multisc-daemon" \
 
 RUN apt-get update -qq \
 	&& apt-get install -y --no-install-recommends \
-	libglpk40 libhdf5-dev libsodium-dev \
-	libcurl4-openssl-dev libssl-dev libxml2-dev \
-	libgit2-dev \
+	libhdf5-dev libglpk-dev libsodium-dev libx11-dev libxml2-dev \
+	pandoc python3 \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN install2.r --error --skipinstalled pak
-
-RUN R -q -e 'pak::pkg_install(c("plumber", "Seurat", "rjson"))'
-RUN R -q -e 'pak::pkg_install(c("readr", "hexbin", "glmGamPoi", "immunogenomics/presto", "url::https://bnprks.r-universe.dev/src/contrib/BPCells_0.3.1.tar.gz"))'
+RUN R -q -e 'pak::pkg_install(c("plumber", "Seurat"))'
+# optional packages
+RUN R -q -e 'pak::pkg_install(c("url::https://bnprks.r-universe.dev/src/contrib/BPCells_0.3.1.tar.gz", "immunogenomics/presto", "glmGamPoi"))'
 
 RUN rm -rf /tmp/downloaded_packages/ /tmp/*.rds
 

@@ -1,11 +1,15 @@
 suppressPackageStartupMessages({
   library(plumber)
+  library(jsonlite)
   library(Seurat)
   library(ggplot2)
 })
 
 # --- Configuration ---
 datasets_dir <- Sys.getenv("DATASETS_DIR", "../data/datasets")
+datasets_meta <- Sys.getenv("DATASETS_META", "meta.json")
+publications_dir <- Sys.getenv("PUBLICATIONS_DIR", "../data/publications")
+publications_meta <- Sys.getenv("PUBLICATIONS_META", "meta.json")
 plot_dir <- Sys.getenv("PLOT_DIR", "../data/plots")
 plot_file <- Sys.getenv("PLOT_FILE", "plot.png")
 data_file <- Sys.getenv("DATA_FILE", "data.rds")
@@ -110,9 +114,21 @@ function(req) {
   forward()
 }
 
+#* Get datasets
+#* @get /datasets
+function() {
+  fromJSON(file.path(datasets_dir, datasets_meta))
+}
+
+#* Get publications
+#* @get /publications
+function() {
+  fromJSON(file.path(publications_dir, publications_meta))
+}
+
 #* Get loaded datasets
 #* @get /status
-#* @get /datasets
+#* @get /loaded
 function() {
   get_datasets()
 }

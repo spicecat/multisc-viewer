@@ -1,7 +1,7 @@
-library("Seurat")
-library("rjson")
+library(Seurat)
+library(jsonlite)
 
 rds <- readRDS(file = "./data.rds", refhook = NULL)
 genes <- rownames(rds@assays$RNA@counts)
 
-write(rjson::toJSON(as.list(genes)), "./genes.json")
+write_json(genes, "./genes.json")

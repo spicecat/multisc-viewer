@@ -6,13 +6,14 @@ import type {
 } from '$lib/types/daemon';
 import type { PlotParams } from '$lib/types/plot';
 import axios, { type AxiosInstance } from 'axios';
+import { setupCache } from 'axios-cache-interceptor';
 import NodeCache from 'node-cache';
 import { daemonConfig } from './config';
 import { datasets } from './data';
 
 type Daemon = AxiosInstance;
 
-const { server, ports, timeout, stdTTL } = daemonConfig;
+const { daemons, timeout, stdTTL } = daemonConfig;
 
 const datasetCache = new NodeCache({ stdTTL }); // Dataset to daemon
 datasetCache.on('expired', (ds: string, daemon: Daemon) => _unloadDataset(ds, daemon));
@@ -21,8 +22,8 @@ const daemonLoad = new Map<Daemon, number>(); // Daemon to load
 
 // register daemons
 await Promise.all(
-	ports.map(async (port) => {
-		const daemon: Daemon = axios.create({ baseURL: `${server}:${port}` });
+	daemons.map(async (daemonUrl) => {
+		const daemon: Daemon = setupCache(axios.create({ baseURL: daemonUrl }));
 		try {
 			const { data } = await daemon.get<StatusResponse>('/status', { timeout });
 			const load = data.datasets.reduce((l: number, ds: string) => {

@@ -1,23 +1,32 @@
-## Description
+# MultiSC-Viewer
 
-MultiSC-Viewer is a website to compare and visualize gene expression in
-multiple single cell/nucleus datasets across different brain regions,
-disease conditions, and species.
-Compare Alzheimer disease (AD), Parkinson disease (PD), and control gene expression and cell clustering.
+Web application for [MultiSC-Viewer](https://git.jasonxu.dev/JasonXu/plot-viewer). 
 
-## Installation
+## Run locally
 
-```bash
-$ git clone https://git.jasonxu.dev/JasonXu/plot-viewer.git
-$ cd plot-viewer
-$ pnpm i
-```
-
-## Running the app
+Requires [Node.js](https://nodejs.org/) and [PM2](https://pm2.keymetrics.io/).
 
 ```bash
-# development
-$ pnpm dev
+# Clone the repository
+git clone https://git.jasonxu.dev/JasonXu/plot-viewer.git
+cd plot-viewer/multisc-viewer
+
+# Install dependencies
+npm install
+
+# Start the app
+npm run dev
 ```
 
-View app at [localhost:5173](http://localhost:5173)
+View app at <http://localhost:5173>.
+
+## Docker
+
+```bash
+docker build -t multisc-viewer .
+docker run -d -p 3000:80 multisc-viewer
+```
+
+## Datasets
+
+## Publications

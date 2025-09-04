@@ -1,0 +1,22 @@
+{
+  "apps": [
+    {
+      "name": "multisc-daemon",
+      "cwd": "./multisc-daemon",
+      "script": "plumber.R",
+      "interpreter": "Rscript",
+      "instances": 1,
+      "exec_mode": "fork",
+      "watch": true,
+      "increment_var": "plumber.port",
+      "env": { "plumber.port": "8000" }
+    },
+    {
+      "name": "multisc-viewer",
+      "cwd": "./multisc-viewer",
+      "script": "./build/index.js",
+      "watch": false,
+      "env": { "NODE_ENV": "development", "DAEMONS": "http://127.0.0.1:8000" }
+    }
+  ]
+}
