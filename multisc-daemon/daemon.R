@@ -1,8 +1,5 @@
 suppressPackageStartupMessages({
-  library(plumber)
-  library(jsonlite)
-  library(Seurat)
-  library(ggplot2)
+  library(SeuratObject)
 })
 
 # --- Configuration ---
@@ -71,7 +68,7 @@ render_plot <- function(ds, gene, group_by, split_by, pt) {
   dir.create(dirname(plot_path), recursive = TRUE, showWarnings = FALSE)
   print(paste("Rendering plot:", plot_id))
   if (pt == "umap") {
-    umap_plot <- DimPlot(
+    umap_plot <- Seurat::DimPlot(
       dataset,
       reduction = "umap",
       label = FALSE,
@@ -82,7 +79,7 @@ render_plot <- function(ds, gene, group_by, split_by, pt) {
       width = 5 * 300, height = 4 * 300, res = 300, pointsize = 12
     )
   } else if (pt == "vln") {
-    p <- VlnPlot(dataset,
+    p <- Seurat::VlnPlot(dataset,
       assay = "RNA", features = gene, pt.size = 0,
       split.by = group_by, group.by = split_by, cols = colors, ncol = 1
     )
@@ -90,7 +87,7 @@ render_plot <- function(ds, gene, group_by, split_by, pt) {
       width = 1200, height = 900, res = 300
     )
   } else if (pt == "feat") {
-    p <- FeaturePlot(dataset,
+    p <- Seurat::FeaturePlot(dataset,
       features = gene, min.cutoff = "q5", max.cutoff = "q95"
     )
     save_plot(p, file.path(plot_path),
@@ -111,19 +108,19 @@ function(req) {
     as.character(Sys.time()), "-", req$REQUEST_METHOD, req$PATH_INFO, "-",
     req$HTTP_USER_AGENT, "@", req$REMOTE_ADDR, "\n"
   )
-  forward()
+  plumber::forward()
 }
 
 #* Get datasets
 #* @get /datasets
 function() {
-  fromJSON(file.path(datasets_dir, datasets_meta))
+  jsonlite::fromJSON(file.path(datasets_dir, datasets_meta))
 }
 
 #* Get publications
 #* @get /publications
 function() {
-  fromJSON(file.path(publications_dir, publications_meta))
+  jsonlite::fromJSON(file.path(publications_dir, publications_meta))
 }
 
 #* Get loaded datasets

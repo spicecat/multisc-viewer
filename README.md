@@ -1,6 +1,6 @@
 # MultiSC-Viewer
 
-MultiSC-Viewer is a web application to compare and visualize gene expression in multiple single cell/nucleus datasets across different brain regions, disease conditions, and species.
+MultiSC-Viewer is a web application to visualize and compare gene expression in multiple single cell/nucleus datasets across different brain regions, disease conditions, and species.
 Compare Alzheimer disease (AD), Parkinson disease (PD), and control gene expression and cell clustering.
 
 ## Run locally

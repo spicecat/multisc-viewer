@@ -1,3 +1,13 @@
+import type { Dataset, Publication } from './data';
+
+export interface DatasetsResponse {
+	datasets: Dataset[];
+}
+
+export interface PublicationsResponse {
+	publications: Publication[];
+}
+
 export interface StatusResponse {
 	datasets: string[];
 }

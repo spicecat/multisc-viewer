@@ -1,7 +1,6 @@
-library(Seurat)
-library(jsonlite)
+#!/usr/bin/env Rscript
 
+library(SeuratObject)
 rds <- readRDS(file = "./data.rds", refhook = NULL)
 genes <- rownames(rds@assays$RNA@counts)
-
-write_json(genes, "./genes.json")
+jsonlite::write_json(genes, "./genes.json")

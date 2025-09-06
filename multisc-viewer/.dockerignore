@@ -1,20 +1,8 @@
-.git
-node_modules
-
-# Output
-/.svelte-kit
-/build
-
-# OS
 .DS_Store
-Thumbs.db
-
-# Env
-.env
-.env.*
-!.env.example
-!.env.test
-
-# Vite
-vite.config.js.timestamp-*
-vite.config.ts.timestamp-*
+.svelte-kit
+build
+node_modules
+.gitignore
+.prettierrc
+eslint.config.js
+README.md

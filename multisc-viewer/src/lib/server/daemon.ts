@@ -1,5 +1,7 @@
 import type {
+	DatasetsResponse,
 	LoadResponse,
+	PublicationsResponse,
 	RenderResponse,
 	StatusResponse,
 	UnloadResponse
@@ -20,24 +22,44 @@ datasetCache.on('expired', (ds: string, daemon: Daemon) => _unloadDataset(ds, da
 
 const daemonLoad = new Map<Daemon, number>(); // Daemon to load
 
-// register daemons
-await Promise.all(
-	daemons.map(async (daemonUrl) => {
-		const daemon: Daemon = setupCache(axios.create({ baseURL: daemonUrl }));
-		try {
-			const { data } = await daemon.get<StatusResponse>('/status', { timeout });
-			const load = data.datasets.reduce((l: number, ds: string) => {
-				datasetCache.set(ds, daemon);
-				return datasets[ds].size + l;
-			}, 0);
-			daemonLoad.set(daemon, load);
-			console.log(`Registered ${daemon.getUri()} with datasets ${data.datasets}, load ${load}.`);
-		} catch (error) {
-			console.log(`Daemon ${daemon.getUri()} is not responding. ${error}`);
-			daemonLoad.set(daemon, 0);
-		}
-	})
-);
+const registerDaemons = async () =>
+	await Promise.all(
+		daemons.map(async (daemonUrl) => {
+			const daemon: Daemon = setupCache(axios.create({ baseURL: daemonUrl, timeout }));
+			try {
+				const { data } = await daemon.get<StatusResponse>('/status');
+				const load = data.datasets.reduce((l: number, ds: string) => {
+					datasetCache.set(ds, daemon);
+					return datasets[ds].size + l;
+				}, 0);
+				daemonLoad.set(daemon, load);
+				console.log(`Registered ${daemon.getUri()} with datasets ${data.datasets}, load ${load}.`);
+			} catch (error) {
+				console.log(`Daemon ${daemon.getUri()} is not responding. ${error}`);
+				daemonLoad.delete(daemon);
+			}
+		})
+	);
+
+setInterval(registerDaemons, 10 * 60 * 1000); // refresh daemons every 10 minutes
+registerDaemons();
+
+export const getDatasets = async (): Promise<DatasetsResponse[]> =>
+	Promise.all(
+		daemonLoad.keys().map(async (daemon) => {
+			const { data } = await daemon.get<DatasetsResponse>('/datasets');
+			return data;
+		})
+	);
+
+export const getPublications = async (): Promise<PublicationsResponse[]> =>
+	Promise.all(
+		daemonLoad.keys().map(async (daemon) => {
+			const { data } = await daemon.get<PublicationsResponse>('/publications');
+			return data;
+		})
+	);
+
 const _unloadDataset = async (ds: string, daemon: Daemon) => {
 	const { data } = await daemon.post<UnloadResponse>('/unload', { datasets: [ds] });
 	datasetCache.del(ds);

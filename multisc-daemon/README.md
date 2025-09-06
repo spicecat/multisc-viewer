@@ -34,4 +34,35 @@ docker run -d -p 8000:8000 multisc-daemon
 
 ## Datasets
 
+Add datasets to the `data/datasets` folder.
+Datasets are folders including the files `cluster.colors.rds`, `data.rds`, `genes.json`, and `genotype.colors.rds`.
+`data.rds` is a Seurat object saved using `saveRDS()`.
+
+
+Generate `genes.json` using the script in `Rscript ../../../multisc-daemon/genes.R`.
+
+```
+plot-viewer
+└── data
+    └── datasets
+        └── My_Dataset
+            └── cluster.colors.rds
+            └── data.rds
+            └── genes.json
+            └── genotype.colors.rds
+        └── Another_Dataset
+            └── cluster.colors.rds
+            └── data.rds
+            └── genes.json
+            └── genotype.colors.rds
+        └── ...
+    multisc-daemon
+        └── genes.R
+        └── plumber.R
+        └── ...
+    multisc-viewer
+        └── ...
+    └── ...
+```
+
 ## Publications
