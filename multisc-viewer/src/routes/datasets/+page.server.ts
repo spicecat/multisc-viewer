@@ -1,6 +1,6 @@
-import { publications } from '$lib/server/data';
+import { datasets } from '$lib/server/data';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => ({
-	publications: Object.values(publications)
+	datasets: Object.values(datasets)
 });
