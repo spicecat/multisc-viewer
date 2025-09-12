@@ -5,13 +5,15 @@ export type GeneData = {
 	[key: string]: Gene;
 };
 
-export type DatasetData = Omit<Dataset, 'size' | 'defaultGene'> & {
-	[key: string]: string | number | string[] | Gene | Author;
+export type DatasetData = Omit<Dataset, 'defaultGenes' | 'size'> & {
+	pubmed: URL;
+	[key: string]: string | number | string[] | Gene | Author | URL;
 };
 
 export type PublicationData = Omit<Publication, 'datasets'> & {
 	datasets: string[];
-	href: string | URL;
+	href: string;
+	pubmed: URL;
 	[key: string]: string | number | Author[] | string[] | URL;
 };
 
@@ -32,7 +34,7 @@ export const datasetColumns = [
 	{ key: 'region', label: 'Region' },
 	{ key: 'disease', label: 'Disease' },
 	{ key: 'cellType', label: 'Cell Type' },
-	{ key: 'PMID', label: 'PMID' }
+	{ key: 'PMID', label: 'PMID', href: 'pubmed' }
 ];
 
 export const publicationColumns: Columns = [
@@ -40,6 +42,6 @@ export const publicationColumns: Columns = [
 	{ key: 'year', label: 'Year' },
 	{ key: 'authors', label: 'Authors' },
 	{ key: 'journal', label: 'Journal' },
-	{ key: 'PMID', label: 'PMID' },
+	{ key: 'PMID', label: 'PMID', href: 'pubmed' },
 	{ key: 'datasets', label: 'Datasets' }
 ];

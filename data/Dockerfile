@@ -1,3 +1,5 @@
 FROM alpine:latest
 
-COPY . /data
+WORKDIR /data
+COPY datasets/ ./datasets/
+COPY publications/ ./publications/

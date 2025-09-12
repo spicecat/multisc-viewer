@@ -1,5 +1,5 @@
+import type { Dataset, DEGs, Gene, Publication } from '$lib/types/data';
 import { uniq } from 'lodash-es';
-import type { Dataset, Gene, Publication } from '$lib/types/data';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { datasetsConfig, publicationsConfig } from './config';
@@ -20,7 +20,7 @@ export const datasets: Record<string, Dataset> = Object.fromEntries(
 	existsSync(`${datasetsDir}/${datasetsMeta}`)
 		? JSON.parse(readFileSync(`${datasetsDir}/${datasetsMeta}`, 'utf-8'))
 				.filter(({ id }: DatasetMeta) =>
-					datasetsRequiredFiles.every((file: string) => existsSync(`${datasetsDir}/${id}/${file}`))
+					datasetsRequiredFiles.every((file) => existsSync(`${datasetsDir}/${id}/${file}`))
 				)
 				.map((ds: DatasetMeta) => [
 					ds.id,
@@ -36,7 +36,7 @@ export const publications: Record<string, Publication> = Object.fromEntries(
 					pub.id,
 					{
 						...pub,
-						datasets: pub.datasets.filter((id) => id in datasets).map((id: string) => datasets[id])
+						datasets: pub.datasets.filter((ds) => ds in datasets).map((ds) => datasets[ds])
 					}
 				]
 			)
@@ -44,10 +44,21 @@ export const publications: Record<string, Publication> = Object.fromEntries(
 );
 
 export const getGenes = async (datasets: string[]): Promise<Gene[]> => {
-	const genes = await Promise.all(
-		datasets.map(async (id) =>
-			JSON.parse(await readFile(`${datasetsDir}/${id}/genes.json`, 'utf-8'))
+	const genes: Gene[][] = await Promise.all(
+		datasets.map(async (ds) =>
+			JSON.parse(await readFile(`${datasetsDir}/${ds}/genes.json`, 'utf-8'))
 		)
 	);
 	return uniq(genes.flat()).toSorted();
+};
+
+export const getDEGs = async (datasets: string[]): Promise<DEGs> => {
+	const degs: DEGs[] = await Promise.all(
+		datasets.map(async (ds) =>
+			existsSync(`${datasetsDir}/${ds}/DEGs.json`)
+				? JSON.parse(await readFile(`${datasetsDir}/${ds}/DEGs.json`, 'utf-8'))
+				: {}
+		)
+	);
+	return Object.assign({}, ...degs);
 };

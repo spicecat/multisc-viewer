@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { Code, House } from '@lucide/svelte';
 	import { AppBar, Tooltip } from '@skeletonlabs/skeleton-svelte';
 	import '../app.css';
@@ -15,7 +16,7 @@
 			onOpenChange={(e) => (homeTipOpen = e.open)}
 			contentBase="card preset-filled p-2"
 		>
-			{#snippet trigger()}<a class="btn preset-tonal" href="/">
+			{#snippet trigger()}<a class="btn preset-tonal" href={resolve('/')}>
 					<House size={16} />
 				</a>{/snippet}
 			{#snippet content()}

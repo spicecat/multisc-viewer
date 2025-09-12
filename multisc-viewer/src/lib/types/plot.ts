@@ -10,7 +10,7 @@ export enum PlotType {
 
 export interface PlotParams {
 	datasets: string[];
-	gene: string;
+	genes: string[];
 	groupBy: Grouping;
 	splitBy: Grouping;
 	plotTypes: PlotType[];

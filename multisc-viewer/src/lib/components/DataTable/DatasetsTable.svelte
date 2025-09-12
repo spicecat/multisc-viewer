@@ -12,9 +12,12 @@
 	const cellTypes = $derived(uniq(datasets.map((ds) => ds.cellType)));
 
 	const data: DatasetData[] = $derived(
-		(cellType ? datasets.filter((ds) => ds.cellType === cellType) : datasets).map((ds) =>
-			omit(ds, ['size', 'defaultGene'])
-		)
+		(cellType ? datasets.filter((ds) => ds.cellType === cellType) : datasets)
+			.map((ds) => omit(ds, ['defaultGenes', 'size']))
+			.map((ds) => ({
+				...ds,
+				pubmed: new URL(`https://pubmed.ncbi.nlm.nih.gov/${ds.PMID}`)
+			}))
 	);
 	const select = $derived(page.url.searchParams.getAll('ds'));
 </script>

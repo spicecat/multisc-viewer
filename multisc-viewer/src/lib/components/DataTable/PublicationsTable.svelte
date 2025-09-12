@@ -9,7 +9,8 @@
 		publications.map((pub) => ({
 			...pub,
 			datasets: pub.datasets.map((ds) => ds.title),
-			href: `/publication/${pub.id}`
+			href: `/publication/${pub.id}`,
+			pubmed: new URL(`https://pubmed.ncbi.nlm.nih.gov/${pub.PMID}`)
 		}))
 	);
 </script>

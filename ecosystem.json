@@ -8,8 +8,8 @@
       "instances": 1,
       "exec_mode": "fork",
       "watch": true,
-      "increment_var": "plumber.port",
-      "env": { "plumber.port": "8000" }
+      "increment_var": "PLUMBER_PORT",
+      "env": { "PLUMBER_PORT": "8000" }
     },
     {
       "name": "multisc-viewer",

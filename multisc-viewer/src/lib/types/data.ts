@@ -1,5 +1,6 @@
 export type Author = string;
 export type Gene = string;
+export type DEGs = Record<string, Gene[]>;
 
 export interface Dataset {
 	id: string;
@@ -10,8 +11,8 @@ export interface Dataset {
 	region: string[];
 	disease: string[];
 	cellType: string;
+	defaultGenes: Gene[];
 	size: number;
-	defaultGene?: Gene;
 }
 
 export interface Publication {

@@ -4,3 +4,6 @@ data/datasets/*
 data/plots/*
 !data/publications/example_meta.json
 !data/datasets/example_meta.json
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md

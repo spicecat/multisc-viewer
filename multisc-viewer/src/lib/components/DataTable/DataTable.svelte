@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Columns, Data } from '$lib/types/data-table';
+	import { ArrowRight } from '@lucide/svelte';
 	import { Pagination, Progress } from '@skeletonlabs/skeleton-svelte';
 
 	let {
@@ -76,7 +77,10 @@
 							{@const d = item[key]}
 							<td>
 								{#if href}
-									<a class="btn preset-tonal text-wrap" href={String(item.href)}>{d} &rarr;</a>
+									<a class="btn preset-tonal-primary text-wrap" href={String(item[href])}>
+										<span>{d}</span>
+										<ArrowRight />
+									</a>
 								{:else if Array.isArray(d)}
 									<div class="flex flex-wrap gap-1">
 										{#each d as chip (`chip-${id}-${key}-${chip}`)}

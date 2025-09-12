@@ -41,9 +41,11 @@ export const getPlotId = (
 	pt: PlotType
 ): string => join(ds, gene, `${groupBy}:${splitBy}`, pt);
 
-const getPlotIds = ({ datasets, gene, groupBy, splitBy, plotTypes }: PlotParams): Set<string> =>
+const getPlotIds = ({ datasets, genes, groupBy, splitBy, plotTypes }: PlotParams): Set<string> =>
 	new Set(
-		datasets.flatMap((ds) => plotTypes.map((pt) => getPlotId(ds, gene, groupBy, splitBy, pt)))
+		datasets.flatMap((ds) =>
+			genes.flatMap((gene) => plotTypes.map((pt) => getPlotId(ds, gene, groupBy, splitBy, pt)))
+		)
 	);
 
 const plotIdParts = (plotId: string) => {
@@ -70,6 +72,29 @@ export const plot = (plotParams: PlotParams): PlotResults => {
 	const keys = getPlotIds(plotParams);
 	const plots = queryPlots(keys);
 	const missingDatasets = uniq([...keys].map((plotId) => plotIdParts(plotId).ds));
-	render({ ...plotParams, datasets: missingDatasets });
+	render({ ...plotParams, datasets: missingDatasets })
+		.then((renderedIds) => {
+			const rendered = new Set(renderedIds);
+			// reject pending requests if not included
+			for (const plotId of keys) {
+				if (!rendered.has(plotId)) {
+					const req = requestCache.get<PlotRequest>(plotId);
+					if (req) {
+						requestCache.del(plotId);
+						req.reject(new Error(`Daemon failed to render plot ${plotId}`));
+					}
+				}
+			}
+		})
+		.catch((error) => {
+			// reject all pending requests
+			for (const plotId of keys) {
+				const req = requestCache.get<PlotRequest>(plotId);
+				if (req) {
+					requestCache.del(plotId);
+					req.reject(new Error(`Daemon render error for ${plotId}: ${String(error)}`));
+				}
+			}
+		});
 	return plots;
 };

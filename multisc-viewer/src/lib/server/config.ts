@@ -20,6 +20,7 @@ export const plotConfig = {
 
 export const daemonConfig = {
 	daemons: env.DAEMONS?.split(',') ?? ['http://127.0.0.1:8000', 'http://127.0.0.1:8001'],
-	timeout: 5000,
+	connectionTimeout: 5 * 1000, // 5 seconds
+	timeout: 60 * 1000, // 1 minute
 	stdTTL: 4 * 60 * 60 // 4 hour
 };

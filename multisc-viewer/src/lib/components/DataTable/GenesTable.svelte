@@ -6,7 +6,7 @@
 
 	let { genes }: { genes: Gene[] } = $props();
 	let data: GeneData[] = $derived(genes.map((gene) => ({ id: gene })));
-	let select = $derived(page.url.searchParams.get('gene') ?? '');
+	let select = $derived(page.url.searchParams.getAll('gene'));
 </script>
 
 <DataTableSearch name="gene" {data} columns={geneColumns} {select} />

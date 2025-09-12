@@ -159,17 +159,19 @@ function(datasets) {
 #* @serializer unboxedJSON
 #* @post /render
 #* @param datasets:[str]* Dataset names
-#* @param gene:str* Gene to plot
+#* @param genes:[str]* Genes to plot
 #* @param groupBy:str Grouping variable
 #* @param splitBy:str Splitting variable
 #* @param plotTypes:[str] Plot types to render (umap, vln, feat)
 function(
-    datasets, gene, groupBy = "CellType", splitBy = "Genotype",
+    datasets, genes, groupBy = "CellType", splitBy = "Genotype",
     plotTypes = list("umap", "vln", "feat")) {
   lapply(datasets, load_dataset)
   unlist(lapply(datasets, function(ds) {
-    lapply(plotTypes, function(pt) {
-      render_plot(ds, gene, groupBy, splitBy, pt)
-    })
+    unlist(lapply(genes, function(gene) {
+      lapply(plotTypes, function(pt) {
+        render_plot(ds, gene, groupBy, splitBy, pt)
+      })
+    }))
   }))
 }
