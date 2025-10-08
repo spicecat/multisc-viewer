@@ -1,9 +1,13 @@
 .DS_Store
-data/publications/*
-data/datasets/*
-data/plots/*
-!data/publications/example_meta.json
-!data/datasets/example_meta.json
-
-#Ignore vscode AI rules
-.github/instructions/codacy.instructions.md
+Thumbs.db
+Icon?
+*.swp
+*.swo
+*.tmp
+*.bak
+*~
+.nfs*
+.idea/
+.vscode/
+data.tar*
+data.zip

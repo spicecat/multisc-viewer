@@ -1,172 +1,271 @@
 import type {
-	DatasetsResponse,
-	LoadResponse,
-	PublicationsResponse,
-	RenderResponse,
-	StatusResponse,
-	UnloadResponse
+	Datasets,
+	DEGs,
+	Genes,
+	Health,
+	Loaded,
+	Load,
+	Plots,
+	PlotsParams,
+	Publications,
+	Unload
 } from '$lib/types/daemon';
-import type { PlotParams } from '$lib/types/plot';
-import axios, { type AxiosInstance } from 'axios';
-import { setupCache } from 'axios-cache-interceptor';
-import NodeCache from 'node-cache';
+import axios from 'axios';
+import { setupCache, type AxiosCacheInstance } from 'axios-cache-interceptor';
+import { LRUCache } from 'lru-cache';
 import { daemonConfig } from './config';
-import { datasets } from './data';
 
-type Daemon = AxiosInstance;
+const { daemonUrls, connectionTimeout, timeout, maxSize, ttl, refresh } = daemonConfig;
+const defaultSize = 1024 * 1024; // default size for datasets with unknown size 1 MB
 
-const { daemons, connectionTimeout, timeout, stdTTL } = daemonConfig;
+export const daemons: Daemon[] = [];
 
-const datasetCache = new NodeCache({ stdTTL }); // Dataset to daemon
-datasetCache.on('expired', (ds: string, daemon: Daemon) => _unloadDataset(ds, daemon));
+/**
+ * Class representing a connection to a daemon server.
+ */
+class Daemon {
+	private axiosInstance: AxiosCacheInstance;
+	private cache: LRUCache<string, string>;
+	requestLoad = 0;
 
-const daemonLoad = new Map<Daemon, number>(); // Daemon to load
+	/**
+	 * Create a Daemon instance.
+	 * @param daemonUrl - URL of the daemon server
+	 */
+	constructor(daemonUrl: string) {
+		this.axiosInstance = setupCache(
+			axios.create({
+				baseURL: daemonUrl,
+				timeout,
+				paramsSerializer: { indexes: null }
+			}),
+			{ ttl }
+		);
+		this.cache = new LRUCache<string, string>({
+			maxSize,
+			ttl,
+			dispose: this.unload
+		});
+	}
 
-const removeDaemon = (daemon: Daemon) => {
-	daemonLoad.delete(daemon);
-	datasetCache.keys().forEach((ds) => {
-		const d = datasetCache.get<Daemon>(ds);
-		if (d === daemon) datasetCache.del(ds);
-	});
-	console.log(`Removed daemon ${daemon.getUri()}`);
-};
+	toString = () => `Daemon(${this.axiosInstance.getUri()})`;
 
-const registerDaemons = async () =>
+	/** Priority for loading datasets.
+	 * Lower priority value means higher priority.
+	 * Priority is based on current cache size and request load.
+	 * @param ds - dataset id
+	 * @returns Priority value
+	 */
+	priority = (ds: string) =>
+		this.cache.calculatedSize + this.requestLoad - (this.cache.has(ds) ? this.cache.maxSize : 0);
+
+	/**
+	 * Check the health of the daemon server.
+	 * @returns Health status of the daemon
+	 */
+	health = async () => {
+		try {
+			const { data } = await this.axiosInstance.get<Health>('/health', {
+				cache: false,
+				signal: AbortSignal.timeout(connectionTimeout)
+			});
+			console.log(`Health ${this}: status ${data.status}`);
+			return data;
+		} catch (error) {
+			console.error(`Health ${this}: error ${error}`);
+			return { status: 'unhealthy' };
+		}
+	};
+
+	/**
+	 * Get the list of datasets currently loaded in the daemon.
+	 * @returns List of all loaded dataset ids
+	 */
+	loaded = async () => {
+		try {
+			const { data } = await this.axiosInstance.get<Loaded>('/loaded', { cache: false });
+			const datasets = await this.datasets(data);
+			for (const ds of data) this.cache.set(ds, ds, { size: datasets[ds].size ?? defaultSize });
+			console.log(`Loaded ${this}: loaded ${data}`);
+			return data;
+		} catch (error) {
+			console.error(`Loaded ${this}: error ${error}`);
+			return [];
+		}
+	};
+
+	/**
+	 * Unload a dataset from the daemon.
+	 * @param ds - dataset ids to unload
+	 * @returns List of all loaded dataset ids
+	 */
+	private unload = async (ds: string) => {
+		try {
+			const { data } = await this.axiosInstance.post<Unload>('/unload', { ds }, { cache: false });
+			this.cache.delete(ds);
+			console.log(`Unload ${this} ds=${ds}: loaded ${data}`);
+			return data;
+		} catch (error) {
+			console.error(`Unload ${this} ds=${ds}: error ${error}`);
+			return [];
+		}
+	};
+
+	/**
+	 * Load datasets into the daemon.
+	 * @param ds - list of dataset ids to load
+	 * @returns List of all loaded dataset ids
+	 */
+	load = async (ds: string[]) => {
+		try {
+			const { data } = await this.axiosInstance.post<Load>('/load', { ds }, { cache: false });
+			const datasets = await this.datasets(data);
+			for (const ds of data) this.cache.set(ds, ds, { size: datasets[ds].size ?? defaultSize });
+			console.log(`Load ${this} ds=${ds}: loaded ${data}`);
+			return data;
+		} catch (error) {
+			console.error(`Load ${this} ds=${ds}: error ${error}`);
+			return [];
+		}
+	};
+
+	/**
+	 * Fetch datasets metadata.
+	 * @param ds - list of dataset ids to fetch; if `undefined`, fetch all datasets
+	 * @returns Dictionary mapping dataset ids to metadata
+	 */
+	datasets = async (ds?: string[]) => {
+		try {
+			const { cached, data } = await this.axiosInstance.get<Datasets>('/datasets', {
+				params: { ds }
+			});
+			if (!cached) console.log(`Datasets ${this} ds=${ds}: keys ${Object.keys(data)}`);
+			return data;
+		} catch (error) {
+			console.error(`Datasets ${this} ds=${ds}: error ${error}`);
+			return {};
+		}
+	};
+
+	/**
+	 * Fetch publications metadata.
+	 * @param pub - list of publication ids to fetch; if `undefined`, fetch all publications
+	 * @returns Dictionary mapping publication ids to metadata
+	 */
+	publications = async (pub?: string[]) => {
+		try {
+			const { cached, data } = await this.axiosInstance.get<Publications>('/publications', {
+				params: { pub }
+			});
+			if (!cached) console.log(`Publications ${this} pub=${pub}: key ${Object.keys(data)}`);
+			return data;
+		} catch (error) {
+			console.error(`Publications ${this} pub=${pub}: error ${error}`);
+			return {};
+		}
+	};
+
+	/**
+	 * Fetch genes for datasets.
+	 * @param ds - list of dataset ids to fetch
+	 * @returns Dictionary mapping dataset ids to genes
+	 */
+	genes = async (ds: string[]) => {
+		try {
+			const { data } = await this.axiosInstance.get<Genes>('/genes', { params: { ds } });
+			console.log(`Genes ${this} ds=${ds}: keys ${Object.keys(data)}`);
+			return data;
+		} catch (error) {
+			console.error(`Genes ${this} ds=${ds}: error ${error}`);
+			return {};
+		}
+	};
+
+	/**
+	 * Fetch differentially expressed genes for datasets.
+	 * @param ds - list of dataset ids to fetch
+	 * @returns Dictionary mapping dataset ids to differentially expressed genes
+	 */
+	degs = async (ds: string[]): Promise<DEGs> => {
+		try {
+			const { data } = await this.axiosInstance.get<DEGs>('/degs', { params: { ds } });
+			console.log(`DEGs ${this} ds=${ds}: keys ${Object.keys(data)}`);
+			return data;
+		} catch (error) {
+			console.error(`DEGs ${this} ds=${ds}: error ${error}`);
+			return {};
+		}
+	};
+
+	/** Render plots.
+	 * @param plotsParams - parameters for plot rendering
+	 * @returns List of rendered plots paths
+	 */
+	plots = async (plotsParams: PlotsParams) => {
+		this.requestLoad += maxSize;
+		try {
+			const { data } = await this.axiosInstance.post<Plots>('/plots', plotsParams);
+			console.log(`Plots ${this} params ${Object.values(plotsParams)}: plots ${data}`);
+			return data;
+		} catch (error) {
+			console.error(`Plots ${this} params ${Object.values(plotsParams)}: error ${error}`);
+			return [];
+		} finally {
+			this.requestLoad -= maxSize;
+		}
+	};
+}
+
+const registerDaemons = async () => {
+	daemons.length = 0;
 	await Promise.all(
-		daemons.map(async (daemonUrl) => {
-			const daemon: Daemon = setupCache(axios.create({ baseURL: daemonUrl, timeout }));
-			try {
-				const { data } = await daemon.get<StatusResponse>('/status', {
-					timeout: connectionTimeout
-				});
-				const load = data.datasets.reduce((l: number, ds: string) => {
-					datasetCache.set(ds, daemon);
-					return datasets[ds].size + l;
-				}, 0);
-				daemonLoad.set(daemon, load);
-				console.log(`Registered ${daemon.getUri()} with datasets ${data.datasets}, load ${load}.`);
-			} catch (error) {
-				console.warn(`Daemon ${daemon.getUri()} is not responding. ${error}`);
-				removeDaemon(daemon);
-			}
+		daemonUrls.map(async (daemonUrl) => {
+			const daemon = new Daemon(daemonUrl);
+			const { status } = await daemon.health();
+			if (status !== 'unhealthy') daemons.push(daemon);
 		})
 	);
+};
 
-setInterval(registerDaemons, 10 * 60 * 1000); // refresh daemons every 10 minutes
+setInterval(registerDaemons, refresh);
 registerDaemons();
 
-export const getDatasets = async (): Promise<DatasetsResponse[]> => {
-	const results = await Promise.allSettled(
-		Array.from(daemonLoad.keys()).map(async (daemon) => {
-			const { data } = await daemon.get<DatasetsResponse>('/datasets');
-			return data;
-		})
-	);
-	return results
-		.filter((r): r is PromiseFulfilledResult<DatasetsResponse> => r.status === 'fulfilled')
-		.map((r) => r.value);
-};
+/**
+ * Map daemons to target dataset ids.
+ * @param ds - list of dataset ids; if empty, target all datasets
+ * @returns Map of Daemon to list of target dataset ids
+ */
+export const getDaemonTargets = async (ds?: string[], load: boolean = false) => {
+	const daemonTargets = new Map<Daemon, string[]>();
+	if (ds?.length === 0) return daemonTargets;
 
-export const getPublications = async (): Promise<PublicationsResponse[]> => {
-	const results = await Promise.allSettled(
-		Array.from(daemonLoad.keys()).map(async (daemon) => {
-			const { data } = await daemon.get<PublicationsResponse>('/publications');
-			return data;
-		})
-	);
-	return results
-		.filter((r): r is PromiseFulfilledResult<PublicationsResponse> => r.status === 'fulfilled')
-		.map((r) => r.value);
-};
-
-const _unloadDataset = async (ds: string, daemon: Daemon) => {
-	try {
-		const { data } = await daemon.post<UnloadResponse>('/unload', { datasets: [ds] });
-		const load = (daemonLoad.get(daemon) ?? 0) - datasets[ds].size;
-		if (daemonLoad.has(daemon)) daemonLoad.set(daemon, load);
-		console.log(`Unloaded ${ds} from ${daemon.getUri()}; datasets ${data.datasets}, load ${load}.`);
-	} catch (error) {
-		console.warn(`Failed to unload ${ds} from ${daemon.getUri()}: ${error}`);
-	} finally {
-		datasetCache.del(ds);
-	}
-};
-
-export const loadDatasets = async (dsList: string[]): Promise<Map<Daemon, Set<string>>> => {
-	dsList = dsList.filter((ds) => ds in datasets);
-
-	const cachedDatasets = datasetCache.mget<Daemon>(dsList);
-
-	const daemonDatasets = new Map<Daemon, Set<string>>();
-	const daemonUnloadedDatasets = new Map<Daemon, Set<string>>();
-
-	if (daemonLoad.size)
-		dsList.forEach((ds) => {
-			const cached = cachedDatasets[ds];
-			const useCached = !!cached && daemonLoad.has(cached);
-			const daemon = useCached
-				? cached
-				: [...daemonLoad.entries()].reduce((minDaemon, currDaemon) =>
-						currDaemon[1] < minDaemon[1] ? currDaemon : minDaemon
-					)[0]; // daemon with minimum load
-
-			if (!daemonDatasets.has(daemon)) {
-				daemonDatasets.set(daemon, new Set<string>());
-				daemonUnloadedDatasets.set(daemon, new Set<string>());
-			}
-			daemonDatasets.get(daemon)!.add(ds);
-			if (!useCached) daemonUnloadedDatasets.get(daemon)!.add(ds);
-
-			const load = datasets[ds].size;
-			daemonLoad.set(daemon, (daemonLoad.get(daemon) ?? 0) + load);
-		});
-
-	await Promise.all(
-		Array.from(daemonUnloadedDatasets.entries()).map(async ([daemon, dsSet]) => {
-			const dsList = Array.from(dsSet);
-			try {
-				const { data } = await daemon.post<LoadResponse>('/load', { datasets: dsList });
-				for (const [ds, loaded] of Object.entries(data)) {
-					if (loaded) datasetCache.set(ds, daemon);
-					else {
-						// rollback load increment
-						daemonLoad.set(daemon, (daemonLoad.get(daemon) ?? 0) - datasets[ds].size);
-						console.error(`Failed to load ${ds} on ${daemon.getUri()}`);
-					}
+	const datasetDaemons = new Map<string, Daemon[]>();
+	const daemonDatasets = new Map<Daemon, Datasets>(
+		await Promise.all(
+			daemons.map(async (daemon): Promise<[Daemon, Datasets]> => {
+				const datasets = await daemon.datasets(ds);
+				for (const d of Object.keys(datasets)) {
+					if (!datasetDaemons.has(d)) datasetDaemons.set(d, []);
+					datasetDaemons.get(d)!.push(daemon);
 				}
-			} catch (error) {
-				// rollback all increments for daemon
-				for (const ds of dsList)
-					daemonLoad.set(daemon, (daemonLoad.get(daemon) ?? 0) - datasets[ds].size);
-				console.error(`Error loading datasets ${dsList} on ${daemon.getUri()}: ${error}`);
-			}
-		})
-	);
-	return daemonDatasets;
-};
-
-export const render = async (plotParams: PlotParams): Promise<RenderResponse> => {
-	try {
-		const daemonDatasets = await loadDatasets(plotParams.datasets);
-		const plots = await Promise.all(
-			Array.from(daemonDatasets.entries()).map(async ([daemon, dsSet]) => {
-				const dsList = Array.from(dsSet);
-				try {
-					const { data } = await daemon.post<RenderResponse>('/render', {
-						...plotParams,
-						datasets: dsList
-					});
-					console.log(`Rendered ${dsList} on ${daemon.getUri()}`);
-					return data;
-				} catch (error) {
-					console.error(`Error rendering ${dsList} on ${daemon.getUri()}: ${error}`);
-					return [];
-				}
+				return [daemon, datasets];
 			})
-		);
-		return plots.flat();
-	} catch (error) {
-		console.error(`Render pipeline error: ${error}`);
-		return [];
+		)
+	);
+
+	for (const [d] of datasetDaemons) {
+		const daemon = datasetDaemons
+			.get(d)!
+			.reduce((minDaemon, currDaemon) =>
+				currDaemon.priority(d) < minDaemon.priority(d) ? currDaemon : minDaemon
+			);
+		if (!daemonTargets.has(daemon)) daemonTargets.set(daemon, []);
+		daemonTargets.get(daemon)!.push(d);
+		daemon.requestLoad += (load ? 1 : -1) * (daemonDatasets.get(daemon)![d].size ?? defaultSize);
 	}
+	for (const [daemon, ds] of daemonTargets)
+		for (const d of ds)
+			daemon.requestLoad -= (load ? 1 : -1) * (daemonDatasets.get(daemon)![d].size ?? defaultSize);
+
+	return daemonTargets;
 };

@@ -1,0 +1,19 @@
+{
+  "_id": "example-pub-1",
+  "$schema": "https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-daemon/openapi.json#/components/schemas/Publication",
+  "author": [
+    {
+      "name": "Doe J"
+    },
+    {
+      "name": "Smith A"
+    }
+  ],
+  "datasets": ["example-ds-1", "example-ds-2"],
+  "date": "2000-01-01",
+  "description": "This is an abstract of this publication.",
+  "identifier": "",
+  "journalName": "Nature",
+  "name": "Multi-omic integration of astrocyte states",
+  "url": "https://pubmed.ncbi.nlm.nih.gov/00000000/"
+}

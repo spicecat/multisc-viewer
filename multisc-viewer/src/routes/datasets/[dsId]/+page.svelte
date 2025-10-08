@@ -1,0 +1,85 @@
+<script lang="ts">
+	import OntologyTerm from '$lib/components/Data/OntologyTerm.svelte';
+	import type { PageProps } from './$types';
+
+	let { data }: PageProps = $props();
+	let { dataset } = $derived(data);
+
+	let name = $derived(dataset.displayName ?? dataset.name ?? dataset._id);
+</script>
+
+<svelte:head>
+	<title>{name}</title>
+</svelte:head>
+
+<section class="mx-auto max-w-256">
+	<section>
+		<h1 class="h4">
+			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+			{@html dataset.name}
+		</h1>
+		<span class="block">
+			{dataset.author?.map((a) => a.name).join(', ')}
+		</span>
+		<span class="inline-block">
+			{dataset.date}
+			<!-- eslint-disable svelte/no-navigation-without-resolve -->
+			<a
+				class="anchor"
+				href={dataset.url}
+				target="_blank"
+				title={`${name} dataset source`}
+				rel="external noopener noreferrer"
+			>
+				{dataset.identifier}
+			</a>
+			<!-- eslint-enable svelte/no-navigation-without-resolve -->
+		</span>
+	</section>
+	<section>
+		<ul class="list-inside space-y-1">
+			<li>
+				<OntologyTerm ontologyTerm={dataset.cellType}><b>Cell Type: </b></OntologyTerm>
+			</li>
+			<li>
+				<OntologyTerm ontologyTerm={dataset.tissue}><b>Tissue: </b></OntologyTerm>
+			</li>
+			<li>
+				<OntologyTerm ontologyTerm={dataset.healthCondition}><b>Health Condition: </b></OntologyTerm
+				>
+			</li>
+			<li>
+				<OntologyTerm ontologyTerm={dataset.species}><b>Species: </b></OntologyTerm>
+			</li>
+		</ul>
+	</section>
+	<section>
+		<h2 class="h6">Abstract</h2>
+		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+		<p>{@html dataset.description}</p>
+	</section>
+	<section>
+		{#if dataset.citation?.length}
+			<h2 class="h6">Citations</h2>
+			<ul class="list-inside list-disc">
+				{#each dataset.citation as cit, i (`li-cit-${i}`)}
+					{@const citName = cit.name ?? cit.identifier ?? cit.url}
+					<li>
+						{citName}
+						<!-- eslint-disable svelte/no-navigation-without-resolve -->
+						<a
+							class="anchor"
+							href={cit.url}
+							target="_blank"
+							title={`${citName} citation source`}
+							rel="noopener noreferrer"
+						>
+							{cit.identifier}
+						</a>
+						<!-- eslint-enable svelte/no-navigation-without-resolve -->
+					</li>
+				{/each}
+			</ul>
+		{/if}
+	</section>
+</section>

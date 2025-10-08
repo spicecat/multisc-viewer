@@ -1,0 +1,70 @@
+{
+  "_id": "example-dataset-1",
+  "$schema": "https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-daemon/openapi.json#/components/schemas/Dataset",
+  "author": [
+    {
+      "name": "Pineda SS"
+    },
+    {
+      "name": "Lee H"
+    },
+    {
+      "name": "Heiman M"
+    }
+  ],
+  "cellType": [
+    {
+      "identifier": "mesh:D001253",
+      "name": "Astrocytes",
+      "url": "http://id.nlm.nih.gov/mesh/D001253"
+    }
+  ],
+  "citation": [
+    {
+      "identifier": "PMID:32681824",
+      "name": "Cell Type-Specific Transcriptomics Reveals that Mutant Huntingtin Leads to Mitochondrial RNA Release and Neuronal Innate Immune Activation.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/32681824/"
+    },
+    {
+      "identifier": "PMID:36650127",
+      "name": "Transcriptional vulnerabilities of striatal neurons in human and rodent models of Huntington's disease.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/36650127/"
+    }
+  ],
+  "date": "2023-01-18",
+  "defaultGene": "APOE",
+  "description": "The mechanisms by which mutant Huntingtin leads to neuronal cell death in Huntington’s disease are not fully understood. To gain new molecular insights, we used snRNA-Seq and TRAP to conduct transcriptomic analyses of striatal cell type-specific gene expression changes in human HD and mouse models of HD.  In striatal spiny projection neurons we observe a release of mitochondrial RNA and a concomitant upregulation of innate immune signaling in spiny projection neurons. We observe that the released mtRNAs can directly bind to the innate immune sensor PKR.  We highlight the importance of studying cell type-specific gene expression dysregulation in HD pathogenesis, and reveal that the activation of innate immune signaling in the most vulnerable HD neurons provides a novel framework to understand the basis of mHTT toxicity and raises new therapeutic opportunities.\nCell type-specific profiling of human HD and HD mouse model striatal and corticostriatal cell types.Please note that the additional counts.mtx, coldata.tsv and rowdata.tsv files containing metadata and sample information were provided on Oct 22, 2020.",
+  "displayName": "Dataset 1",
+  "healthCondition": [
+    {
+      "displayName": "HD",
+      "identifier": "mesh:D006816",
+      "name": "Huntington Disease",
+      "url": "http://id.nlm.nih.gov/mesh/D006816"
+    }
+  ],
+  "identifier": "GSE152058",
+  "name": "Cell Type-Specific Transcriptomics Reveals that Mutant Huntingtin Leads to Mitochondrial RNA Release and Neuronal Innate Immune Activation",
+  "species": [
+    {
+      "displayName": "Mouse | Mus musculus",
+      "identifier": "10090",
+      "name": "Mus musculus",
+      "url": "https://www.uniprot.org/taxonomy/10090"
+    },
+    {
+      "displayName": "Human | Homo sapiens",
+      "identifier": "9606",
+      "name": "Homo sapiens",
+      "url": "https://www.uniprot.org/taxonomy/9606"
+    }
+  ],
+  "tissue": [
+    {
+      "identifier": "mesh:D011699",
+      "name": "Putamen",
+      "url": "http://id.nlm.nih.gov/mesh/D011699"
+    }
+  ],
+  "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE152058"
+}

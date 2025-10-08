@@ -1,19 +1,21 @@
 # MultiSC-Viewer
 
-MultiSC-Viewer is a web application to visualize and compare gene expression in multiple single cell/nucleus datasets across different brain regions, disease conditions, and species.
+[MultiSC-Viewer](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-viewer) is a web application for visualizing and comparing gene expression in multiple single cell/nucleus datasets across different brain regions, disease conditions, and species.
 
 ## Features
-- Interactive graphs for real-time datasets exploration
-- Load balancing to manage datasets across multiple daemons for parallelized plot generation
-- Docker support for automated deployment.
 
-## Run locally
+- **Multiple datasets visualization and comparison**: currently the only available tool that supports a side-by-side comparative view of more than two datasets simultaneously
+- **Interactive plots**: interactive plots controls for real-time exploration of datasets
+- **Plot streaming**: renders plots as they are generated, allowing users to view results without waiting for all plots to complete
+- **Load balancing and scalability**: manages datasets across multiple plotting daemons for parallelized plot generation.
 
-Requires [Node.js](https://nodejs.org/), [PM2](https://pm2.keymetrics.io/), and [R](https://www.r-project.org/).
+## Run Locally
+
+Requires [R](https://www.r-project.org/), [Seurat](https://satijalab.org/seurat/), [plumber](https://www.rplumber.io/), [Node.js](https://nodejs.org/), [PM2](https://pm2.keymetrics.io/).
 
 ```bash
 # Clone the repository
-git clone https://git.jasonxu.dev/JasonXu/plot-viewer.git
+git clone --single-branch -b main https://git.jasonxu.dev/JasonXu/plot-viewer.git
 cd plot-viewer
 
 # Install system dependencies (Debian/Ubuntu)
@@ -30,12 +32,15 @@ npm --prefix multisc-viewer run build
 
 ```bash
 # Start the app
-pm2 start ecosystem.json
+pm2 start ecosystem.config.js
+
+# Scale the number of plotting daemons (optional)
+pm2 scale multisc-daemon 4
 ```
 
 ```bash
 # Stop the app
-pm2 stop ecosystem.json
+pm2 stop ecosystem.config.js
 ```
 
 View app at <http://localhost:3000>.
@@ -45,3 +50,12 @@ View app at <http://localhost:3000>.
 ```bash
 docker compose up -d
 ```
+
+---
+
+## Related
+
+- MultiSC: [https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-viewer](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/README.md)
+- Add MultiSC-Data: [https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/data](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/data/README.md)
+- Run MultiSC-Daemon: [https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-daemon](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-daemon/README.md)
+- Run MultiSC-Viewer: [https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-viewer](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-viewer/README.md)

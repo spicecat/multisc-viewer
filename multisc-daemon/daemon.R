@@ -1,26 +1,36 @@
 suppressPackageStartupMessages({
   library(SeuratObject)
+  source("genes.R")
 })
 
 # --- Configuration ---
-datasets_dir <- Sys.getenv("DATASETS_DIR", "../data/datasets")
-datasets_meta <- Sys.getenv("DATASETS_META", "meta.json")
-publications_dir <- Sys.getenv("PUBLICATIONS_DIR", "../data/publications")
-publications_meta <- Sys.getenv("PUBLICATIONS_META", "meta.json")
-plot_dir <- Sys.getenv("PLOT_DIR", "../data/plots")
-plot_file <- Sys.getenv("PLOT_FILE", "plot.png")
-data_file <- Sys.getenv("DATA_FILE", "data.rds")
-genotype_color_file <- Sys.getenv("GENOTYPE_COLOR_FILE", "genotype.colors.rds")
-cluster_color_file <- Sys.getenv("CLUSTER_COLOR_FILE", "cluster.colors.rds")
-dir.create(plot_dir, recursive = TRUE, showWarnings = FALSE)
+ds_dir <- Sys.getenv("DATASETS_DIR", "../data/datasets")
+ds_index_file <- "index.json"
+ds_meta_file <- "metadata.json"
+ds_data_file <- "data.rds"
+ds_genes_file <- "genes.json"
+ds_degs_file <- "degs.json"
+genotype_color_file <- "genotype.colors.rds"
+cluster_color_file <- "cluster.colors.rds"
+
+pub_dir <- Sys.getenv("PUBLICATIONS_DIR", "../data/publications")
+pub_index_file <- "index.json"
+pub_meta_file <- "metadata.json"
+
+plots_dir <- Sys.getenv("PLOTS_DIR", "../data/plots")
+plot_file <- "plot.png"
+dir.create(plots_dir, FALSE, TRUE)
 
 # --- Global State ---
-dataset_data <- list()
-dataset_status <- list()
+ds_data <- list()
 
 # --- Helpers ---
-get_datasets <- function() {
-  n <- names(dataset_data)
+get_ds_path <- function() {
+  jsonlite::fromJSON(file.path(ds_dir, ds_index_file))
+}
+
+get_loaded <- function() {
+  n <- names(ds_data)
   if (is.null(n)) {
     list(datasets = list())
   } else {
@@ -28,21 +38,17 @@ get_datasets <- function() {
   }
 }
 
-load_dataset <- function(ds) {
-  if (!ds %in% names(dataset_data)) {
-    dataset_data[[ds]] <<- readRDS(file.path(datasets_dir, ds, data_file))
-    print(paste("Loaded dataset:", ds))
-  }
-  TRUE
+read_ds_data <- function(ds_path) {
+  readRDS(file.path(ds_dir, ds_path, ds_data_file))
 }
 
-get_colors <- function(ds, group_by) {
+get_colors <- function(ds_path, group_by) {
   color_file <- ifelse(
     group_by == "Genotype",
     genotype_color_file,
     cluster_color_file
   )
-  readRDS(file.path(datasets_dir, ds, color_file))
+  readRDS(file.path(ds_dir, ds_path, color_file))
 }
 
 save_plot <- function(plot_object, path, ...) {
@@ -53,15 +59,15 @@ save_plot <- function(plot_object, path, ...) {
   file.rename(temp_path, path)
 }
 
-render_plot <- function(ds, gene, group_by, split_by, pt) {
-  dataset <- dataset_data[[ds]]
-  colors <- get_colors(ds, group_by)
-  plot_id <- paste(ds, gene,
-    paste(group_by, split_by, sep = ":"), pt,
+render_plot <- function(ds_path, ds, gene, pt, group_by, split_by) {
+  data <- ds_data[[ds]]
+  colors <- get_colors(ds_path, group_by)
+  plot_id <- paste(ds, gene, pt,
+    paste(group_by, split_by, sep = ":"),
     sep = "/"
   )
   plot_path <- file.path(
-    plot_dir,
+    plots_dir,
     plot_id,
     plot_file
   )
@@ -69,7 +75,7 @@ render_plot <- function(ds, gene, group_by, split_by, pt) {
   print(paste("Rendering plot:", plot_id))
   if (pt == "umap") {
     umap_plot <- Seurat::DimPlot(
-      dataset,
+      data,
       reduction = "umap",
       label = FALSE,
       group.by = group_by,
@@ -79,7 +85,7 @@ render_plot <- function(ds, gene, group_by, split_by, pt) {
       width = 5 * 300, height = 4 * 300, res = 300, pointsize = 12
     )
   } else if (pt == "vln") {
-    p <- Seurat::VlnPlot(dataset,
+    p <- Seurat::VlnPlot(data,
       assay = "RNA", features = gene, pt.size = 0,
       split.by = group_by, group.by = split_by, cols = colors, ncol = 1
     )
@@ -87,7 +93,7 @@ render_plot <- function(ds, gene, group_by, split_by, pt) {
       width = 1200, height = 900, res = 300
     )
   } else if (pt == "feat") {
-    p <- Seurat::FeaturePlot(dataset,
+    p <- Seurat::FeaturePlot(data,
       features = gene, min.cutoff = "q5", max.cutoff = "q95"
     )
     save_plot(p, file.path(plot_path),
@@ -99,7 +105,7 @@ render_plot <- function(ds, gene, group_by, split_by, pt) {
   plot_id
 }
 
-#* @apiTitle MultiSC Viewer Daemon
+#* @apiTitle MultiSC-Daemon API
 
 #* Log request information
 #* @filter logger
@@ -111,66 +117,136 @@ function(req) {
   plumber::forward()
 }
 
-#* Get datasets
-#* @get /datasets
+#* Check daemon health.
+#* @serializer unboxedJSON
+#* @get /health
 function() {
-  jsonlite::fromJSON(file.path(datasets_dir, datasets_meta))
+  list(status = "ok")
 }
 
-#* Get publications
-#* @get /publications
-function() {
-  jsonlite::fromJSON(file.path(publications_dir, publications_meta))
-}
-
-#* Get loaded datasets
-#* @get /status
+#* Get loaded datasets on daemon.
 #* @get /loaded
 function() {
-  get_datasets()
+  get_loaded()
 }
 
-#* Unload a dataset
+#* Unload datasets on daemon.
 #* @post /unload
-#* @param datasets:[str]* Dataset names to unload
-function(datasets) {
-  loaded_datasets <<- dataset_data[!names(dataset_data) %in% datasets]
-  get_datasets()
+#* @param ds:[str] Dataset ids. Unset to unload all datasets.
+function(ds) {
+  if (missing(ds)) ds <- names(ds_data)
+  ds_data <<- ds_data[!names(ds_data) %in% ds]
+  get_loaded()
 }
 
-#* Load datasets
+#* Load datasets on daemon.
 #* @serializer unboxedJSON
 #* @post /load
-#* @param datasets:[str]* Dataset names to load
-function(datasets) {
-  setNames(lapply(datasets, function(ds) {
-    tryCatch(
-      {
-        load_dataset(ds)
-      },
-      error = function(e) {
-        FALSE
-      }
-    )
-  }), datasets)
+#* @param ds:[str]* Dataset ids
+load_ds <- function(ds) {
+  ds_path <- get_ds_path()
+  lapply(ds, function(d) {
+    try({
+      if (!d %in% names(ds_data)) ds_data[[d]] <<- read_ds_data(ds_path[[d]])
+    })
+  })
+  get_loaded()
 }
 
-#* Render plots for datasets
+#* Get datasets metadata.
 #* @serializer unboxedJSON
-#* @post /render
-#* @param datasets:[str]* Dataset names
-#* @param genes:[str]* Genes to plot
+#* @get /datasets
+#* @param ds:[str] Dataset ids. Unset to get all datasets.
+function(ds) {
+  ds_path <- get_ds_path()
+  if (missing(ds)) ds <- names(ds_path)
+  metadata <- setNames(lapply(ds, function(d) {
+    tryCatch(
+      {
+        meta <- jsonlite::fromJSON(file.path(
+          ds_dir, ds_path[[d]], ds_meta_file
+        ))
+        meta$size <- file.info(file.path(
+          ds_dir, ds_path[[d]], ds_data_file
+        ))$size
+        meta
+      },
+      error = function(e) NULL
+    )
+  }), ds)
+  metadata[!vapply(metadata, is.null, logical(1))]
+}
+
+#* Get publications metadata.
+#* @serializer unboxedJSON
+#* @get /publications
+#* @param pub:[str] Publication ids. Unset to get all publications.
+function(pub) {
+  pub_path <- jsonlite::fromJSON(file.path(pub_dir, pub_index_file))
+  if (missing(pub)) pub <- names(pub_path)
+  metadata <- setNames(lapply(pub, function(p) {
+    tryCatch(
+      jsonlite::fromJSON(file.path(pub_dir, pub_path[[p]], pub_meta_file)),
+      error = function(e) NULL
+    )
+  }), pub)
+  metadata[!vapply(metadata, is.null, logical(1))]
+}
+
+#* Get genes for datasets.
+#* @get /genes
+#* @param ds:[str]* Dataset ids
+function(ds) {
+  ds_path <- get_ds_path()
+  setNames(lapply(ds, function(d) {
+    tryCatch(
+      jsonlite::fromJSON(file.path(ds_dir, ds_path[[d]], ds_genes_file)),
+      error = function(e) {
+        tryCatch(
+          write_genes(read_ds_data(ds_path[[d]])),
+          error = function(e) {
+            list()
+          }
+        )
+      }
+    )
+  }), ds)
+}
+
+#* Get differentially expressed genes for datasets.
+#* @get /degs
+#* @param ds:[str]* Dataset ids
+function(ds) {
+  ds_path <- get_ds_path()
+  setNames(lapply(ds, function(d) {
+    tryCatch(
+      unique(jsonlite::fromJSON(file.path(ds_dir, ds_path[[d]], ds_degs_file))),
+      error = function(e) {
+        list()
+      }
+    )
+  }), ds)
+}
+
+#* Generate plots for datasets.
+#* @serializer unboxedJSON
+#* @post /plots
+#* @param datasets:[str]* Dataset ids
+#* @param gene:[str]* Genes
+#* @param plotTypes:[str] Plots to render
 #* @param groupBy:str Grouping variable
 #* @param splitBy:str Splitting variable
-#* @param plotTypes:[str] Plot types to render (umap, vln, feat)
 function(
-    datasets, genes, groupBy = "CellType", splitBy = "Genotype",
-    plotTypes = list("umap", "vln", "feat")) {
-  lapply(datasets, load_dataset)
-  unlist(lapply(datasets, function(ds) {
-    unlist(lapply(genes, function(gene) {
-      lapply(plotTypes, function(pt) {
-        render_plot(ds, gene, groupBy, splitBy, pt)
+    ds, gene, pt = list("umap", "vln", "feat"),
+    groupBy = "CellType", splitBy = "Genotype") {
+  ds_path <- get_ds_path()
+  unlist(lapply(ds, function(d) {
+    try({
+      if (!d %in% names(ds_data)) ds_data[[d]] <<- read_ds_data(ds_path[[d]])
+    })
+    unlist(lapply(gene, function(g) {
+      lapply(pt, function(p) {
+        render_plot(ds_path[[d]], d, g, p, groupBy, splitBy)
       })
     }))
   }))

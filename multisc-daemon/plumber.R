@@ -1,7 +1,8 @@
 #!/usr/bin/env Rscript
 
-plumber::pr("daemon.R") |>
-  plumber::pr_run(
-    host = "0.0.0.0",
-    port = Sys.getenv("PLUMBER_PORT", 8000)
-  )
+pr <- plumber::plumb("daemon.R")
+api <- jsonlite::read_json("openapi.json")
+pr <- plumber::pr_set_api_spec(pr, api)
+port <- Sys.getenv("PLUMBER_PORT", 8000)
+print(sprintf("Starting multisc-daemon on port %s", port))
+plumber::pr_run(pr, "0.0.0.0", port)

@@ -1,16 +1,16 @@
 <script lang="ts">
-	import DatasetsTable from '$lib/components/DataTable/DatasetsTable.svelte';
+	import PlotsForm from '$lib/components/Plots/Form.svelte';
 	import type { PageProps } from '../$types';
 
 	let { data }: PageProps = $props();
-	let { datasets } = data;
+	let { datasets } = $derived(data);
 </script>
 
 <svelte:head>
-	<title>Datasets</title>
+	<title>MultiSC-Viewer Datasets</title>
 </svelte:head>
 
-<section class="mx-auto size-fit">
+<section class="mx-auto">
 	<h2 class="text-center h2">Datasets</h2>
-	<DatasetsTable {datasets} />
+	<PlotsForm {datasets} />
 </section>

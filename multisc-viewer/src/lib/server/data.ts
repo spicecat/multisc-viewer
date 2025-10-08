@@ -1,64 +1,55 @@
-import type { Dataset, DEGs, Gene, Publication } from '$lib/types/data';
-import { uniq } from 'lodash-es';
-import { existsSync, readFileSync, statSync } from 'node:fs';
-import { readFile } from 'node:fs/promises';
-import { datasetsConfig, publicationsConfig } from './config';
+import type { Datasets, DEGs, Genes, Publications } from '$lib/types/daemon';
+import { merge } from 'lodash-es';
+import { getDaemonTargets } from './daemon';
 
-type DatasetMeta = Omit<Dataset, 'size'>;
-
-type PublicationMeta = Omit<Publication, 'datasets'> & { datasets: string[] };
-
-const {
-	dir: datasetsDir,
-	meta: datasetsMeta,
-	requiredFiles: datasetsRequiredFiles
-} = datasetsConfig;
-
-const { dir: publicationsDir, meta: publicationsMeta } = publicationsConfig;
-
-export const datasets: Record<string, Dataset> = Object.fromEntries(
-	existsSync(`${datasetsDir}/${datasetsMeta}`)
-		? JSON.parse(readFileSync(`${datasetsDir}/${datasetsMeta}`, 'utf-8'))
-				.filter(({ id }: DatasetMeta) =>
-					datasetsRequiredFiles.every((file) => existsSync(`${datasetsDir}/${id}/${file}`))
-				)
-				.map((ds: DatasetMeta) => [
-					ds.id,
-					{ ...ds, size: statSync(`${datasetsDir}/${ds.id}/data.rds`).size }
-				])
-		: []
-);
-
-export const publications: Record<string, Publication> = Object.fromEntries(
-	existsSync(`${publicationsDir}/${publicationsMeta}`)
-		? JSON.parse(readFileSync(`${publicationsDir}/${publicationsMeta}`, 'utf-8')).map(
-				(pub: PublicationMeta) => [
-					pub.id,
-					{
-						...pub,
-						datasets: pub.datasets.filter((ds) => ds in datasets).map((ds) => datasets[ds])
-					}
-				]
-			)
-		: []
-);
-
-export const getGenes = async (datasets: string[]): Promise<Gene[]> => {
-	const genes: Gene[][] = await Promise.all(
-		datasets.map(async (ds) =>
-			JSON.parse(await readFile(`${datasetsDir}/${ds}/genes.json`, 'utf-8'))
-		)
+/**
+ * Fetch datasets metadata.
+ * @param ds - list of dataset ids to fetch; if `undefined`, fetch all datasets
+ * @returns Dictionary mapping dataset ids to metadata
+ */
+export const getDatasets = async (ds?: string[]) => {
+	const daemonTargets = await getDaemonTargets(ds);
+	const datasets = await Promise.all(
+		daemonTargets.entries().map(async ([daemon, dds]) => daemon.datasets(dds))
 	);
-	return uniq(genes.flat()).toSorted();
+	return datasets.reduce(merge<Datasets, Datasets>, {});
 };
 
-export const getDEGs = async (datasets: string[]): Promise<DEGs> => {
-	const degs: DEGs[] = await Promise.all(
-		datasets.map(async (ds) =>
-			existsSync(`${datasetsDir}/${ds}/DEGs.json`)
-				? JSON.parse(await readFile(`${datasetsDir}/${ds}/DEGs.json`, 'utf-8'))
-				: {}
-		)
+/**
+ * Fetch publications metadata.
+ * @param pub - list of publication ids to fetch; if `undefined`, fetch all publications
+ * @returns Dictionary mapping publication ids to metadata
+ */
+export const getPublications = async (pub?: string[]) => {
+	const daemonTargets = await getDaemonTargets();
+	const publications = await Promise.all(
+		daemonTargets.entries().map(async ([daemon]) => daemon.publications(pub))
 	);
-	return Object.assign({}, ...degs);
+	return publications.reduce(merge<Publications, Publications>, {});
+};
+
+/**
+ * Fetch genes for datasets.
+ * @param ds - list of dataset ids to fetch
+ * @returns Dictionary mapping dataset ids to genes
+ */
+export const getGenes = async (ds: string[]) => {
+	const daemonTargets = await getDaemonTargets(ds);
+	const genes = await Promise.all(
+		daemonTargets.entries().map(async ([daemon, dds]) => daemon.genes(dds))
+	);
+	return genes.reduce(merge<Genes, Genes>, {});
+};
+
+/**
+ * Fetch differentially expressed genes for datasets.
+ * @param ds - list of dataset ids to fetch
+ * @returns Dictionary mapping dataset ids to differentially expressed genes
+ */
+export const getDEGs = async (ds: string[]) => {
+	const daemonTargets = await getDaemonTargets(ds);
+	const degs = await Promise.all(
+		daemonTargets.entries().map(async ([daemon, dds]) => daemon.degs(dds))
+	);
+	return degs.reduce(merge<DEGs, DEGs>, {});
 };

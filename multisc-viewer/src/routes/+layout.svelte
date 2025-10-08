@@ -32,7 +32,7 @@
 		>
 			{#snippet trigger()}<a
 					class="btn preset-tonal"
-					href="https://git.jasonxu.dev/JasonXu/plot-viewer/"
+					href="https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/"
 					target="_blank"
 					rel="noreferrer"
 				>
@@ -46,6 +46,6 @@
 	<span class="text-lg font-bold">MultiSC-Viewer</span>
 </AppBar>
 
-<main class="container mx-auto space-y-8">
+<main class="container mx-auto space-y-8 pb-[50vh]">
 	{@render children()}
 </main>
