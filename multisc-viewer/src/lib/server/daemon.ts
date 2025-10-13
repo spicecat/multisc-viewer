@@ -1,18 +1,7 @@
-import type {
-	Datasets,
-	DEGs,
-	Genes,
-	Health,
-	Loaded,
-	Load,
-	Plots,
-	PlotsParams,
-	Publications,
-	Unload
-} from '$lib/types/daemon';
-import axios from 'axios';
-import { setupCache, type AxiosCacheInstance } from 'axios-cache-interceptor';
+import type { paths } from '$lib/types/api';
+import type { Datasets, DEGs, PlotsParams } from '$lib/types/daemon';
 import { LRUCache } from 'lru-cache';
+import createClient, { type Client, type Middleware } from 'openapi-fetch';
 import { daemonConfig } from './config';
 
 const { daemonUrls, connectionTimeout, timeout, maxSize, ttl, refresh } = daemonConfig;
@@ -24,31 +13,42 @@ export const daemons: Daemon[] = [];
  * Class representing a connection to a daemon server.
  */
 class Daemon {
-	private axiosInstance: AxiosCacheInstance;
+	private client: Client<paths>;
 	private cache: LRUCache<string, string>;
 	requestLoad = 0;
 
 	/**
 	 * Create a Daemon instance.
-	 * @param daemonUrl - URL of the daemon server
+	 * @param baseUrl - URL of the daemon server
 	 */
-	constructor(daemonUrl: string) {
-		this.axiosInstance = setupCache(
-			axios.create({
-				baseURL: daemonUrl,
-				timeout,
-				paramsSerializer: { indexes: null }
-			}),
-			{ ttl }
-		);
+	constructor(baseUrl: string) {
+		const logger: Middleware = {
+			async onRequest({ request }) {
+				console.log(`Request ${request.method} ${request.url} ${request.body}`);
+				return request;
+			},
+			async onResponse({ response }) {
+				console.log(`Response ${response.status} ${response.url}`);
+				return response;
+			},
+			async onError({ request, error }) {
+				console.error(`Error ${baseUrl} ${request.url} - ${(<Error>error).message}`);
+				return;
+			}
+		};
+		this.client = createClient<paths>({
+			baseUrl,
+			headers: { 'Cache-Control': `max-age=${Math.floor(ttl / 1000)}` },
+			signal: AbortSignal.timeout(timeout)
+		});
+		this.client.use(logger);
+
 		this.cache = new LRUCache<string, string>({
 			maxSize,
 			ttl,
 			dispose: this.unload
 		});
 	}
-
-	toString = () => `Daemon(${this.axiosInstance.getUri()})`;
 
 	/** Priority for loading datasets.
 	 * Lower priority value means higher priority.
@@ -65,14 +65,13 @@ class Daemon {
 	 */
 	health = async () => {
 		try {
-			const { data } = await this.axiosInstance.get<Health>('/health', {
-				cache: false,
-				signal: AbortSignal.timeout(connectionTimeout)
+			const { data, error } = await this.client.GET('/health', {
+				signal: AbortSignal.timeout(connectionTimeout),
+				cache: 'no-cache'
 			});
-			console.log(`Health ${this}: status ${data.status}`);
+			if (error) throw error;
 			return data;
-		} catch (error) {
-			console.error(`Health ${this}: error ${error}`);
+		} catch {
 			return { status: 'unhealthy' };
 		}
 	};
@@ -83,13 +82,14 @@ class Daemon {
 	 */
 	loaded = async () => {
 		try {
-			const { data } = await this.axiosInstance.get<Loaded>('/loaded', { cache: false });
+			const { data, error } = await this.client.GET('/loaded', {
+				cache: 'no-cache'
+			});
+			if (error) throw error;
 			const datasets = await this.datasets(data);
 			for (const ds of data) this.cache.set(ds, ds, { size: datasets[ds].size ?? defaultSize });
-			console.log(`Loaded ${this}: loaded ${data}`);
 			return data;
-		} catch (error) {
-			console.error(`Loaded ${this}: error ${error}`);
+		} catch {
 			return [];
 		}
 	};
@@ -101,12 +101,14 @@ class Daemon {
 	 */
 	private unload = async (ds: string) => {
 		try {
-			const { data } = await this.axiosInstance.post<Unload>('/unload', { ds }, { cache: false });
+			const { data, error } = await this.client.POST('/unload', {
+				body: { ds: [ds] },
+				cache: 'no-cache'
+			});
+			if (error) throw error;
 			this.cache.delete(ds);
-			console.log(`Unload ${this} ds=${ds}: loaded ${data}`);
 			return data;
-		} catch (error) {
-			console.error(`Unload ${this} ds=${ds}: error ${error}`);
+		} catch {
 			return [];
 		}
 	};
@@ -118,13 +120,15 @@ class Daemon {
 	 */
 	load = async (ds: string[]) => {
 		try {
-			const { data } = await this.axiosInstance.post<Load>('/load', { ds }, { cache: false });
+			const { data, error } = await this.client.POST('/load', {
+				body: { ds },
+				cache: 'no-cache'
+			});
+			if (error) throw error;
 			const datasets = await this.datasets(data);
 			for (const ds of data) this.cache.set(ds, ds, { size: datasets[ds].size ?? defaultSize });
-			console.log(`Load ${this} ds=${ds}: loaded ${data}`);
 			return data;
-		} catch (error) {
-			console.error(`Load ${this} ds=${ds}: error ${error}`);
+		} catch {
 			return [];
 		}
 	};
@@ -136,13 +140,12 @@ class Daemon {
 	 */
 	datasets = async (ds?: string[]) => {
 		try {
-			const { cached, data } = await this.axiosInstance.get<Datasets>('/datasets', {
-				params: { ds }
+			const { data, error } = await this.client.GET('/datasets', {
+				params: { query: { ds } }
 			});
-			if (!cached) console.log(`Datasets ${this} ds=${ds}: keys ${Object.keys(data)}`);
+			if (error) throw error;
 			return data;
-		} catch (error) {
-			console.error(`Datasets ${this} ds=${ds}: error ${error}`);
+		} catch {
 			return {};
 		}
 	};
@@ -154,13 +157,12 @@ class Daemon {
 	 */
 	publications = async (pub?: string[]) => {
 		try {
-			const { cached, data } = await this.axiosInstance.get<Publications>('/publications', {
-				params: { pub }
+			const { data, error } = await this.client.GET('/publications', {
+				params: { query: { pub } }
 			});
-			if (!cached) console.log(`Publications ${this} pub=${pub}: key ${Object.keys(data)}`);
+			if (error) throw error;
 			return data;
-		} catch (error) {
-			console.error(`Publications ${this} pub=${pub}: error ${error}`);
+		} catch {
 			return {};
 		}
 	};
@@ -172,11 +174,10 @@ class Daemon {
 	 */
 	genes = async (ds: string[]) => {
 		try {
-			const { data } = await this.axiosInstance.get<Genes>('/genes', { params: { ds } });
-			console.log(`Genes ${this} ds=${ds}: keys ${Object.keys(data)}`);
+			const { data, error } = await this.client.GET('/genes', { params: { query: { ds } } });
+			if (error) throw error;
 			return data;
-		} catch (error) {
-			console.error(`Genes ${this} ds=${ds}: error ${error}`);
+		} catch {
 			return {};
 		}
 	};
@@ -188,11 +189,10 @@ class Daemon {
 	 */
 	degs = async (ds: string[]): Promise<DEGs> => {
 		try {
-			const { data } = await this.axiosInstance.get<DEGs>('/degs', { params: { ds } });
-			console.log(`DEGs ${this} ds=${ds}: keys ${Object.keys(data)}`);
+			const { data, error } = await this.client.GET('/degs', { params: { query: { ds } } });
+			if (error) throw error;
 			return data;
-		} catch (error) {
-			console.error(`DEGs ${this} ds=${ds}: error ${error}`);
+		} catch {
 			return {};
 		}
 	};
@@ -202,13 +202,12 @@ class Daemon {
 	 * @returns List of rendered plots paths
 	 */
 	plots = async (plotsParams: PlotsParams) => {
-		this.requestLoad += maxSize;
 		try {
-			const { data } = await this.axiosInstance.post<Plots>('/plots', plotsParams);
-			console.log(`Plots ${this} params ${Object.values(plotsParams)}: plots ${data}`);
+			this.requestLoad += maxSize;
+			const { data, error } = await this.client.POST('/plots', { body: plotsParams });
+			if (error) throw error;
 			return data;
-		} catch (error) {
-			console.error(`Plots ${this} params ${Object.values(plotsParams)}: error ${error}`);
+		} catch {
 			return [];
 		} finally {
 			this.requestLoad -= maxSize;
@@ -228,7 +227,7 @@ const registerDaemons = async () => {
 };
 
 setInterval(registerDaemons, refresh);
-registerDaemons();
+await registerDaemons();
 
 /**
  * Map daemons to target dataset ids.
