@@ -55,14 +55,24 @@
 	});
 </script>
 
-<span class="input-group flex w-full">
-	<div class="ig-cell preset-tonal">
-		<Search size={16} />
-	</div>
-	<TagsInput
-		name="tags"
-		value={tags}
-		onValueChange={(e) => (tags = e.value)}
-		placeholder={`Search ${name}...`}
-	/>
-</span>
+<TagsInput name="tags" value={tags} onValueChange={(e) => (tags = e.value)}>
+	<TagsInput.Label>Search {name}</TagsInput.Label>
+	<TagsInput.Control>
+		<TagsInput.Context>
+			{#snippet children(tagsInput)}
+				{#each tagsInput().value as value, index (index)}
+					<TagsInput.Item {value} {index}>
+						<TagsInput.ItemPreview class="preset-tonal-primary">
+							<TagsInput.ItemText>{value}</TagsInput.ItemText>
+							<TagsInput.ItemDeleteTrigger />
+						</TagsInput.ItemPreview>
+						<TagsInput.ItemInput />
+					</TagsInput.Item>
+				{/each}
+			{/snippet}
+		</TagsInput.Context>
+		<TagsInput.Input placeholder={`Add a tag...`} />
+	</TagsInput.Control>
+	<TagsInput.ClearTrigger>Clear All</TagsInput.ClearTrigger>
+	<TagsInput.HiddenInput />
+</TagsInput>

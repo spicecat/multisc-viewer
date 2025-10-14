@@ -34,7 +34,7 @@ npm --prefix multisc-viewer run build
 # Start the app
 pm2 start ecosystem.config.js
 
-# Scale the number of plotting daemons (optional)
+# Scale the number of plotting daemons
 pm2 scale multisc-daemon 4
 ```
 

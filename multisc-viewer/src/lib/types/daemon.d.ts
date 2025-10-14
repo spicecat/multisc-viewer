@@ -1,10 +1,5 @@
 import type { components, paths } from './api';
 
-export type Health = paths['/health']['get']['responses']['200']['content']['application/json'];
-export type Loaded = paths['/loaded']['get']['responses']['200']['content']['application/json'];
-export type Unload = paths['/unload']['post']['responses']['200']['content']['application/json'];
-export type Load = paths['/load']['post']['responses']['200']['content']['application/json'];
-
 export type Datasets = paths['/datasets']['get']['responses']['200']['content']['application/json'];
 export type Publications =
 	paths['/publications']['get']['responses']['200']['content']['application/json'];

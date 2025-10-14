@@ -2,7 +2,7 @@
 	import { navigating, page } from '$app/state';
 	import type { Datasets, DEGs, Genes } from '$lib/types/daemon';
 	import { ArrowRight } from '@lucide/svelte';
-	import { ProgressRing } from '@skeletonlabs/skeleton-svelte';
+	import { Progress } from '@skeletonlabs/skeleton-svelte';
 	import DatasetsTable from '../Data/DatasetsTable.svelte';
 	import GenesTable from '../Data/GenesTable.svelte';
 
@@ -26,12 +26,17 @@
 		{/if}
 	</div>
 	<DatasetsTable {datasets}>
-		<button type="submit" class="btn preset-filled-primary-500">
+		<button type="submit" class="my-auto btn flex items-center preset-filled-primary-500">
 			Plot Datasets
 			{#if navigating.to}
-				<ProgressRing value={null} size="size-5" />
+				<Progress value={null}>
+					<Progress.Circle style="--size: 24px; --thickness: 4px;">
+						<Progress.CircleTrack />
+						<Progress.CircleRange />
+					</Progress.Circle>
+				</Progress>
 			{:else}
-				<ArrowRight />
+				<ArrowRight size="24" />
 			{/if}
 		</button>
 	</DatasetsTable>

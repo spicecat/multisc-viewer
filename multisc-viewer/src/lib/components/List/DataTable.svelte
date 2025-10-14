@@ -27,7 +27,7 @@
 	});
 </script>
 
-<div class="table-wrap">
+<div class="place-items-center">
 	<table class="table caption-bottom">
 		<thead>
 			{@render children?.()}
@@ -42,14 +42,5 @@
 			{/each}
 		</tbody>
 	</table>
+	<Pagination count={data.length} {pageSize} {page} onPageChange={(e) => (page = e.page)} />
 </div>
-<footer class="flex justify-center">
-	<Pagination
-		data={items}
-		showFirstLastButtons
-		count={data.length}
-		{page}
-		{pageSize}
-		onPageChange={(e) => (page = e.page)}
-	/>
-</footer>

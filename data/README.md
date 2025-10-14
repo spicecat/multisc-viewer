@@ -111,7 +111,7 @@ Example dataset folder `metadata.json`:
 ```jsonc
 {
   "_id": "example-ds-1",
-  "$schema": "https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-daemon/openapi.json#/components/schemas/Dataset",
+  "$schema": "https://git.jasonxu.dev/JasonXu/plot-viewer/raw/branch/main/multisc-daemon/openapi.json#/components/schemas/Dataset",
   "name": "Example Dataset 1 with <i>HTML</i>",
   "displayName": "Example Dataset 1",
   "description": "This is a summary of this dataset.",

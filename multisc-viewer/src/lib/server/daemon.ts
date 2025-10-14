@@ -38,8 +38,7 @@ class Daemon {
 		};
 		this.client = createClient<paths>({
 			baseUrl,
-			headers: { 'Cache-Control': `max-age=${Math.floor(ttl / 1000)}` },
-			signal: AbortSignal.timeout(timeout)
+			headers: { 'Cache-Control': `max-age=${Math.floor(ttl / 1000)}` }
 		});
 		this.client.use(logger);
 
@@ -83,6 +82,7 @@ class Daemon {
 	loaded = async () => {
 		try {
 			const { data, error } = await this.client.GET('/loaded', {
+				signal: AbortSignal.timeout(timeout),
 				cache: 'no-cache'
 			});
 			if (error) throw error;
@@ -103,6 +103,7 @@ class Daemon {
 		try {
 			const { data, error } = await this.client.POST('/unload', {
 				body: { ds: [ds] },
+				signal: AbortSignal.timeout(timeout),
 				cache: 'no-cache'
 			});
 			if (error) throw error;
@@ -122,6 +123,7 @@ class Daemon {
 		try {
 			const { data, error } = await this.client.POST('/load', {
 				body: { ds },
+				signal: AbortSignal.timeout(timeout),
 				cache: 'no-cache'
 			});
 			if (error) throw error;
@@ -141,7 +143,8 @@ class Daemon {
 	datasets = async (ds?: string[]) => {
 		try {
 			const { data, error } = await this.client.GET('/datasets', {
-				params: { query: { ds } }
+				params: { query: { ds } },
+				signal: AbortSignal.timeout(timeout)
 			});
 			if (error) throw error;
 			return data;
@@ -158,7 +161,8 @@ class Daemon {
 	publications = async (pub?: string[]) => {
 		try {
 			const { data, error } = await this.client.GET('/publications', {
-				params: { query: { pub } }
+				params: { query: { pub } },
+				signal: AbortSignal.timeout(timeout)
 			});
 			if (error) throw error;
 			return data;
@@ -174,7 +178,10 @@ class Daemon {
 	 */
 	genes = async (ds: string[]) => {
 		try {
-			const { data, error } = await this.client.GET('/genes', { params: { query: { ds } } });
+			const { data, error } = await this.client.GET('/genes', {
+				params: { query: { ds } },
+				signal: AbortSignal.timeout(timeout)
+			});
 			if (error) throw error;
 			return data;
 		} catch {
@@ -189,7 +196,10 @@ class Daemon {
 	 */
 	degs = async (ds: string[]): Promise<DEGs> => {
 		try {
-			const { data, error } = await this.client.GET('/degs', { params: { query: { ds } } });
+			const { data, error } = await this.client.GET('/degs', {
+				params: { query: { ds } },
+				signal: AbortSignal.timeout(timeout)
+			});
 			if (error) throw error;
 			return data;
 		} catch {
@@ -204,7 +214,10 @@ class Daemon {
 	plots = async (plotsParams: PlotsParams) => {
 		try {
 			this.requestLoad += maxSize;
-			const { data, error } = await this.client.POST('/plots', { body: plotsParams });
+			const { data, error } = await this.client.POST('/plots', {
+				body: plotsParams,
+				signal: AbortSignal.timeout(timeout)
+			});
 			if (error) throw error;
 			return data;
 		} catch {

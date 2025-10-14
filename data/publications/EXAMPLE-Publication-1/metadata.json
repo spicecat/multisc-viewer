@@ -1,6 +1,6 @@
 {
   "_id": "example-pub-1",
-  "$schema": "https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-daemon/openapi.json#/components/schemas/Publication",
+  "$schema": "https://git.jasonxu.dev/JasonXu/plot-viewer/raw/branch/main/multisc-daemon/openapi.json#/components/schemas/Publication",
   "author": [
     {
       "name": "Doe J"

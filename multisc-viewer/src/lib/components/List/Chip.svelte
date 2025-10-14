@@ -9,10 +9,9 @@
 </script>
 
 <button
+	type="button"
 	class="chip preset-tonal"
 	onclick={() => {
-		if (tags && tag && !tags.includes(tag)) {
-			tags.push(tag);
-		}
+		if (tags && tag && !tags.includes(tag)) tags.push(tag);
 	}}>{@render children()}</button
 >

@@ -19,20 +19,20 @@
 	let items = $derived(tab ? data.filter(filter(tab)) : data);
 </script>
 
-<Tabs value={tab} onValueChange={(e) => (tab = e.value)} fluid>
-	{#snippet list()}
-		<Tabs.Control value="">
+<Tabs value={tab} onValueChange={(e) => (tab = e.value)}>
+	<Tabs.List>
+		<Tabs.Trigger class="flex-1" value="">
 			<span class="font-bold">{data.length}</span>
 			All
-		</Tabs.Control>
+		</Tabs.Trigger>
 		{#each tabs as tab (`tab-${tab}`)}
-			<Tabs.Control value={tab}>
+			<Tabs.Trigger class="flex-1" value={tab}>
 				<span class="font-bold">{data.filter(filter(tab)).length}</span>
 				{tab}
-			</Tabs.Control>
+			</Tabs.Trigger>
 		{/each}
-	{/snippet}
-	{#snippet content()}
+	</Tabs.List>
+	<Tabs.Content value={tab}>
 		{@render panels(items)}
-	{/snippet}
+	</Tabs.Content>
 </Tabs>

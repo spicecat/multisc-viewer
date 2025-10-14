@@ -1,6 +1,6 @@
 {
   "_id": "example-ds-2",
-  "$schema": "https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-daemon/openapi.json#/components/schemas/Dataset",
+  "$schema": "https://git.jasonxu.dev/JasonXu/plot-viewer/raw/branch/main/multisc-daemon/openapi.json#/components/schemas/Dataset",
   "author": [
     {
       "name": "Ip N N"

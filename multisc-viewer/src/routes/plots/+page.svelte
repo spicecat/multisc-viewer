@@ -2,7 +2,7 @@
 	import Publication from '$lib/components/Data/Publication.svelte';
 	import PlotsForm from '$lib/components/Plots/Form.svelte';
 	import { Camera } from '@lucide/svelte';
-	import { ProgressRing } from '@skeletonlabs/skeleton-svelte';
+	import { Progress } from '@skeletonlabs/skeleton-svelte';
 	import html2canvas from 'html2canvas-pro';
 	import { dndzone } from 'svelte-dnd-action';
 	import { SvelteMap } from 'svelte/reactivity';
@@ -68,7 +68,12 @@
 					{#if plotId}
 						<div class="flex aspect-video w-xs items-center justify-center p-2">
 							{#await plotsResults[plotId]}
-								<ProgressRing value={null} />
+								<Progress value={null}>
+									<Progress.Circle>
+										<Progress.CircleTrack />
+										<Progress.CircleRange />
+									</Progress.Circle>
+								</Progress>
 							{:then plotData}
 								<img
 									bind:this={() => plotsElements.get(plotId), (e) => plotsElements.set(plotId, e)}
