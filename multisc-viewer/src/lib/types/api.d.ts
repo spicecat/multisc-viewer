@@ -221,10 +221,12 @@ export interface components {
 			name?: string;
 			/** @example https://pubmed.ncbi.nlm.nih.gov/00000000/ */
 			url?: string;
-			/** @example [
+			/**
+			 * @example [
 			 *       "example-ds-1",
 			 *       "example-ds-2"
-			 *     ] */
+			 *     ]
+			 */
 			datasets: string[];
 		};
 		Gene: string[];

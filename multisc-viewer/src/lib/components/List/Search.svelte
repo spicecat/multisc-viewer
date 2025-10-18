@@ -1,5 +1,4 @@
 <script lang="ts" generics="T">
-	import { Search } from '@lucide/svelte';
 	import { TagsInput } from '@skeletonlabs/skeleton-svelte';
 	import Fuse, { type IFuseOptions } from 'fuse.js';
 
@@ -71,7 +70,7 @@
 				{/each}
 			{/snippet}
 		</TagsInput.Context>
-		<TagsInput.Input placeholder={`Add a tag...`} />
+		<TagsInput.Input placeholder="Add a tag..." />
 	</TagsInput.Control>
 	<TagsInput.ClearTrigger>Clear All</TagsInput.ClearTrigger>
 	<TagsInput.HiddenInput />

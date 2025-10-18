@@ -25,22 +25,30 @@ class Daemon {
 		const logger: Middleware = {
 			async onRequest({ request }) {
 				console.log(`Request ${request.method} ${request.url} ${request.body}`);
-				return request;
 			},
 			async onResponse({ response }) {
 				console.log(`Response ${response.status} ${response.url}`);
-				return response;
 			},
 			async onError({ request, error }) {
-				console.error(`Error ${baseUrl} ${request.url} - ${(<Error>error).message}`);
-				return;
+				console.error(`Error ${request.url} - ${(<Error>error).message}`);
 			}
 		};
-		this.client = createClient<paths>({
-			baseUrl,
-			headers: { 'Cache-Control': `max-age=${Math.floor(ttl / 1000)}` }
-		});
+
+		const requestCache: LRUCache<string, Response> = new LRUCache({ ttl, ttlAutopurge: true });
+		const cacheMiddleware: Middleware = {
+			async onRequest({ request, schemaPath }) {
+				if (request.method === 'GET' && schemaPath !== '/health' && requestCache.has(request.url))
+					return Response.json(requestCache.get(request.url));
+			},
+			async onResponse({ request, response, schemaPath }) {
+				if (request.method === 'GET' && schemaPath !== '/health')
+					requestCache.set(request.url, await response.clone().json());
+			}
+		};
+
+		this.client = createClient<paths>({ baseUrl });
 		this.client.use(logger);
+		this.client.use(cacheMiddleware);
 
 		this.cache = new LRUCache<string, string>({
 			maxSize,
@@ -65,8 +73,7 @@ class Daemon {
 	health = async () => {
 		try {
 			const { data, error } = await this.client.GET('/health', {
-				signal: AbortSignal.timeout(connectionTimeout),
-				cache: 'no-cache'
+				signal: AbortSignal.timeout(connectionTimeout)
 			});
 			if (error) throw error;
 			return data;
@@ -82,8 +89,7 @@ class Daemon {
 	loaded = async () => {
 		try {
 			const { data, error } = await this.client.GET('/loaded', {
-				signal: AbortSignal.timeout(timeout),
-				cache: 'no-cache'
+				signal: AbortSignal.timeout(timeout)
 			});
 			if (error) throw error;
 			const datasets = await this.datasets(data);
@@ -103,8 +109,7 @@ class Daemon {
 		try {
 			const { data, error } = await this.client.POST('/unload', {
 				body: { ds: [ds] },
-				signal: AbortSignal.timeout(timeout),
-				cache: 'no-cache'
+				signal: AbortSignal.timeout(timeout)
 			});
 			if (error) throw error;
 			this.cache.delete(ds);
@@ -123,8 +128,7 @@ class Daemon {
 		try {
 			const { data, error } = await this.client.POST('/load', {
 				body: { ds },
-				signal: AbortSignal.timeout(timeout),
-				cache: 'no-cache'
+				signal: AbortSignal.timeout(timeout)
 			});
 			if (error) throw error;
 			const datasets = await this.datasets(data);

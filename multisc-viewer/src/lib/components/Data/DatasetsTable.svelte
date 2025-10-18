@@ -82,7 +82,7 @@
 					<input type="checkbox" class="checkbox" name="ds" value={ds._id} bind:group={selected} />
 				</td>
 				<td>
-					<button class="btn preset-tonal-primary text-wrap">
+					<button type="button" class="btn preset-tonal-primary text-wrap">
 						<a href={resolve('/datasets/[dsId]', { dsId: ds._id })} title={`${name} dataset page`}>
 							<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 							{@html name}
@@ -120,7 +120,7 @@
 	{/snippet}
 </Tabs>
 
-<!-- Prevent resetting selected on page change -->
+<!-- Prevent forgetting selected on page change -->
 {#each selected as s, i (`ds-hidden-${i}`)}
 	<input type="checkbox" class="hidden" value={s} bind:group={selected} />
 {/each}

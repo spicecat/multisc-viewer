@@ -1,6 +1,7 @@
 <script lang="ts" generics="T">
 	import { Pagination } from '@skeletonlabs/skeleton-svelte';
 	import type { Snippet } from 'svelte';
+	import { ArrowLeftIcon, ArrowRightIcon } from '@lucide/svelte';
 
 	let {
 		data,
@@ -27,7 +28,7 @@
 	});
 </script>
 
-<div class="place-items-center">
+<div class="grid w-full place-items-center">
 	<table class="table caption-bottom">
 		<thead>
 			{@render children?.()}
@@ -42,5 +43,25 @@
 			{/each}
 		</tbody>
 	</table>
-	<Pagination count={data.length} {pageSize} {page} onPageChange={(e) => (page = e.page)} />
+	<Pagination count={data.length} {pageSize} {page} onPageChange={(e) => (page = e.page)}>
+		<Pagination.PrevTrigger>
+			<ArrowLeftIcon class="size-4" />
+		</Pagination.PrevTrigger>
+		<Pagination.Context>
+			{#snippet children(pagination)}
+				{#each pagination().pages as page, index (page)}
+					{#if page.type === 'page'}
+						<Pagination.Item {...page}>
+							{page.value}
+						</Pagination.Item>
+					{:else}
+						<Pagination.Ellipsis {index}>&#8230;</Pagination.Ellipsis>
+					{/if}
+				{/each}
+			{/snippet}
+		</Pagination.Context>
+		<Pagination.NextTrigger>
+			<ArrowRightIcon class="size-4" />
+		</Pagination.NextTrigger>
+	</Pagination>
 </div>

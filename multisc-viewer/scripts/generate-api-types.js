@@ -3,7 +3,7 @@ import path from 'node:path';
 import openapiTS, { astToString } from 'openapi-typescript';
 
 const cwd = process.cwd();
-const outSpec = path.resolve(cwd, 'static', 'openapi.json');
+const outSpec = path.resolve(cwd, 'static', 'api', 'openapi.json');
 const outTypes = path.resolve(cwd, 'src', 'lib', 'types', 'api.d.ts');
 
 const localSpec = path.resolve(cwd, '..', 'multisc-daemon', 'openapi.json');

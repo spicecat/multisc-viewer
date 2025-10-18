@@ -1,12 +1,15 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import SwaggerUI from 'swagger-ui';
-	import 'swagger-ui/dist/swagger-ui.css';
+	import { SwaggerUIBundle } from 'swagger-ui-dist';
+	import 'swagger-ui-dist/swagger-ui.css';
+
+	let domNode: HTMLElement;
 
 	onMount(async () => {
-		SwaggerUI({
-			spec: fetch('/openapi.json').then((res) => res.json()),
-			dom_id: '#swagger-ui-container'
+		SwaggerUIBundle({
+			spec: await (await fetch('/api/openapi.json')).json(),
+			deepLinking: true,
+			domNode
 		});
 	});
 </script>
@@ -15,4 +18,4 @@
 	<title>SwaggerUI</title>
 </svelte:head>
 
-<div id="swagger-ui-container"></div>
+<div bind:this={domNode}></div>

@@ -36,8 +36,7 @@
 
 <svelte:head>
 	<title
-		>Plots {publication &&
-			Object.values(datasets)
+		>Plots {Object.values(datasets)
 				.map((ds) => ds.displayName ?? ds.name ?? ds._id)
 				.join(' ')}
 	</title>
@@ -48,6 +47,7 @@
 	<hr class="hr" />
 {/if}
 
+<section class="space-y-2">
 <button type="button" class="btn preset-filled" onclick={downloadPlots}>
 	Download All Plots <Camera size={18} />
 </button>
@@ -66,20 +66,20 @@
 				{#each plotsParams.pt as p (`plots-pt-${d}-${g}-${p}`)}
 					{@const plotId = plotsIdMap[d]?.[g]?.[p]}
 					{#if plotId}
-						<div class="flex aspect-video w-xs items-center justify-center p-2">
+						<div class="w-xs p-2 flex flex-col items-center">
 							{#await plotsResults[plotId]}
-								<Progress value={null}>
-									<Progress.Circle>
-										<Progress.CircleTrack />
-										<Progress.CircleRange />
-									</Progress.Circle>
-								</Progress>
+							<Progress value={null} class="items-center">
+								<Progress.Circle>
+									<Progress.CircleTrack />
+									<Progress.CircleRange />
+								</Progress.Circle>
+							</Progress>
 							{:then plotData}
-								<img
-									bind:this={() => plotsElements.get(plotId), (e) => plotsElements.set(plotId, e)}
-									src={plotData}
-									alt={`Plot ${plotId}`}
-								/>
+							<img
+								bind:this={() => plotsElements.get(plotId), (e) => plotsElements.set(plotId, e)}
+								src={plotData}
+								alt={`Plot ${plotId}`}
+							/>
 							{:catch error}
 								<p>Error loading plot: {error.message}</p>
 							{/await}
@@ -89,6 +89,7 @@
 			{/each}
 		</div>
 	{/each}
+</section>
 </section>
 
 <hr class="hr" />
