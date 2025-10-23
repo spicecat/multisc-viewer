@@ -8,7 +8,8 @@
 </script>
 
 <svelte:head>
-	<title>{publication.name ?? publication._id}</title>
+	<title>{data.meta.title}</title>
+	<meta name="description" content={data.meta.description} />
 </svelte:head>
 
 <Publication {publication} />

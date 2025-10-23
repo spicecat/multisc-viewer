@@ -43,7 +43,7 @@
 			{/each}
 		</tbody>
 	</table>
-	<Pagination count={data.length} {pageSize} {page} onPageChange={(e) => (page = e.page)}>
+	<Pagination count={items.length} {pageSize} {page} onPageChange={(e) => (page = e.page)}>
 		<Pagination.PrevTrigger>
 			<ArrowLeftIcon class="size-4" />
 		</Pagination.PrevTrigger>

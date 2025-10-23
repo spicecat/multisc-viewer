@@ -7,6 +7,11 @@ export const load: PageServerLoad = async () => {
 	const datasets = await getDatasets(ds);
 	return {
 		datasets,
-		publications
+		publications,
+		meta: {
+			title: 'MultiSC-Viewer - Publications',
+			description:
+				'Explore publications with MultiSC-Viewer, a web application for visualizing and comparing gene expression across multiple datasets, brain regions, disease conditions, and species.'
+		}
 	};
 };

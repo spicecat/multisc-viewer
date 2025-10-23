@@ -13,6 +13,7 @@
 		}))
 	);
 	let items: typeof data = $state([]);
+	let tags: string[] = $state([]);
 
 	const searchOptions = {
 		keys: [
@@ -40,8 +41,6 @@
 			'datasets.tissue.name'
 		]
 	};
-
-	let tags: string[] = $state([]);
 </script>
 
 <Search name="Publications" {data} bind:items bind:tags {searchOptions} />
@@ -65,15 +64,17 @@
 				{pub.journalName}
 				{pub.date}
 				<!-- eslint-disable svelte/no-navigation-without-resolve -->
-				<a
-					href={pub.url}
-					class="anchor"
-					target="_blank"
-					title={`${name} publication source`}
-					rel="external noopener noreferrer"
-				>
-					{pub.identifier}
-				</a>
+				{#if pub.url}
+					<a
+						href={pub.url}
+						class="anchor"
+						target="_blank"
+						title={`${name} publication source`}
+						rel="external noopener noreferrer"
+					>
+						{pub.identifier ?? pub.url}
+					</a>
+				{/if}
 				<!-- eslint-enable svelte/no-navigation-without-resolve -->
 			</span>
 			<span class="block space-y-1 space-x-1">

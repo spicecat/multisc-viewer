@@ -7,7 +7,8 @@
 </script>
 
 <svelte:head>
-	<title>MultiSC-Viewer Datasets</title>
+	<title>{data.meta.title}</title>
+	<meta name="description" content={data.meta.description} />
 </svelte:head>
 
 <section class="mx-auto">

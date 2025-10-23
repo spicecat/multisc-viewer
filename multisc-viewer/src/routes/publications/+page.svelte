@@ -7,10 +7,11 @@
 </script>
 
 <svelte:head>
-	<title>MultiSC-Viewer Publications</title>
+	<title>{data.meta.title}</title>
+	<meta name="description" content={data.meta.description} />
 </svelte:head>
 
-<section class="mx-auto max-w-256">
+<section class="mx-auto max-w-5xl">
 	<h2 class="text-center h2">Publications</h2>
 	<PublicationsTable {datasets} {publications} />
 </section>

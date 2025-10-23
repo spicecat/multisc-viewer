@@ -362,13 +362,13 @@
         ],
         "responses": {
           "200": {
-            "description": "Dictionary mapping dataset id to differentially expressed genes",
+            "description": "Dictionary mapping dataset id to dictionary mapping DEG id to differentially expressed genes",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "additionalProperties": {
-                    "$ref": "#/components/schemas/Gene"
+                    "$ref": "#/components/schemas/DEGs"
                   }
                 }
               }
@@ -598,6 +598,26 @@
         "items": {
           "type": "string",
           "example": "APOE"
+        }
+      },
+      "DEGs": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "properties": {
+            "_id": {
+              "type": "string",
+              "example": "example-ds-deg"
+            },
+            "gene": {
+              "$ref": "#/components/schemas/Gene"
+            },
+            "name": {
+              "type": "string",
+              "example": "Dataset DEGs"
+            }
+          },
+          "required": ["_id", "gene"]
         }
       },
       "Author": {

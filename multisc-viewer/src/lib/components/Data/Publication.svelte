@@ -6,7 +6,7 @@
 	let name = $derived(publication.name ?? publication._id);
 </script>
 
-<section class="mx-auto max-w-256">
+<section class="mx-auto max-w-5xl">
 	<section>
 		<h1 class="h4">
 			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
@@ -19,15 +19,17 @@
 			{publication.journalName}
 			{publication.date}
 			<!-- eslint-disable svelte/no-navigation-without-resolve -->
-			<a
-				class="anchor"
-				href={publication.url}
-				target="_blank"
-				title={`${name} publication page`}
-				rel="external noopener noreferrer"
-			>
-				{publication.identifier}
-			</a>
+			{#if publication.url}
+				<a
+					href={publication.url}
+					class="anchor"
+					target="_blank"
+					title={`${name} publication source`}
+					rel="external noopener noreferrer"
+				>
+					{publication.identifier ?? publication.url}
+				</a>
+			{/if}
 			<!-- eslint-enable svelte/no-navigation-without-resolve -->
 		</span>
 	</section>

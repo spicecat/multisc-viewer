@@ -2,13 +2,13 @@
 	import { page } from '$app/state';
 	import type { PlotsParams } from '$lib/types/daemon';
 
+	let pt = $state(page.url.searchParams.getAll('pt'));
+
 	const ptOptions: Record<string, PlotsParams['pt'][number]> = {
 		UMAP: 'umap',
 		Violin: 'vln',
 		Feature: 'feat'
 	};
-
-	let pt = $state(page.url.searchParams.getAll('pt'));
 </script>
 
 <label class="label">

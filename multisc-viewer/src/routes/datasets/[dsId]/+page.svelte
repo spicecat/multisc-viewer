@@ -4,15 +4,14 @@
 
 	let { data }: PageProps = $props();
 	let { dataset } = $derived(data);
-
-	let name = $derived(dataset.displayName ?? dataset.name ?? dataset._id);
 </script>
 
 <svelte:head>
-	<title>{name}</title>
+	<title>{data.meta.title}</title>
+	<meta name="description" content={data.meta.description} />
 </svelte:head>
 
-<section class="mx-auto max-w-256">
+<section class="mx-auto max-w-5xl">
 	<section>
 		<h1 class="h4">
 			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
@@ -24,15 +23,17 @@
 		<span class="inline-block">
 			{dataset.date}
 			<!-- eslint-disable svelte/no-navigation-without-resolve -->
-			<a
-				class="anchor"
-				href={dataset.url}
-				target="_blank"
-				title={`${name} dataset source`}
-				rel="external noopener noreferrer"
-			>
-				{dataset.identifier}
-			</a>
+			{#if dataset.url}
+				<a
+					class="anchor"
+					href={dataset.url}
+					target="_blank"
+					title={`${dataset.displayName ?? dataset.name ?? dataset._id} dataset source`}
+					rel="external noopener noreferrer"
+				>
+					{dataset.identifier ?? dataset.url}
+				</a>
+			{/if}
 			<!-- eslint-enable svelte/no-navigation-without-resolve -->
 		</span>
 	</section>
@@ -72,7 +73,7 @@
 							href={cit.url}
 							target="_blank"
 							title={`${citName} citation source`}
-							rel="noopener noreferrer"
+							rel="external noopener noreferrer"
 						>
 							{cit.identifier}
 						</a>

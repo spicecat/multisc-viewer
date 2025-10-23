@@ -13,8 +13,11 @@
 
 	let { datasets, children }: { datasets: Datasets; children?: Snippet } = $props();
 
+	let selected = $state(page.url.searchParams.getAll('ds'));
+
 	let data = $derived(Object.values(datasets));
 	let items: typeof data = $state([]);
+	let tags: string[] = $state([]);
 
 	const searchOptions = {
 		keys: [
@@ -39,9 +42,6 @@
 			'url'
 		]
 	};
-
-	let tags: string[] = $state([]);
-	let selected = $state(page.url.searchParams.getAll('ds'));
 </script>
 
 <div class="flex gap-4">
@@ -57,16 +57,15 @@
 		<DataTable data={cellItems} selected={selected.map((s) => datasets[s])}>
 			<tr>
 				<th>
-					<label class="flex items-center space-x-2">
-						<input
-							type="checkbox"
-							class="checkbox"
-							checked={cellItems.every((ds) => selected.includes(ds._id))}
-							onchange={(e) =>
-								(selected = e.currentTarget.checked ? cellItems.map((ds) => ds._id) : [])}
-						/>
-						<span class="font-bold">{selected.length}</span>
-					</label>
+					<input
+						type="checkbox"
+						class="checkbox"
+						aria-label="Select all datasets"
+						checked={cellItems.every((ds) => selected.includes(ds._id))}
+						onchange={(e) =>
+							(selected = e.currentTarget.checked ? cellItems.map((ds) => ds._id) : [])}
+					/>
+					<span class="font-bold">{selected.length}</span>
 				</th>
 				<th>Dataset</th>
 				<th>Cell Type</th>
@@ -79,7 +78,14 @@
 			{#snippet row(ds)}
 				{@const name = ds.displayName ?? ds.name ?? ds._id}
 				<td>
-					<input type="checkbox" class="checkbox" name="ds" value={ds._id} bind:group={selected} />
+					<input
+						type="checkbox"
+						class="checkbox"
+						aria-label="Select dataset {name}"
+						name="ds"
+						value={ds._id}
+						bind:group={selected}
+					/>
 				</td>
 				<td>
 					<button type="button" class="btn preset-tonal-primary text-wrap">

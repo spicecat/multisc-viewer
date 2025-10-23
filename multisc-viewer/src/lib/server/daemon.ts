@@ -24,7 +24,7 @@ class Daemon {
 	constructor(baseUrl: string) {
 		const logger: Middleware = {
 			async onRequest({ request }) {
-				console.log(`Request ${request.method} ${request.url} ${request.body}`);
+				console.log(`Request ${request.method} ${request.url}`);
 			},
 			async onResponse({ response }) {
 				console.log(`Response ${response.status} ${response.url}`);
@@ -37,8 +37,10 @@ class Daemon {
 		const requestCache: LRUCache<string, Response> = new LRUCache({ ttl, ttlAutopurge: true });
 		const cacheMiddleware: Middleware = {
 			async onRequest({ request, schemaPath }) {
-				if (request.method === 'GET' && schemaPath !== '/health' && requestCache.has(request.url))
+				if (request.method === 'GET' && schemaPath !== '/health' && requestCache.has(request.url)) {
+					console.log(`Cache hit for ${request.url}`);
 					return Response.json(requestCache.get(request.url));
+				}
 			},
 			async onResponse({ request, response, schemaPath }) {
 				if (request.method === 'GET' && schemaPath !== '/health')
@@ -196,7 +198,7 @@ class Daemon {
 	/**
 	 * Fetch differentially expressed genes for datasets.
 	 * @param ds - list of dataset ids to fetch
-	 * @returns Dictionary mapping dataset ids to differentially expressed genes
+	 * @returns Dictionary mapping dataset ids to dictionary mapping deg id to differentially expressed genes
 	 */
 	degs = async (ds: string[]): Promise<DEGs> => {
 		try {

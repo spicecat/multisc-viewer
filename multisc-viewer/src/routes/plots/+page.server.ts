@@ -20,9 +20,12 @@ export const load: PageServerLoad = async ({ url }) => {
 		if (pub && !publication) error(404, `Publication ${pub} not found`);
 		datasets = await getDatasets(publication ? publication.datasets : undefined);
 
-		const genes = new Set<string>();
-		for (const d of ds) if (datasets[d].defaultGene) genes.add(datasets[d].defaultGene);
-		gene.push(...genes);
+		const genesSet = new Set<string>();
+		for (const d of ds) {
+			const defaultGene = datasets[d]?.defaultGene;
+			if (defaultGene) genesSet.add(defaultGene);
+		}
+		gene.push(...genesSet);
 	}
 	if (pt.length === 0) pt.push(...(<PlotsParams['pt']>['umap', 'vln', 'feat']));
 
@@ -61,6 +64,11 @@ export const load: PageServerLoad = async ({ url }) => {
 	const plotsParams: PlotsParams = { ds, gene, pt, groupBy, splitBy };
 	const plotsResults = plots(plotsParams);
 
+	const name = publication
+		? (publication.name ?? publication._id)
+		: `datasets ${Object.values(datasets)
+				.map((d) => d.name ?? d._id)
+				.join(', ')}`;
 	return {
 		datasets,
 		publication,
@@ -68,6 +76,10 @@ export const load: PageServerLoad = async ({ url }) => {
 		degs,
 		plotsIdMap,
 		plotsParams,
-		plotsResults
+		plotsResults,
+		meta: {
+			title: `MultiSC-Viewer - Plots for ${name}`,
+			description: `Explore visualizations for ${name} with MultiSC-Viewer, a web application for visualizing and comparing gene expression across multiple datasets, brain regions, disease conditions, and species.`
+		}
 	};
 };

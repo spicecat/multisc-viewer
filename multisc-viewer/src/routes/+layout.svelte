@@ -10,7 +10,7 @@
 <AppBar>
 	<AppBar.Toolbar class="grid-cols-[auto_1fr_auto]">
 		<AppBar.Lead>
-			<a class="btn preset-tonal" href={resolve('/')}>
+			<a class="btn preset-tonal" title="Home" href={resolve('/')}>
 				<House size={16} />
 			</a>
 		</AppBar.Lead>
@@ -20,9 +20,10 @@
 		<AppBar.Trail>
 			<a
 				class="btn preset-tonal"
+				title="Source Code"
 				href="https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/"
 				target="_blank"
-				rel="noreferrer"
+				rel="external noopener noreferrer"
 			>
 				<Code size={16} />
 			</a>

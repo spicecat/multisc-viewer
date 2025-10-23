@@ -30,7 +30,7 @@ const plotsCache = new LRUCache<string, string>({
 	maxSize,
 	sizeCalculation: (path) => {
 		try {
-			return statSync(path).size;
+			return Math.max(statSync(path).size, 1);
 		} catch {
 			return 1;
 		}

@@ -230,6 +230,15 @@ export interface components {
 			datasets: string[];
 		};
 		Gene: string[];
+		DEGs: {
+			[key: string]: {
+				/** @example example-ds-deg */
+				_id: string;
+				gene: components['schemas']['Gene'];
+				/** @example Dataset DEGs */
+				name?: string;
+			};
+		};
 		Author: {
 			/**
 			 * @description Surname Initial
@@ -524,14 +533,14 @@ export interface operations {
 		};
 		requestBody?: never;
 		responses: {
-			/** @description Dictionary mapping dataset id to differentially expressed genes */
+			/** @description Dictionary mapping dataset id to dictionary mapping DEG id to differentially expressed genes */
 			200: {
 				headers: {
 					[name: string]: unknown;
 				};
 				content: {
 					'application/json': {
-						[key: string]: components['schemas']['Gene'];
+						[key: string]: components['schemas']['DEGs'];
 					};
 				};
 			};
