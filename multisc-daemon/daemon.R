@@ -194,6 +194,7 @@ function(pub) {
 }
 
 #* Get genes for datasets.
+#* @serializer unboxedJSON
 #* @get /genes
 #* @param ds:[str]* Dataset ids
 function(ds) {
@@ -204,9 +205,7 @@ function(ds) {
       error = function(e) {
         tryCatch(
           write_genes(read_ds_data(ds_path[[d]])),
-          error = function(e) {
-            list()
-          }
+          error = function(e) list()
         )
       }
     )
@@ -214,18 +213,18 @@ function(ds) {
 }
 
 #* Get differentially expressed genes for datasets.
+#* @serializer unboxedJSON
 #* @get /degs
 #* @param ds:[str]* Dataset ids
 function(ds) {
   ds_path <- get_ds_path()
-  setNames(lapply(ds, function(d) {
+  degs <- setNames(lapply(ds, function(d) {
     tryCatch(
-      unique(jsonlite::fromJSON(file.path(ds_dir, ds_path[[d]], ds_degs_file))),
-      error = function(e) {
-        list()
-      }
+      jsonlite::fromJSON(file.path(ds_dir, ds_path[[d]], ds_degs_file)),
+      error = function(e) NULL
     )
   }), ds)
+  degs[!vapply(degs, is.null, logical(1))]
 }
 
 #* Generate plots for datasets.
@@ -237,8 +236,9 @@ function(ds) {
 #* @param groupBy:str Grouping variable
 #* @param splitBy:str Splitting variable
 function(
-    ds, gene, pt = list("umap", "vln", "feat"),
-    groupBy = "CellType", splitBy = "Genotype") {
+  ds, gene, pt = list("umap", "vln", "feat"),
+  groupBy = "CellType", splitBy = "Genotype"
+) {
   ds_path <- get_ds_path()
   unlist(lapply(ds, function(d) {
     try({
