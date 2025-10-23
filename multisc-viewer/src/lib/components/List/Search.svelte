@@ -33,7 +33,7 @@
 		items = tags.length
 			? fuse
 					.search({
-						$and: tags.map((tag) => {
+						$or: tags.map((tag) => {
 							const [val, path] = tag.toLowerCase().split('=', 2).toReversed();
 							return {
 								$or:
@@ -54,7 +54,7 @@
 	});
 </script>
 
-<TagsInput name="tags" value={tags} onValueChange={(e) => (tags = e.value)}>
+<TagsInput value={tags} addOnPaste name="tags" onValueChange={(e) => (tags = e.value)}>
 	<TagsInput.Label>Search {name}</TagsInput.Label>
 	<TagsInput.Control>
 		<TagsInput.Context>
