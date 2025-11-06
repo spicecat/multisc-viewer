@@ -3,8 +3,11 @@ import type { components, paths } from './api';
 export type Datasets = paths['/datasets']['get']['responses']['200']['content']['application/json'];
 export type Publications =
 	paths['/publications']['get']['responses']['200']['content']['application/json'];
+
 export type Genes = paths['/genes']['get']['responses']['200']['content']['application/json'];
 export type DEGs = paths['/degs']['get']['responses']['200']['content']['application/json'];
+export type GenesRows =
+	paths['/genes-rows']['get']['responses']['200']['content']['application/json'];
 
 export type PlotsParams = paths['/plots']['post']['requestBody']['content']['application/json'];
 export type Plots = paths['/plots']['post']['responses']['200']['content']['application/json'];

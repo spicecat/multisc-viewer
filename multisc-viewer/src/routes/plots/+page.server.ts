@@ -1,4 +1,4 @@
-import { getDatasets, getDEGs, getGenes, getPublications } from '$lib/server/data';
+import { getDatasets, getPublications, getGenesRows } from '$lib/server/data';
 import { getPlotId, plots } from '$lib/server/plots';
 import type { Datasets, PlotsParams, Publication } from '$lib/types/daemon';
 import { error, redirect } from '@sveltejs/kit';
@@ -46,8 +46,6 @@ export const load: PageServerLoad = async ({ url }) => {
 	if (pub && !publication) publication = (await getPublications([pub]))[pub];
 	if (pub && !publication) error(404, `Publication ${pub} not found`);
 	if (!datasets) datasets = await getDatasets(publication ? publication.datasets : undefined);
-	const genes = await getGenes(ds);
-	const degs = await getDEGs(ds);
 
 	const plotsIdMap = Object.fromEntries(
 		ds.map((d) => [
@@ -60,9 +58,11 @@ export const load: PageServerLoad = async ({ url }) => {
 			)
 		])
 	);
-
+	
 	const plotsParams: PlotsParams = { ds, gene, pt, groupBy, splitBy };
 	const plotsResults = plots(plotsParams);
+	
+	const genesRows = await getGenesRows(ds);
 
 	const name = publication
 		? (publication.name ?? publication._id)
@@ -72,8 +72,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	return {
 		datasets,
 		publication,
-		genes,
-		degs,
+		genesRows,
 		plotsIdMap,
 		plotsParams,
 		plotsResults,

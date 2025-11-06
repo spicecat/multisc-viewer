@@ -3,10 +3,10 @@ import path from 'node:path';
 import openapiTS, { astToString } from 'openapi-typescript';
 
 const cwd = process.cwd();
-const outSpec = path.resolve(cwd, 'static', 'api', 'openapi.json');
-const outTypes = path.resolve(cwd, 'src', 'lib', 'types', 'api.d.ts');
+const outSpec = path.resolve(cwd, 'static/api/openapi.json');
+const outTypes = path.resolve(cwd, 'src/lib/types/api.d.ts');
 
-const localSpec = path.resolve(cwd, '..', 'multisc-daemon', 'openapi.json');
+const localSpec = path.resolve(cwd, '../MultiSCDaemon/inst/plumber/daemon/openapi.json');
 const remoteSpec =
 	'https://git.jasonxu.dev/JasonXu/plot-viewer/raw/branch/main/multisc-daemon/openapi.json';
 

@@ -25,11 +25,11 @@ dir.create(plots_dir, FALSE, TRUE)
 ds_data <- list()
 
 # --- Helpers ---
-get_ds_path <- function() {
+get_ds_index <- function() {
   jsonlite::fromJSON(file.path(ds_dir, ds_index_file))
 }
 
-get_loaded <- function() {
+ds_loaded <- function() {
   n <- names(ds_data)
   if (is.null(n)) {
     list(datasets = list())
@@ -38,7 +38,7 @@ get_loaded <- function() {
   }
 }
 
-read_ds_data <- function(ds_path) {
+get_ds_data <- function(ds_path) {
   readRDS(file.path(ds_dir, ds_path, ds_data_file))
 }
 
@@ -52,11 +52,11 @@ get_colors <- function(ds_path, group_by) {
 }
 
 save_plot <- function(plot_object, path, ...) {
-  temp_path <- tempfile(tmpdir = dirname(path))
-  png(temp_path, ...)
+  temp_index <- tempfile(tmpdir = dirname(path))
+  png(temp_index, ...)
   print(plot_object)
   dev.off()
-  file.rename(temp_path, path)
+  file.rename(temp_index, path)
 }
 
 render_plot <- function(ds_path, ds, gene, pt, group_by, split_by) {
@@ -74,14 +74,14 @@ render_plot <- function(ds_path, ds, gene, pt, group_by, split_by) {
   dir.create(dirname(plot_path), recursive = TRUE, showWarnings = FALSE)
   print(paste("Rendering plot:", plot_id))
   if (pt == "umap") {
-    umap_plot <- Seurat::DimPlot(
+    p <- Seurat::DimPlot(
       data,
       reduction = "umap",
       label = FALSE,
       group.by = group_by,
       cols = colors
     )
-    save_plot(umap_plot, plot_path,
+    save_plot(p, plot_path,
       width = 5 * 300, height = 4 * 300, res = 300, pointsize = 12
     )
   } else if (pt == "vln") {
@@ -127,7 +127,7 @@ function() {
 #* Get loaded datasets on daemon.
 #* @get /loaded
 function() {
-  get_loaded()
+  ds_loaded()
 }
 
 #* Unload datasets on daemon.
@@ -136,21 +136,21 @@ function() {
 function(ds) {
   if (missing(ds)) ds <- names(ds_data)
   ds_data <<- ds_data[!names(ds_data) %in% ds]
-  get_loaded()
+  ds_loaded()
 }
 
 #* Load datasets on daemon.
 #* @serializer unboxedJSON
 #* @post /load
 #* @param ds:[str]* Dataset ids
-load_ds <- function(ds) {
-  ds_path <- get_ds_path()
+function(ds) {
+  ds_index <- get_ds_index()
   lapply(ds, function(d) {
     try({
-      if (!d %in% names(ds_data)) ds_data[[d]] <<- read_ds_data(ds_path[[d]])
+      if (!d %in% names(ds_data)) ds_data[[d]] <<- get_ds_data(ds_index[[d]])
     })
   })
-  get_loaded()
+  ds_loaded()
 }
 
 #* Get datasets metadata.
@@ -158,16 +158,16 @@ load_ds <- function(ds) {
 #* @get /datasets
 #* @param ds:[str] Dataset ids. Unset to get all datasets.
 function(ds) {
-  ds_path <- get_ds_path()
-  if (missing(ds)) ds <- names(ds_path)
+  ds_index <- get_ds_index()
+  if (missing(ds)) ds <- names(ds_index)
   metadata <- setNames(lapply(ds, function(d) {
     tryCatch(
       {
         meta <- jsonlite::fromJSON(file.path(
-          ds_dir, ds_path[[d]], ds_meta_file
+          ds_dir, ds_index[[d]], ds_meta_file
         ))
         meta$size <- file.info(file.path(
-          ds_dir, ds_path[[d]], ds_data_file
+          ds_dir, ds_index[[d]], ds_data_file
         ))$size
         meta
       },
@@ -182,11 +182,11 @@ function(ds) {
 #* @get /publications
 #* @param pub:[str] Publication ids. Unset to get all publications.
 function(pub) {
-  pub_path <- jsonlite::fromJSON(file.path(pub_dir, pub_index_file))
-  if (missing(pub)) pub <- names(pub_path)
+  pub_index <- jsonlite::fromJSON(file.path(pub_dir, pub_index_file))
+  if (missing(pub)) pub <- names(pub_index)
   metadata <- setNames(lapply(pub, function(p) {
     tryCatch(
-      jsonlite::fromJSON(file.path(pub_dir, pub_path[[p]], pub_meta_file)),
+      jsonlite::fromJSON(file.path(pub_dir, pub_index[[p]], pub_meta_file)),
       error = function(e) NULL
     )
   }), pub)
@@ -198,13 +198,13 @@ function(pub) {
 #* @get /genes
 #* @param ds:[str]* Dataset ids
 function(ds) {
-  ds_path <- get_ds_path()
+  ds_index <- get_ds_index()
   setNames(lapply(ds, function(d) {
     tryCatch(
-      jsonlite::fromJSON(file.path(ds_dir, ds_path[[d]], ds_genes_file)),
+      jsonlite::fromJSON(file.path(ds_dir, ds_index[[d]], ds_genes_file)),
       error = function(e) {
         tryCatch(
-          write_genes(read_ds_data(ds_path[[d]])),
+          write_genes(get_ds_data(ds_index[[d]])),
           error = function(e) list()
         )
       }
@@ -217,14 +217,103 @@ function(ds) {
 #* @get /degs
 #* @param ds:[str]* Dataset ids
 function(ds) {
-  ds_path <- get_ds_path()
+  ds_index <- get_ds_index()
   degs <- setNames(lapply(ds, function(d) {
     tryCatch(
-      jsonlite::fromJSON(file.path(ds_dir, ds_path[[d]], ds_degs_file)),
+      jsonlite::fromJSON(file.path(ds_dir, ds_index[[d]], ds_degs_file)),
       error = function(e) NULL
     )
   }), ds)
   degs[!vapply(degs, is.null, logical(1))]
+}
+
+#* Get aggregated gene rows and summary metadata for datasets.
+#* Computes gene rows from DEGs and returns lightweight metadata to avoid transferring large arrays.
+#* @serializer unboxedJSON
+#* @get /gene_rows
+#* @param ds:[str]* Dataset ids
+function(ds) {
+  ds_index <- get_ds_index()
+
+  # Aggregation maps
+  rows_map <- new.env(parent = emptyenv())
+  degs_meta <- list()
+  genes_count <- list()
+
+  lapply(ds, function(d) {
+    # Read DEGs for dataset and build meta and rows
+    degs <- tryCatch(
+      jsonlite::fromJSON(file.path(ds_dir, ds_index[[d]], ds_degs_file)),
+      error = function(e) NULL
+    )
+    if (!is.null(degs)) {
+      # per-dataset meta container
+      degs_meta[[d]] <<- list()
+      # iterate each DEG group
+      lapply(names(degs), function(deg_id) {
+        ds_deg <- degs[[deg_id]]
+        # record deg meta: name and gene count (without returning full list)
+        degs_meta[[d]][[deg_id]] <<- list(
+          `_id` = deg_id,
+          name = if (!is.null(ds_deg$name)) ds_deg$name else NULL,
+          geneCount = length(ds_deg$gene)
+        )
+        # aggregate rows by gene id
+        lapply(ds_deg$gene, function(g) {
+          if (!exists(g, envir = rows_map, inherits = FALSE)) {
+            assign(g, list(
+              `_id` = g,
+              datasets = as.list(character()),
+              degs = as.list(character())
+            ), envir = rows_map)
+          }
+          row <- get(g, envir = rows_map, inherits = FALSE)
+          # append dataset id if not present
+          if (!(d %in% row$datasets)) row$datasets <- append(row$datasets, d)
+          # append deg id if not present
+          if (!(deg_id %in% row$degs)) row$degs <- append(row$degs, deg_id)
+          assign(g, row, envir = rows_map)
+          NULL
+        })
+        NULL
+      })
+    }
+
+    # Read genes to return only counts
+    genes <- tryCatch(
+      jsonlite::fromJSON(file.path(ds_dir, ds_index[[d]], ds_genes_file)),
+      error = function(e) {
+        # fallback to computing when genes.json missing
+        tryCatch(
+          write_genes(get_ds_data(ds_index[[d]])),
+          error = function(e) list()
+        )
+      }
+    )
+    genes_count[[d]] <<- length(genes)
+    NULL
+  })
+
+  # Convert rows map to list and sort by degs count desc then id
+  rows <- as.list(mget(ls(envir = rows_map), envir = rows_map))
+  rows <- rows[order(sapply(rows, function(x) length(x$degs)), decreasing = TRUE)]
+  # tie-breaker: _id ascending
+  if (length(rows) > 1) {
+    # stable sort by name where degs count equal
+    deg_counts <- sapply(rows, function(x) length(x$degs))
+    same <- duplicated(deg_counts) | duplicated(deg_counts, fromLast = TRUE)
+    if (any(same)) {
+      rows_same <- rows[same]
+      order_same <- order(vapply(rows_same, function(x) x$`_id`, character(1)))
+      rows[same] <- rows_same[order_same]
+    }
+  }
+
+  list(
+    rows = rows,
+    degsMeta = degs_meta,
+    genesCount = genes_count
+  )
 }
 
 #* Generate plots for datasets.
@@ -239,14 +328,14 @@ function(
   ds, gene, pt = list("umap", "vln", "feat"),
   groupBy = "CellType", splitBy = "Genotype"
 ) {
-  ds_path <- get_ds_path()
+  ds_index <- get_ds_index()
   unlist(lapply(ds, function(d) {
     try({
-      if (!d %in% names(ds_data)) ds_data[[d]] <<- read_ds_data(ds_path[[d]])
+      if (!d %in% names(ds_data)) ds_data[[d]] <<- get_ds_data(ds_index[[d]])
     })
     unlist(lapply(gene, function(g) {
       lapply(pt, function(p) {
-        render_plot(ds_path[[d]], d, g, p, groupBy, splitBy)
+        render_plot(ds_index[[d]], d, g, p, groupBy, splitBy)
       })
     }))
   }))

@@ -1,4 +1,4 @@
-import type { Datasets, DEGs, Genes, Publications } from '$lib/types/daemon';
+import type { Datasets, DEGs, Genes, GenesRows, Publications } from '$lib/types/daemon';
 import { merge } from 'lodash-es';
 import { getDaemonTargets } from './daemon';
 
@@ -52,4 +52,17 @@ export const getDEGs = async (ds: string[]) => {
 		daemonTargets.entries().map(async ([daemon, dds]) => daemon.degs(dds))
 	);
 	return degs.reduce(merge<DEGs, DEGs>, {});
+};
+
+/**
+ * Fetch rows for gene datasets and differentially expressed genes.
+ * @param ds - list of dataset ids to fetch
+ * @returns List of gene rows
+ * */
+export const getGenesRows = async (ds: string[]) => {
+	const daemonTargets = await getDaemonTargets(ds);
+	const genesRows = await Promise.all(
+		daemonTargets.entries().map(async ([daemon, dds]) => daemon.genesRows(dds))
+	);
+	return genesRows.reduce(merge<GenesRows, GenesRows>, []);
 };

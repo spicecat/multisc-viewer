@@ -94,16 +94,17 @@ const queryPlots = (plotIds: Set<string>): PlotRequests => {
 	const queryPlot = async (plotId: string): Promise<string> => {
 		const plotPath =
 			plotsCache.get(plotId) ??
-			(await new Promise<string>((resolve, reject) => {
+			(await new Promise<string>((resolve) => {
 				requestCache.set(plotId, {
 					resolve,
 					reject: (reason: string) => {
 						console.warn(reason);
-						reject(reason);
+						resolve('');
 					}
 				});
 			}));
 		plotIds.delete(plotId);
+		if (!plotPath) return '';
 		const plotData = await readFile(plotPath, 'base64');
 		return 'data:image/png;base64,' + plotData;
 	};

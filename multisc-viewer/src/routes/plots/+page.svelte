@@ -9,8 +9,7 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
-	let { datasets, publication, genes, degs, plotsIdMap, plotsParams, plotsResults } =
-		$derived(data);
+	let { datasets, publication, genesRows, plotsIdMap, plotsParams, plotsResults } = $derived(data);
 
 	let plotsElements = new SvelteMap<string, HTMLImageElement>();
 	async function downloadPlots() {
@@ -92,5 +91,5 @@
 <hr class="hr" />
 
 <section class="mx-auto">
-	<PlotsForm {datasets} {genes} {degs} />
+	<PlotsForm {datasets} {genesRows} />
 </section>

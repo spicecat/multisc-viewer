@@ -14,6 +14,7 @@ export const daemons: Daemon[] = [];
  */
 class Daemon {
 	private client: Client<paths>;
+	private baseUrl: string;
 	private cache: LRUCache<string, string>;
 	requestLoad = 0;
 
@@ -22,6 +23,7 @@ class Daemon {
 	 * @param baseUrl - URL of the daemon server
 	 */
 	constructor(baseUrl: string) {
+		this.baseUrl = baseUrl;
 		const logger: Middleware = {
 			async onRequest({ request }) {
 				console.log(`Request ${request.method} ${request.url}`);
@@ -213,6 +215,24 @@ class Daemon {
 		}
 	};
 
+	/**
+	 * Fetch rows for gene datasets and differentially expressed genes.
+	 * @param ds - list of dataset ids to fetch
+	 * @returns List of gene rows
+	 * */
+	genesRows = async (ds: string[]) => {
+		try {
+			const { data, error } = await this.client.GET('/genes-rows', {
+				params: { query: { ds } },
+				signal: AbortSignal.timeout(timeout)
+			});
+			if (error) throw error;
+			return data;
+		} catch {
+			return [];
+		}
+	};
+
 	/** Render plots.
 	 * @param plotsParams - parameters for plot rendering
 	 * @returns List of rendered plots paths
@@ -220,8 +240,14 @@ class Daemon {
 	plots = async (plotsParams: PlotsParams) => {
 		try {
 			this.requestLoad += maxSize;
+			const datasets = await this.datasets(plotsParams.ds);
 			const { data, error } = await this.client.POST('/plots', {
-				body: plotsParams,
+				body: {
+					...plotsParams,
+					ds: plotsParams.ds.sort(
+						(a, b) => (datasets[a].size ?? defaultSize) - (datasets[b].size ?? defaultSize)
+					)
+				},
 				signal: AbortSignal.timeout(timeout)
 			});
 			if (error) throw error;
