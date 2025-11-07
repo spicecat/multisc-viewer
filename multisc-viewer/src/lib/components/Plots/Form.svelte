@@ -15,15 +15,15 @@
 <form action="/plots" class="space-y-4">
 	<input type="hidden" name="pub" value={page.params.pubId} />
 	{#if genesRows}
-	<div class="mx-auto flex gap-4">
-		<div>
-			<GenesTable {datasets} {genesRows} />
+		<div class="mx-auto flex gap-4">
+			<div>
+				<GenesTable {datasets} {genesRows} />
+			</div>
+			<div class="space-y-4">
+				<Groupings />
+				<PlotTypes />
+			</div>
 		</div>
-		<div class="space-y-4">
-			<Groupings />
-			<PlotTypes />
-		</div>
-	</div>
 	{/if}
 	<DatasetsTable {datasets}>
 		<button type="submit" class="my-auto btn flex items-center preset-filled-primary-500">

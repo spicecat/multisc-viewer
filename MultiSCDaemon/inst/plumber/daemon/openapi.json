@@ -616,6 +616,31 @@
             "format": "uri",
             "example": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE000000"
           },
+          "gene": {
+            "type": "integer",
+            "description": "Number of genes"
+          },
+          "deg": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "example": "example-ds-deg"
+                },
+                "gene": {
+                  "type": "integer",
+                  "description": "Number of differentially expressed genes"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "Dataset DEGs"
+                }
+              },
+              "required": ["_id", "gene"]
+            }
+          },
           "size": {
             "type": "integer",
             "description": "Size of dataset in bytes"

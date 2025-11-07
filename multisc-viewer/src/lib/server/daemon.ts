@@ -222,6 +222,7 @@ class Daemon {
 	 * */
 	genesRows = async (ds: string[]) => {
 		try {
+			this.requestLoad += maxSize;
 			const { data, error } = await this.client.GET('/genes-rows', {
 				params: { query: { ds } },
 				signal: AbortSignal.timeout(timeout)
@@ -230,6 +231,8 @@ class Daemon {
 			return data;
 		} catch {
 			return [];
+		} finally {
+			this.requestLoad -= maxSize;
 		}
 	};
 

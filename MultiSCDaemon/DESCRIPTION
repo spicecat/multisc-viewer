@@ -13,4 +13,6 @@ Imports:
     data.table,
     jsonlite,
     plumber,
+    R.utils,
+    Seurat,
     SeuratObject

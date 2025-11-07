@@ -1,4 +1,5 @@
 #' @import data.table
+#' @importFrom utils stack
 
 ds_genes_file <- "genes.json"
 ds_degs_file <- "degs.json"
@@ -77,7 +78,7 @@ genes_rows <- function(ds) {
     list(
       `_id` = jsonlite::unbox(row$gene),
       datasets = row$datasets,
-      degs = row$degs
+      degs = ifelse(row$degs == "", list(), row$degs)
     )
   })
 

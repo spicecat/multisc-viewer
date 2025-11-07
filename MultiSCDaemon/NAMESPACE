@@ -2,4 +2,9 @@
 
 export(msc_plumb)
 export(write_genes)
+import(SeuratObject)
 import(data.table)
+importFrom(grDevices,dev.off)
+importFrom(grDevices,png)
+importFrom(stats,setNames)
+importFrom(utils,stack)

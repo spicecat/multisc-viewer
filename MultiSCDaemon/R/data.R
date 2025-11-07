@@ -1,3 +1,5 @@
+#' @importFrom stats setNames
+
 ds_index_file <- "index.json"
 ds_meta_file <- "metadata.json"
 ds_data_file <- "data.rds"
@@ -45,11 +47,19 @@ get_pub_index <- function() {
 datasets <- function(ds) {
   ds_index <- get_ds_index()
   if (missing(ds)) ds <- names(ds_index)
+  ds_genes <- genes(ds)
+  ds_degs <- degs(ds)
   metadata <- setNames(lapply(ds, function(d) {
+    ds_deg <- ds_degs[[d]]
+    lapply(names(ds_deg), function(deg) {
+      ds_deg[[deg]]$gene <<- length(ds_deg[[deg]]$gene)
+    })
     tryCatch(
       {
         path <- file.path(ds_index[[d]], ds_meta_file)
         meta <- jsonlite::fromJSON(path)
+        meta$gene <- length(ds_genes[[d]])
+        meta$deg <- ds_deg
         meta$size <- file.info(path)$size
         meta
       },

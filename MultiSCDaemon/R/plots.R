@@ -1,3 +1,6 @@
+#' @importFrom grDevices png dev.off
+#' @import SeuratObject
+
 genotype_color_file <- "genotype.colors.rds"
 cluster_color_file <- "cluster.colors.rds"
 plot_file <- "plot.png"

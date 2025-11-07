@@ -45,7 +45,7 @@ export const load: PageServerLoad = async ({ url }) => {
 
 	if (pub && !publication) publication = (await getPublications([pub]))[pub];
 	if (pub && !publication) error(404, `Publication ${pub} not found`);
-	if (!datasets) datasets = await getDatasets(publication ? publication.datasets : undefined);
+	if (!datasets) datasets = await getDatasets(publication ? publication.datasets : ds);
 
 	const plotsIdMap = Object.fromEntries(
 		ds.map((d) => [
@@ -58,11 +58,11 @@ export const load: PageServerLoad = async ({ url }) => {
 			)
 		])
 	);
-	
+
 	const plotsParams: PlotsParams = { ds, gene, pt, groupBy, splitBy };
 	const plotsResults = plots(plotsParams);
-	
-	const genesRows = await getGenesRows(ds);
+
+	const genesRows = await getGenesRows(Object.keys(datasets));
 
 	const name = publication
 		? (publication.name ?? publication._id)

@@ -5,6 +5,12 @@
     "description": "Backend service for [MultiSC-Viewer](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main) to serve data and plots.",
     "version": "1.0.0"
   },
+  "servers": [
+    {
+      "url": "https://apollo.wustl.edu/api",
+      "description": "MultiSC-Viewer Production Server"
+    }
+  ],
   "tags": [
     {
       "name": "daemon",
@@ -387,6 +393,76 @@
         }
       }
     },
+    "/genes-rows": {
+      "get": {
+        "tags": ["data"],
+        "operationId": "/genes-rows-GET",
+        "summary": "Get differentially expressed genes for datasets.",
+        "parameters": [
+          {
+            "name": "ds",
+            "in": "query",
+            "description": "Dataset ids",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of gene rows",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "description": "Gene rows",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "_id": {
+                        "type": "string",
+                        "example": "APOE"
+                      },
+                      "datasets": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "example": ["example-ds-1", "example-ds-2"]
+                      },
+                      "degs": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "example": ["example-ds-deg"]
+                      }
+                    },
+                    "required": ["_id", "datasets", "degs"]
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/plots": {
       "post": {
         "tags": ["plots"],
@@ -539,6 +615,31 @@
             "type": "string",
             "format": "uri",
             "example": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE000000"
+          },
+          "gene": {
+            "type": "integer",
+            "description": "Number of genes"
+          },
+          "deg": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "example": "example-ds-deg"
+                },
+                "gene": {
+                  "type": "integer",
+                  "description": "Number of differentially expressed genes"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "Dataset DEGs"
+                }
+              },
+              "required": ["_id", "gene"]
+            }
           },
           "size": {
             "type": "integer",

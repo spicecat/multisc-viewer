@@ -73,10 +73,10 @@ Required Files
 
 Optional Files
 
-| File         | Description                                                                                             |
-| ------------ | ------------------------------------------------------------------------------------------------------- |
-| `genes.json` | Array of dataset genes ([1.2.3](#123-dataset-genes-genesjson))                                          |
-| `degs.json`  | Array of differentially expressed genes ([1.2.4](#124-dataset-differentially-expressed-genes-degsjson)) |
+| File         | Description                                                                                                    |
+| ------------ | -------------------------------------------------------------------------------------------------------------- |
+| `genes.json` | Array of dataset genes ([1.2.3](#123-dataset-genes-genesjson))                                                 |
+| `degs.json`  | Object mapping DEG set id to an object of DEGs ([1.2.4](#124-dataset-differentially-expressed-genes-degsjson)) |
 
 #### 1.2.2 Dataset Metadata (`metadata.json`)
 
@@ -102,7 +102,6 @@ All other properties are optional, but recommended when applicable.
 | `cellType`        | OntologyTerm        | Array of cell type objects ([1.2.2.3](#1223-ontologyterm))                                     |
 | `tissue`          | OntologyTerm        | Array of tissue or anatomical source objects ([1.2.2.3](#1223-ontologyterm))                   |
 | `url`             | string (URI)        | Link to dataset source (if `identifier` is provided)                                           |
-| `size`            | integer             | Size in bytes of `data.rds` (automatically added by daemon)                                    |
 
 Full dataset `metadata.json` examples: [`datasets/EXAMPLE-Dataset-1/metadata.json`](datasets/EXAMPLE-Dataset-1/metadata.json) and [`datasets/EXAMPLE-Dataset-2/metadata.json`](datasets/EXAMPLE-Dataset-2/metadata.json).
 
@@ -263,12 +262,29 @@ Example `genes.json`:
 
 #### 1.2.4 Dataset Differentially Expressed Genes (`degs.json`)
 
-Array of strings representing differentially expressed genes in the dataset.
+Object whose keys are DEG set ids for the dataset. Each value is an object with:
+
+| Field  | Type     | Description                             |
+| ------ | -------- | --------------------------------------- |
+| `_id`  | string   | Unique DEG set id                       |
+| `gene` | string[] | Array of differentially expressed genes |
+| `name` | string   | Display name                            |
 
 Example `degs.json`:
 
 ```jsonc
-["SNCA", "MAPT", "LRRK2"]
+{
+  "example-ds-condition-1-deg": {
+    "_id": "example-ds-deg",
+    "name": "Dataset DEGs",
+    "gene": ["SNCA", "MAPT", "LRRK2"]
+  },
+  "example-ds-condition-2-deg": {
+    "_id": "example-ds-deg",
+    "name": "Dataset DEGs",
+    "gene": ["LRRK2", "GBA", "APP"]
+  }
+}
 ```
 
 #### 1.2.5 R Color Vectors

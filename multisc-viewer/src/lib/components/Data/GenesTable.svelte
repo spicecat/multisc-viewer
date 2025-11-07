@@ -39,9 +39,25 @@
 		</th>
 		<th>Gene</th>
 		{#each Object.keys(datasets) as ds (`genes-th-ds-${ds}`)}
-			<th class="border-x border-gray-300">
-				{datasets[ds]?.displayName ?? ds}
-			</th>
+			{@const degs = datasets[ds].deg}
+			{#if degs}
+				{#each Object.values(degs) as deg, i (`degs-th-deg-${deg._id}`)}
+					<th class={i === 0 ? 'border-l border-gray-300' : undefined}>
+						{deg.name ?? deg._id}
+						<p class="font-bold">
+							<span>{datasets[ds].gene} genes</span>
+							<span class="text-red-500">{deg.gene} DEGs</span>
+						</p>
+					</th>
+				{/each}
+			{:else}
+				<th class="border-x border-gray-300">
+					{datasets[ds]?.displayName ?? ds}
+					<p class="font-bold">
+						<span>{datasets[ds].gene} genes</span>
+					</p>
+				</th>
+			{/if}
 		{/each}
 		<th># of Datasets</th>
 	</tr>
@@ -58,15 +74,35 @@
 		</td>
 		<td>{gene._id}</td>
 		{#each Object.keys(datasets) as ds (`genes-td-ds-${ds}`)}
-			<td class="border-x border-gray-300">
-				<div class="flex justify-center">
-					{#if gene.datasets.includes(ds)}
-						<Dna />
-					{/if}
-				</div>
-			</td>
+			{@const degs = datasets[ds].deg}
+			{#if degs}
+				{#each Object.values(degs) as deg, i (`degs-td-deg-${deg._id}`)}
+					<td class={i === 0 ? 'border-l border-gray-300' : undefined}>
+						<div class="flex justify-center">
+							{#if gene.degs.includes(deg._id)}
+								<Dna color="red" />
+							{:else if gene.datasets.includes(ds)}
+								<Dna />
+							{/if}
+						</div>
+					</td>
+				{/each}
+			{:else}
+				<td class="border-x border-gray-300">
+					<div class="flex justify-center">
+						{#if gene.datasets.includes(ds)}
+							<Dna />
+						{/if}
+					</div>
+				</td>
+			{/if}
 		{/each}
-		<td class="text-center">{gene.datasets.length}</td>
+		<td class="fold-bold text-center">
+			<p class="font-bold">
+				<span>{gene.datasets.length}, </span>
+				<span class="text-red-500">{gene.degs.length}</span>
+			</p>
+		</td>
 	{/snippet}
 </DataTable>
 
