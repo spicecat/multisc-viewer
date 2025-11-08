@@ -8,7 +8,7 @@ const outTypes = path.resolve(cwd, 'src/lib/types/api.d.ts');
 
 const localSpec = path.resolve(cwd, '../MultiSCDaemon/inst/plumber/daemon/openapi.json');
 const remoteSpec =
-	'https://git.jasonxu.dev/JasonXu/plot-viewer/raw/branch/main/multisc-daemon/openapi.json';
+	'https://git.jasonxu.dev/JasonXu/plot-viewer/raw/branch/main/MultiSCDaemon/inst/plumber/daemon/openapi.json';
 
 // prefer local monorepo file, else remote URL
 try {

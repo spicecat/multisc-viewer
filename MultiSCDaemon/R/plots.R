@@ -22,7 +22,6 @@ save_plot <- function(plot_object, path, ...) {
   file.rename(temp_path, path)
 }
 
-
 render_plot <- function(ds_path, ds, gene, pt, group_by, split_by) {
   data <- .ds_data[[ds]]
   colors <- get_colors(ds_path, group_by)
@@ -64,7 +63,7 @@ render_plot <- function(ds_path, ds, gene, pt, group_by, split_by) {
       width = 1200, height = 1200, res = 300
     )
   } else {
-    stop(paste("Unknown plot type:", pt))
+    return()
   }
   plot_id
 }
@@ -74,16 +73,24 @@ plots <- function(
   groupBy = "CellType", splitBy = "Genotype"
 ) {
   ds_index <- get_ds_index()
-  unlist(lapply(ds, function(d) {
+  plot_ids <- unlist(lapply(ds, function(d) {
     try({
       if (!d %in% ls(.ds_data)) {
         .ds_data[[d]] <- get_ds_data(ds_index[[d]])
       }
     })
     unlist(lapply(gene, function(g) {
-      lapply(pt, function(p) {
-        render_plot(ds_index[[d]], d, g, p, groupBy, splitBy)
-      })
+      unlist(lapply(pt, function(p) {
+        tryCatch(
+          render_plot(ds_index[[d]], d, g, p, groupBy, splitBy),
+          error = function(e) NULL
+        )
+      }))
     }))
   }))
+  if (length(plot_ids) == 0) {
+    return(list())
+  } else {
+    return(plot_ids)
+  }
 }

@@ -1,21 +1,29 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
 
 # MultiSCDaemon
 
 <!-- badges: start -->
-
 <!-- badges: end -->
-
-Backend service to serve data and plots for
-[MultiSC-Viewer](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main).
+Backend service to serve data and plots for [MultiSC-Viewer](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main).
 
 ## Installation
 
-Install the development version from the root of the repository (after
-cloning) or directly via `remotes`/`pak`.
+Install the development version from the root of the repository (after cloning) or directly via `remotes`/`pak`.
 
-``` r
+```r
 # Using pak (recommended)
 install.packages("pak")
 pak::pkg_install("JasonXu314/plot-viewer@master", dependencies = TRUE, upgrade = FALSE)
@@ -30,14 +38,13 @@ install.packages("pak")
 pak::pkg_install("./plot-viewer/MultiSCDaemon")
 ```
 
-This package depends on `plumber`, `Seurat` and other tidyverse/base
-packages; `pak` will resolve these automatically.
+This package depends on `plumber`, `Seurat` and other tidyverse/base packages; `pak` will resolve these automatically.
 
 ## Running the daemon
 
 ### From R
 
-``` r
+```r
 library(MultiSCDaemon)
 # Launch on default port (8000)
 msc_plumb()
@@ -51,11 +58,10 @@ msc_plumb(port = 8000, host = "0.0.0.0")
 
 ### Environment variables
 
-`msc_plumb()` reads paths from environment variables before starting and
-sets internal `options()` used by API handlers.
+`msc_plumb()` reads paths from environment variables before starting and sets internal `options()` used by API handlers.
 
 | Variable | Default | Description |
-|----|----|----|
+|----------|---------|-------------|
 | `PLUMBER_PORT` | 8000 | HTTP port (alternative to `port` argument) |
 | `DATASETS_DIR` | `../data/datasets` | Directory containing dataset folders & `index.json` |
 | `PUBLICATIONS_DIR` | `../data/publications` | Directory containing publication folders & `index.json` |
@@ -63,7 +69,7 @@ sets internal `options()` used by API handlers.
 
 Set them prior to calling `msc_plumb()`:
 
-``` bash
+```bash
 export DATASETS_DIR="/path/to/data/datasets"
 export PUBLICATIONS_DIR="/path/to/data/publications"
 export PLOTS_DIR="/path/to/data/plots"
@@ -73,17 +79,16 @@ R -e 'MultiSCDaemon::msc_plumb()'
 
 ### Docker
 
-A Dockerfile is provided (see `multisc-daemon/Dockerfile`). Build and
-run:
+A Dockerfile is provided (see `multisc-daemon/Dockerfile`). Build and run:
 
-``` bash
+```bash
 docker build -t multisc-daemon multisc-daemon
 docker run -d -p 8000:8000 multisc-daemon
 ```
 
 Override environment + mount data:
 
-``` bash
+```bash
 docker run -d \
   -p 8123:8000 \
   -e DATASETS_DIR=/data/datasets \
@@ -95,8 +100,7 @@ docker run -d \
 
 ### Access
 
-Once running: `http://localhost:8000/` serves the API root. Interactive
-docs (if enabled) usually at `http://localhost:8000/__docs__/`.
+Once running: `http://localhost:8000/` serves the API root. Interactive docs (if enabled) usually at `http://localhost:8000/__docs__/`.
 
 ## Function reference
 
@@ -104,24 +108,22 @@ docs (if enabled) usually at `http://localhost:8000/__docs__/`.
 
 Arguments:
 
-- `port` – numeric port to bind (defaults to env `PLUMBER_PORT` or 8000)
-- `...` – forwarded to `plumber::plumb()$run()` (e.g. `host`,
-  `swagger = TRUE`)
+* `port` – numeric port to bind (defaults to env `PLUMBER_PORT` or 8000)
+* `...` – forwarded to `plumber::plumb()$run()` (e.g. `host`, `swagger = TRUE`)
 
 Side-effects: sets options
 
-- `MultiSCDaemon.DATASETS_DIR`
-- `MultiSCDaemon.PUBLICATIONS_DIR`
-- `MultiSCDaemon.PLOTS_DIR`
+* `MultiSCDaemon.DATASETS_DIR`
+* `MultiSCDaemon.PUBLICATIONS_DIR`
+* `MultiSCDaemon.PLOTS_DIR`
 
-These are derived from corresponding environment variables (with
-defaults) and are normalized paths.
+These are derived from corresponding environment variables (with defaults) and are normalized paths.
 
 Returns: the running Plumber router (invisibly) after calling `$run()`.
 
 ## Example request workflow
 
-``` r
+```r
 library(MultiSCDaemon)
 msc_plumb(port = 8000)
 # Then in another session or using httr/curl you could query endpoints, e.g.:
@@ -133,23 +135,22 @@ msc_plumb(port = 8000)
 
 Render this README after edits:
 
-``` r
+```r
 devtools::build_readme()
 ```
 
 Run tests / checks (if added):
 
-``` r
+```r
 devtools::check()
 ```
 
 ## Related
 
-- MultiSC Viewer frontend: `multisc-viewer`
-- Data directory layout: `data/`
-- Daemon (raw R scripts / Docker): `multisc-daemon/`
+* MultiSC Viewer frontend: `multisc-viewer`
+* Data directory layout: `data/`
+* Daemon (raw R scripts / Docker): `multisc-daemon/`
 
-------------------------------------------------------------------------
+---
 
-For issues or contributions, please open a PR or issue in the main
-repository.
+For issues or contributions, please open a PR or issue in the main repository.
