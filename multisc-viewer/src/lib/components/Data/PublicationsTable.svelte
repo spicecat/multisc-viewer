@@ -1,54 +1,57 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
-	import type { Datasets, Publications } from '$lib/types/daemon';
-	import Search from '../List/Search.svelte';
-	import Chip from '../List/Chip.svelte';
+import { resolve } from "$app/paths";
+import Chip from "$lib/components/List/Chip.svelte";
+import Search from "$lib/components/List/Search.svelte";
+import type { DatasetsMap, PublicationsMap } from "$lib/types/daemon";
 
-	let { datasets, publications }: { datasets: Datasets; publications: Publications } = $props();
+const {
+	datasets,
+	publications,
+}: { datasets: DatasetsMap; publications: PublicationsMap } = $props();
 
-	let data = $derived(
-		Object.values(publications).map((pub) => ({
-			...pub,
-			datasets: pub.datasets.map((ds) => datasets[ds])
-		}))
-	);
-	let items: typeof data = $state([]);
-	let tags: string[] = $state([]);
+const data = $derived(
+	Object.values(publications).map((pub) => ({
+		...pub,
+		datasets: pub.datasets.map((ds) => datasets[ds]),
+	})),
+);
+let items = $state<typeof data>([]);
+let tags = $state<string[]>([]);
 
-	const searchOptions = {
-		keys: [
-			'author.name',
-			'date',
-			'description',
-			'journalName',
-			'identifier',
-			'name',
-			'url',
-			'datasets._id',
-			'datasets.displayName',
-			'datasets.name',
-			'datasets.healthCondition.displayName',
-			'datasets.healthCondition.identifier',
-			'datasets.healthCondition.name',
-			'datasets.species.displayName',
-			'datasets.species.identifier',
-			'datasets.species.name',
-			'datasets.cellType.displayName',
-			'datasets.cellType.identifier',
-			'datasets.cellType.name',
-			'datasets.tissue.displayName',
-			'datasets.tissue.identifier',
-			'datasets.tissue.name'
-		]
-	};
+const searchOptions = {
+	keys: [
+		"author.name",
+		"publicationDate",
+		"description",
+		"journalName",
+		"identifier",
+		"name",
+		"url",
+		"datasets.id",
+		"datasets.displayName",
+		"datasets.name",
+		"datasets.healthCondition.displayName",
+		"datasets.healthCondition.identifier",
+		"datasets.healthCondition.name",
+		"datasets.species.displayName",
+		"datasets.species.identifier",
+		"datasets.species.name",
+		"datasets.cellType.displayName",
+		"datasets.cellType.identifier",
+		"datasets.cellType.name",
+		"datasets.tissue.displayName",
+		"datasets.tissue.identifier",
+		"datasets.tissue.name",
+	],
+};
 </script>
 
 <Search name="Publications" {data} bind:items bind:tags {searchOptions} />
-{#each items as pub (`pub-${pub._id}`)}
-	{@const name = pub.name ?? pub._id}
+{#each items as pub (`pub-${pub.id}`)}
+	{@const name = pub.name ?? pub.id}
 	<div>
 		<a
-			href={resolve('/publications/[pubId]', { pubId: pub._id })}
+			href={resolve('/publications/[pubId]', { pubId: pub.id })}
 			class="anchor text-lg font-medium"
 			title={`${name} publication page`}
 			rel="external noopener noreferrer"
@@ -62,7 +65,7 @@
 			</span>
 			<span class="inline-block">
 				{pub.journalName}
-				{pub.date}
+				{pub.publicationDate}
 				<!-- eslint-disable svelte/no-navigation-without-resolve -->
 				{#if pub.url}
 					<a
@@ -78,8 +81,8 @@
 				<!-- eslint-enable svelte/no-navigation-without-resolve -->
 			</span>
 			<span class="block space-y-1 space-x-1">
-				{#each pub.datasets as ds (`ds-${pub._id}-${ds._id}`)}
-					{@const name = ds.displayName ?? ds.name ?? ds._id}
+				{#each pub.datasets as ds (`ds-${pub.id}-${ds.id}`)}
+					{@const name = ds.displayName ?? ds.name ?? ds.id}
 					<Chip bind:tags tag={`datasets=${name}`}>{name}</Chip>
 				{/each}
 			</span>

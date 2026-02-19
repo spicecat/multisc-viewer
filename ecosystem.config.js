@@ -10,7 +10,7 @@ module.exports = {
       watch: true,
       increment_var: "PLUMBER_PORT",
       autorestart: false,
-      env: { PLUMBER_PORT: 8000 },
+      env: { PLUMBER_PORT: 8080 },
     },
     {
       name: "multisc-viewer",

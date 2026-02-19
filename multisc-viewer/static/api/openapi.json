@@ -1,786 +1,913 @@
 {
-  "openapi": "3.0.4",
-  "info": {
-    "title": "MultiSC-Daemon API",
-    "description": "Backend service for [MultiSC-Viewer](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main) to serve data and plots.",
-    "version": "1.0.0"
-  },
-  "servers": [
-    {
-      "url": "https://apollo.wustl.edu/api",
-      "description": "MultiSC-Viewer Production Server"
-    }
-  ],
-  "tags": [
-    {
-      "name": "daemon",
-      "description": "Load and unload datasets on daemon."
-    },
-    {
-      "name": "data",
-      "description": "Fetch metadata for datasets and publications."
-    },
-    {
-      "name": "plots",
-      "description": "Generate plots for datasets."
-    }
-  ],
-  "paths": {
-    "/health": {
-      "get": {
-        "tags": ["daemon"],
-        "operationId": "/health-GET",
-        "summary": "Check daemon health.",
-        "responses": {
-          "200": {
-            "description": "Daemon health",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "example": "ok"
-                    }
-                  },
-                  "required": ["status"]
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/loaded": {
-      "get": {
-        "tags": ["daemon"],
-        "operationId": "/loaded-GET",
-        "summary": "Get loaded datasets on daemon.",
-        "responses": {
-          "200": {
-            "description": "List of loaded dataset ids",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
-                  "example": ["example-ds-1", "example-ds-2"]
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/unload": {
-      "post": {
-        "tags": ["daemon"],
-        "operationId": "/unload-POST",
-        "summary": "Unload datasets on daemon.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "ds": {
-                    "type": "array",
-                    "description": "Dataset ids",
-                    "items": {
-                      "type": "string"
-                    },
-                    "example": ["example-ds-1"]
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "List of loaded dataset ids",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
-                  "example": ["example-ds-2"]
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/load": {
-      "post": {
-        "tags": ["daemon"],
-        "operationId": "/load-POST",
-        "summary": "Load datasets on daemon.",
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "ds": {
-                    "type": "array",
-                    "description": "Dataset ids. Unset to unload all datasets.",
-                    "items": {
-                      "type": "string"
-                    },
-                    "example": ["example-ds-1", "example-ds-2"]
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "List of loaded dataset ids",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
-                  "example": ["example-ds-1", "example-ds-2"]
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/datasets": {
-      "get": {
-        "tags": ["data"],
-        "operationId": "/datasets-GET",
-        "summary": "Get datasets metadata.",
-        "parameters": [
-          {
-            "name": "ds",
-            "in": "query",
-            "description": "Dataset ids. Unset to get all datasets.",
-            "required": false,
-            "style": "form",
-            "explode": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Dictionary mapping dataset id to metadata",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "$ref": "#/components/schemas/Dataset"
-                  }
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/publications": {
-      "get": {
-        "tags": ["data"],
-        "operationId": "/publications-GET",
-        "summary": "Get publications metadata.",
-        "parameters": [
-          {
-            "name": "pub",
-            "in": "query",
-            "description": "Publication ids. Unset to get all publications.",
-            "required": false,
-            "style": "form",
-            "explode": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Dictionary mapping publication id to metadata",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "$ref": "#/components/schemas/Publication"
-                  }
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/genes": {
-      "get": {
-        "tags": ["data"],
-        "operationId": "/genes-GET",
-        "summary": "Get genes for datasets.",
-        "parameters": [
-          {
-            "name": "ds",
-            "in": "query",
-            "description": "Dataset ids",
-            "required": true,
-            "style": "form",
-            "explode": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Dictionary mapping dataset id to genes",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "$ref": "#/components/schemas/Gene"
-                  }
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/degs": {
-      "get": {
-        "tags": ["data"],
-        "operationId": "/degs-GET",
-        "summary": "Get differentially expressed genes for datasets.",
-        "parameters": [
-          {
-            "name": "ds",
-            "in": "query",
-            "description": "Dataset ids",
-            "required": true,
-            "style": "form",
-            "explode": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Dictionary mapping dataset id to dictionary mapping DEG id to differentially expressed genes",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "$ref": "#/components/schemas/DEGs"
-                  }
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/genes-rows": {
-      "get": {
-        "tags": ["data"],
-        "operationId": "/genes-rows-GET",
-        "summary": "Get differentially expressed genes for datasets.",
-        "parameters": [
-          {
-            "name": "ds",
-            "in": "query",
-            "description": "Dataset ids",
-            "required": true,
-            "style": "form",
-            "explode": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of gene rows",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "description": "Gene rows",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "_id": {
-                        "type": "string",
-                        "example": "APOE"
-                      },
-                      "datasets": {
-                        "type": "array",
-                        "items": {
-                          "type": "string"
-                        },
-                        "example": ["example-ds-1", "example-ds-2"]
-                      },
-                      "degs": {
-                        "type": "array",
-                        "items": {
-                          "type": "string"
-                        },
-                        "example": ["example-ds-deg"]
-                      }
-                    },
-                    "required": ["_id", "datasets", "degs"]
-                  }
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/plots": {
-      "post": {
-        "tags": ["plots"],
-        "operationId": "/plots-POST",
-        "summary": "Generate plots for datasets.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "description": "Parameters for generating plots",
-                "properties": {
-                  "ds": {
-                    "type": "array",
-                    "description": "Dataset ids",
-                    "items": {
-                      "type": "string"
-                    },
-                    "example": ["example-ds-1", "example-ds-2"]
-                  },
-                  "gene": {
-                    "$ref": "#/components/schemas/Gene"
-                  },
-                  "pt": {
-                    "type": "array",
-                    "description": "Plot types",
-                    "items": {
-                      "type": "string",
-                      "enum": ["umap", "vln", "feat"]
-                    },
-                    "example": ["umap", "vln", "feat"],
-                    "default": ["umap", "vln", "feat"]
-                  },
-                  "groupBy": {
-                    "type": "string",
-                    "enum": ["CellType", "Genotype"],
-                    "example": "CellType",
-                    "default": "CellType"
-                  },
-                  "splitBy": {
-                    "type": "string",
-                    "enum": ["CellType", "Genotype"],
-                    "example": "Genotype",
-                    "default": "Genotype"
-                  }
-                },
-                "required": ["ds", "gene", "pt", "groupBy", "splitBy"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "List of paths to directories with plots",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plot"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "Dataset": {
-        "type": "object",
-        "properties": {
-          "_id": {
-            "type": "string"
-          },
-          "author": {
-            "$ref": "#/components/schemas/Author"
-          },
-          "citation": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "identifier": {
-                  "type": "string",
-                  "example": "PMID:00000000"
-                },
-                "name": {
-                  "type": "string",
-                  "example": "Primary Study Title"
-                },
-                "url": {
-                  "type": "string",
-                  "format": "uri",
-                  "example": "https://pubmed.ncbi.nlm.nih.gov/00000000/"
-                }
-              }
-            }
-          },
-          "date": {
-            "type": "string",
-            "description": "Formatted as YYYY-MM-DD",
-            "format": "date",
-            "example": "2000-01-01"
-          },
-          "defaultGene": {
-            "type": "string",
-            "description": "Default gene to plot",
-            "example": "APOE"
-          },
-          "description": {
-            "type": "string",
-            "example": "This is a summary of this dataset."
-          },
-          "displayName": {
-            "type": "string",
-            "example": "Dataset 1"
-          },
-          "healthCondition": {
-            "$ref": "#/components/schemas/OntologyTerm"
-          },
-          "identifier": {
-            "type": "string",
-            "example": "GSE000000"
-          },
-          "name": {
-            "type": "string",
-            "example": "Dataset Title"
-          },
-          "species": {
-            "$ref": "#/components/schemas/OntologyTerm"
-          },
-          "cellType": {
-            "$ref": "#/components/schemas/OntologyTerm"
-          },
-          "tissue": {
-            "$ref": "#/components/schemas/OntologyTerm"
-          },
-          "url": {
-            "type": "string",
-            "format": "uri",
-            "example": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE000000"
-          },
-          "gene": {
-            "type": "integer",
-            "description": "Number of genes"
-          },
-          "deg": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object",
-              "properties": {
-                "_id": {
-                  "type": "string",
-                  "example": "example-ds-deg"
-                },
-                "gene": {
-                  "type": "integer",
-                  "description": "Number of differentially expressed genes"
-                },
-                "name": {
-                  "type": "string",
-                  "example": "Dataset DEGs"
-                }
-              },
-              "required": ["_id", "gene"]
-            }
-          },
-          "size": {
-            "type": "integer",
-            "description": "Size of dataset in bytes"
-          }
-        },
-        "required": ["_id"]
-      },
-      "Publication": {
-        "type": "object",
-        "properties": {
-          "_id": {
-            "type": "string",
-            "example": "example-pub-1"
-          },
-          "author": {
-            "$ref": "#/components/schemas/Author"
-          },
-          "date": {
-            "type": "string",
-            "description": "YYYY-MM-DD",
-            "format": "date",
-            "example": "2000-01-01"
-          },
-          "description": {
-            "type": "string",
-            "example": "This is an abstract of this publication."
-          },
-          "journalName": {
-            "type": "string",
-            "example": "Nature"
-          },
-          "identifier": {
-            "type": "string",
-            "example": "PMID:00000000"
-          },
-          "name": {
-            "type": "string",
-            "example": "Primary Study Title"
-          },
-          "url": {
-            "type": "string",
-            "example": "https://pubmed.ncbi.nlm.nih.gov/00000000/"
-          },
-          "datasets": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "example": ["example-ds-1", "example-ds-2"]
-          }
-        },
-        "required": ["_id", "datasets"]
-      },
-      "Gene": {
-        "type": "array",
-        "items": {
-          "type": "string",
-          "example": "APOE"
-        }
-      },
-      "DEGs": {
-        "type": "object",
-        "additionalProperties": {
-          "type": "object",
-          "properties": {
-            "_id": {
-              "type": "string",
-              "example": "example-ds-deg"
-            },
-            "gene": {
-              "$ref": "#/components/schemas/Gene"
-            },
-            "name": {
-              "type": "string",
-              "example": "Dataset DEGs"
-            }
-          },
-          "required": ["_id", "gene"]
-        }
-      },
-      "Author": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string",
-              "description": "Surname Initial",
-              "example": "Doe J"
-            }
-          },
-          "required": ["name"]
-        }
-      },
-      "OntologyTerm": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "displayName": {
-              "type": "string",
-              "example": "AD"
-            },
-            "identifier": {
-              "type": "string",
-              "example": "mesh:D000544"
-            },
-            "name": {
-              "type": "string",
-              "example": "Alzheimer Disease"
-            },
-            "url": {
-              "type": "string",
-              "format": "uri",
-              "example": "http://id.nlm.nih.gov/mesh/D000544"
-            }
-          },
-          "required": ["name"]
-        }
-      },
-      "Plot": {
-        "type": "array",
-        "description": "List of paths to directories with plots",
-        "items": {
-          "type": "string",
-          "description": "Path to directory with plot",
-          "example": "example-ds-1/APOE/umap/CellType:Genotype"
-        }
-      },
-      "Error": {
-        "type": "object",
-        "description": "Error response",
-        "properties": {
-          "error": {
-            "type": "string",
-            "example": "500 - Internal server error"
-          }
-        },
-        "required": ["error"]
-      }
-    }
-  }
+	"openapi": "3.0.4",
+	"info": {
+		"title": "MultiSCViewerR API",
+		"description": "Backend service for [MultiSC-Viewer](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main) to serve data and plots.",
+		"version": "1.0.0"
+	},
+	"servers": [
+		{
+			"url": "https://apollo.wustl.edu/api",
+			"description": "MultiSC-Viewer Production Server"
+		}
+	],
+	"tags": [
+		{
+			"name": "state",
+			"description": "Load and unload datasets on daemon"
+		},
+		{
+			"name": "data",
+			"description": "Fetch metadata for datasets and publications"
+		},
+		{
+			"name": "plots",
+			"description": "Generate plots for datasets"
+		}
+	],
+	"paths": {
+		"/health": {
+			"get": {
+				"tags": ["state"],
+				"operationId": "/health-GET",
+				"summary": "Check daemon health",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"status": {
+											"type": "string",
+											"example": "ok"
+										}
+									},
+									"required": ["status"]
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "Error response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/loaded": {
+			"get": {
+				"tags": ["state"],
+				"operationId": "/loaded-GET",
+				"summary": "Get loaded datasets",
+				"responses": {
+					"200": {
+						"description": "Loaded dataset ids",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"type": "string"
+									},
+									"example": ["example-ds-1", "example-ds-2"]
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "Error response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/unload": {
+			"post": {
+				"tags": ["state"],
+				"operationId": "/unload-POST",
+				"summary": "Unload datasets",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"ds": {
+										"type": "array",
+										"description": "Dataset ids. Unset to unload all datasets",
+										"items": {
+											"type": "string"
+										},
+										"example": ["example-ds-1"]
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Loaded dataset ids",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"type": "string"
+									},
+									"example": ["example-ds-2"]
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "Error response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/load": {
+			"post": {
+				"tags": ["state"],
+				"operationId": "/load-POST",
+				"summary": "Load datasets",
+				"requestBody": {
+					"required": false,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"ds": {
+										"type": "array",
+										"description": "Dataset ids",
+										"items": {
+											"type": "string"
+										},
+										"example": ["example-ds-1", "example-ds-2"]
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Loaded dataset ids",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"type": "string"
+									},
+									"example": ["example-ds-1", "example-ds-2"]
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "Error response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/datasets-index": {
+			"get": {
+				"tags": ["data"],
+				"operationId": "/datasets-index-GET",
+				"summary": "Get datasets index",
+				"responses": {
+					"200": {
+						"description": "List of datasets ids and sizes",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"type": "object",
+										"properties": {
+											"id": {
+												"type": "string",
+												"example": "example-ds-1"
+											},
+											"size": {
+												"type": "integer",
+												"description": "Size of dataset in bytes",
+												"example": 123456789
+											}
+										},
+										"required": ["id", "size"]
+									}
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "Error response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/datasets": {
+			"get": {
+				"tags": ["data"],
+				"operationId": "/datasets-GET",
+				"summary": "Get datasets metadata",
+				"parameters": [
+					{
+						"name": "ds",
+						"in": "query",
+						"description": "Dataset ids. Unset to get all datasets.",
+						"required": false,
+						"style": "form",
+						"explode": true,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							},
+							"example": ["example-ds-1", "example-ds-2"]
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "List of datasets metadata",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/Dataset"
+									}
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "Error response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/publications": {
+			"get": {
+				"tags": ["data"],
+				"operationId": "/publications-GET",
+				"summary": "Get publications metadata",
+				"parameters": [
+					{
+						"name": "pub",
+						"in": "query",
+						"description": "Publication ids. Unset to get all publications.",
+						"required": false,
+						"style": "form",
+						"explode": true,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							},
+							"example": ["example-pub-1"]
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "List of publications metadata",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/Publication"
+									}
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "Error response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/genes": {
+			"get": {
+				"tags": ["data"],
+				"operationId": "/genes-GET",
+				"summary": "Get genes for datasets",
+				"parameters": [
+					{
+						"name": "ds",
+						"in": "query",
+						"description": "Dataset ids",
+						"required": true,
+						"style": "form",
+						"explode": true,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							},
+							"example": ["example-ds-1", "example-ds-2"]
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "List of datasets genes",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/Gene"
+									}
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "Error response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/degs": {
+			"get": {
+				"tags": ["data"],
+				"operationId": "/degs-GET",
+				"summary": "Get differentially expressed genes for datasets",
+				"parameters": [
+					{
+						"name": "ds",
+						"in": "query",
+						"description": "Dataset ids",
+						"required": true,
+						"style": "form",
+						"explode": true,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							},
+							"example": ["example-ds-1", "example-ds-2"]
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "List of datasets differentially expressed genes",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/DEGs"
+									}
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "Error response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/genes-rows": {
+			"get": {
+				"tags": ["data"],
+				"operationId": "/genes-rows-GET",
+				"summary": "Query differentially expressed genes across datasets",
+				"parameters": [
+					{
+						"name": "ds",
+						"in": "query",
+						"description": "Dataset ids",
+						"required": true,
+						"style": "form",
+						"explode": true,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					},
+					{
+						"name": "gene",
+						"in": "query",
+						"description": "Genes query filter",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"example": "APOE"
+						}
+					},
+					{
+						"name": "limit",
+						"in": "query",
+						"description": "Results limit",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"example": 10
+						}
+					},
+					{
+						"name": "offset",
+						"in": "query",
+						"description": "Results offset",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"default": 0,
+							"example": 0
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "List of genes rows",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/GenesRows"
+									}
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "Error response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/plots": {
+			"post": {
+				"tags": ["plots"],
+				"operationId": "/plots-POST",
+				"summary": "Generate plots for datasets",
+				"parameters": [
+					{
+						"name": "ds",
+						"in": "query",
+						"description": "Dataset ids",
+						"required": true,
+						"style": "form",
+						"explode": true,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							},
+							"example": ["example-ds-1", "example-ds-2"]
+						}
+					},
+					{
+						"name": "gene",
+						"in": "query",
+						"description": "Gene symbols",
+						"required": true,
+						"style": "form",
+						"explode": true,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							},
+							"example": ["APOE", "TREM2"]
+						}
+					},
+					{
+						"name": "pt",
+						"in": "query",
+						"description": "Plot types",
+						"required": true,
+						"style": "form",
+						"explode": true,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": ["umap", "vln", "feat"]
+							},
+							"example": ["umap", "vln", "feat"]
+						}
+					},
+					{
+						"name": "groupBy",
+						"in": "query",
+						"description": "Group by parameter",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"enum": ["CellType", "Genotype"],
+							"example": "CellType"
+						}
+					},
+					{
+						"name": "splitBy",
+						"in": "query",
+						"description": "Split by parameter",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"enum": ["CellType", "Genotype"],
+							"example": "Genotype"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Generated plot ids",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Plot"
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "Error response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"Dataset": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "Dataset id",
+						"example": "example-ds-1"
+					},
+					"author": {
+						"$ref": "#/components/schemas/Author"
+					},
+					"citation": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"identifier": {
+									"type": "string",
+									"example": "PMID:00000000"
+								},
+								"name": {
+									"type": "string",
+									"example": "Primary Study Title"
+								},
+								"url": {
+									"type": "string",
+									"format": "uri",
+									"example": "https://pubmed.ncbi.nlm.nih.gov/00000000/"
+								}
+							}
+						}
+					},
+					"publicationDate": {
+						"type": "string",
+						"description": "Formatted as YYYY-MM-DD",
+						"format": "date",
+						"example": "2000-01-01"
+					},
+					"defaultGene": {
+						"type": "string",
+						"description": "Default gene to plot",
+						"example": "APOE"
+					},
+					"description": {
+						"type": "string",
+						"example": "This is a summary of this dataset."
+					},
+					"displayName": {
+						"type": "string",
+						"example": "Dataset 1"
+					},
+					"healthCondition": {
+						"$ref": "#/components/schemas/OntologyTerm"
+					},
+					"identifier": {
+						"type": "string",
+						"example": "GSE000000"
+					},
+					"name": {
+						"type": "string",
+						"example": "Dataset Title"
+					},
+					"species": {
+						"$ref": "#/components/schemas/OntologyTerm"
+					},
+					"cellType": {
+						"$ref": "#/components/schemas/OntologyTerm"
+					},
+					"tissue": {
+						"$ref": "#/components/schemas/OntologyTerm"
+					},
+					"url": {
+						"type": "string",
+						"format": "uri",
+						"example": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE000000"
+					},
+					"genes": {
+						"type": "integer",
+						"description": "Number of genes in dataset",
+						"example": 20000
+					},
+					"deg": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"id": {
+									"type": "string",
+									"example": "example-ds-deg"
+								},
+								"name": {
+									"type": "string",
+									"example": "Dataset DEGs"
+								},
+								"genes": {
+									"type": "integer",
+									"description": "Number of differentially expressed genes in dataset",
+									"example": 2000
+								}
+							},
+							"required": ["id"]
+						}
+					}
+				},
+				"required": ["id"]
+			},
+			"Publication": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"example": "example-pub-1"
+					},
+					"author": {
+						"$ref": "#/components/schemas/Author"
+					},
+					"publicationDate": {
+						"type": "string",
+						"description": "YYYY-MM-DD",
+						"format": "date",
+						"example": "2000-01-01"
+					},
+					"description": {
+						"type": "string",
+						"example": "This is an abstract of this publication."
+					},
+					"journalName": {
+						"type": "string",
+						"example": "Nature"
+					},
+					"identifier": {
+						"type": "string",
+						"example": "PMID:00000000"
+					},
+					"name": {
+						"type": "string",
+						"example": "Primary Study Title"
+					},
+					"url": {
+						"type": "string",
+						"example": "https://pubmed.ncbi.nlm.nih.gov/00000000/"
+					},
+					"datasets": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"example": ["example-ds-1", "example-ds-2"]
+					}
+				},
+				"required": ["id", "datasets"]
+			},
+			"Gene": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"example": "example-ds-1"
+					},
+					"name": {
+						"type": "string",
+						"description": "DEG set name",
+						"example": "Dataset DEGs"
+					},
+					"gene": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"example": ["APOE", "TREM2", "CLU"]
+					}
+				},
+				"required": ["id", "gene"]
+			},
+			"DEGs": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"example": "example-ds-1"
+					},
+					"deg": {
+						"$ref": "#/components/schemas/Gene"
+					}
+				},
+				"required": ["id", "deg"]
+			},
+			"GenesRows": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"example": "APOE"
+					},
+					"gene": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"description": "Dataset ids with gene"
+						},
+						"example": ["example-ds-1", "example-ds-2"]
+					},
+					"deg": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"description": "Dataset DEG ids with gene"
+						},
+						"example": ["example-ds-deg1", "example-ds-deg2"]
+					}
+				},
+				"required": ["id", "gene", "deg"]
+			},
+			"Author": {
+				"type": "array",
+				"items": {
+					"type": "object",
+					"properties": {
+						"name": {
+							"type": "string",
+							"description": "Surname Initial",
+							"example": "Doe J"
+						}
+					},
+					"required": ["name"]
+				}
+			},
+			"OntologyTerm": {
+				"type": "array",
+				"items": {
+					"type": "object",
+					"properties": {
+						"displayName": {
+							"type": "string",
+							"example": "AD"
+						},
+						"identifier": {
+							"type": "string",
+							"example": "mesh:D000544"
+						},
+						"name": {
+							"type": "string",
+							"example": "Alzheimer Disease"
+						},
+						"url": {
+							"type": "string",
+							"format": "uri",
+							"example": "http://id.nlm.nih.gov/mesh/D000544"
+						}
+					},
+					"required": ["name"]
+				}
+			},
+			"Plot": {
+				"type": "array",
+				"description": "Generated plot ids",
+				"items": {
+					"type": "string",
+					"example": "example-ds-1/APOE/umap/CellType:Genotype"
+				}
+			},
+			"Error": {
+				"type": "object",
+				"description": "Error response",
+				"properties": {
+					"type": {
+						"type": "string",
+						"format": "uri",
+						"example": "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.1"
+					},
+					"title": {
+						"type": "string",
+						"example": "Bad Request"
+					},
+					"status": {
+						"type": "integer",
+						"format": "int32",
+						"example": 400
+					},
+					"detail": {
+						"type": "string",
+						"example": "Detailed error message."
+					}
+				},
+				"required": ["status"]
+			}
+		}
+	}
 }

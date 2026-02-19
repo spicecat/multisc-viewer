@@ -1,7 +1,7 @@
-import { getDEGs } from '$lib/server/data';
-import { type RequestHandler, json } from '@sveltejs/kit';
+import { json, type RequestHandler } from "@sveltejs/kit";
+import { getDEGs } from "$lib/server/data";
 
 export const GET: RequestHandler = async ({ url }) => {
-	const datasets = url.searchParams.getAll('ds');
+	const datasets = url.searchParams.getAll("ds");
 	return json(await getDEGs(datasets));
 };

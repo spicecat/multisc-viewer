@@ -4,3 +4,5 @@ fetch-metadata/
 plots/*
 publications/*
 !EXAMPLE*
+*.duckdb
+*.duckdb.wal

@@ -29,17 +29,16 @@ Single-cell RNA-seq datasets are stored as folders containing a serialized Seura
 
 ### 1.1 Datasets Index (`data/datasets/index.json`)
 
-`data/datasets/index.json` is a map of dataset `_id` to a path of the dataset folder (relative to `data/datasets`).
-All `_id` should be unique.
+`data/datasets/index.json` is a map of dataset `id` to a path of the dataset folder (relative to `data/datasets`).
+All `id` should be unique.
 
 Example `index.json`:
 
 ```jsonc
 {
-  "example-ds-1": "EXAMPLE-Dataset-1",
-  "example-ds-2": "./EXAMPLE-Dataset-2",
-  "example-ds-3": "./relative/path/to/EXAMPLE-Dataset-3",
-  "example-ds-4": "/absolute/path/to/EXAMPLE-Dataset-4"
+  "example-ds-1": "Dataset-1",
+  "example-ds-2": "./Dataset-2",
+  "example-ds-3": "/absolute/path/to/EXAMPLE-datasets/Dataset-3"
 }
 ```
 
@@ -82,16 +81,16 @@ Optional Files
 
 Dataset metadata schema is sourced from the [Dataset component](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-daemon/openapi.json#/components/schemas/Dataset) of the [MultiSC-Daemon API](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-daemon/openapi.json).
 
-`required`: `_id`
+`required`: `id`
 
 All other properties are optional, but recommended when applicable.
 
 | Field             | Type                | Description                                                                                    |
 | ----------------- | ------------------- | ---------------------------------------------------------------------------------------------- |
-| `_id`             | string              | Unique dataset id (key used in datasets index [1.1](#11-datasets-index-datadatasetsindexjson)) |
+| `id`             | string              | Unique dataset id (key used in datasets index [1.1](#11-datasets-index-datadatasetsindexjson)) |
 | `author`          | Author              | Array of author objects ([1.2.2.1](#1221-author))                                              |
 | `citation`        | Citation            | Array of citation objects ([1.2.2.2](#1222-citation))                                          |
-| `date`            | string (YYYY-MM-DD) | Release date                                                                                   |
+| `publicationDate`            | string (YYYY-MM-DD) | Release publicationDate                                                                                   |
 | `defaultGene`     | string              | Default gene to plot                                                                           |
 | `description`     | string (HTML)       | Abstract (supports raw HTML)                                                                   |
 | `displayName`     | string              | Short display label                                                                            |
@@ -103,14 +102,13 @@ All other properties are optional, but recommended when applicable.
 | `tissue`          | OntologyTerm        | Array of tissue or anatomical source objects ([1.2.2.3](#1223-ontologyterm))                   |
 | `url`             | string (URI)        | Link to dataset source (if `identifier` is provided)                                           |
 
-Full dataset `metadata.json` examples: [`datasets/EXAMPLE-Dataset-1/metadata.json`](datasets/EXAMPLE-Dataset-1/metadata.json) and [`datasets/EXAMPLE-Dataset-2/metadata.json`](datasets/EXAMPLE-Dataset-2/metadata.json).
+Full dataset `metadata.json` examples: [`Example-datasets/Dataset-1/metadata.json`](EXAMPLE-datasets/Dataset-1/metadata.json) and [`EXAMPLE-datasets/Dataset-2/metadata.json`](EXAMPLE-datasets/Dataset-2/metadata.json).
 
 Example dataset folder `metadata.json`:
 
 ```jsonc
 {
-  "_id": "example-ds-1",
-  "$schema": "https://git.jasonxu.dev/JasonXu/plot-viewer/raw/branch/main/multisc-daemon/openapi.json#/components/schemas/Dataset",
+  "id": "example-ds-1",
   "name": "Example Dataset 1 with <i>HTML</i>",
   "displayName": "Example Dataset 1",
   "description": "This is a summary of this dataset.",
@@ -122,7 +120,7 @@ Example dataset folder `metadata.json`:
       "url": "https://pubmed.ncbi.nlm.nih.gov/00000000/"
     }
   ],
-  "date": "2024-01-15",
+  "publicationDate": "2024-01-15",
   "identifier": "GSE000000",
   "defaultGene": "APOE",
   "healthCondition": [
@@ -266,7 +264,7 @@ Object whose keys are DEG set ids for the dataset. Each value is an object with:
 
 | Field  | Type     | Description                             |
 | ------ | -------- | --------------------------------------- |
-| `_id`  | string   | Unique DEG set id                       |
+| `id`  | string   | Unique DEG set id                       |
 | `gene` | string[] | Array of differentially expressed genes |
 | `name` | string   | Display name                            |
 
@@ -275,12 +273,12 @@ Example `degs.json`:
 ```jsonc
 {
   "example-ds-condition-1-deg": {
-    "_id": "example-ds-deg",
+    "id": "example-ds-deg",
     "name": "Dataset DEGs",
     "gene": ["SNCA", "MAPT", "LRRK2"]
   },
   "example-ds-condition-2-deg": {
-    "_id": "example-ds-deg",
+    "id": "example-ds-deg",
     "name": "Dataset DEGs",
     "gene": ["LRRK2", "GBA", "APP"]
   }
@@ -330,17 +328,17 @@ Publications are stored as folders containing publication metadata.
 
 ### 3.1 Publications Index (`data/publications/index.json`)
 
-`data/publications/index.json` is a map of publication `_id` to a path of the publication folder (relative to `data/publications`).
-All `_id` should be unique.
+`data/publications/index.json` is a map of publication `id` to a path of the publication folder (relative to `data/publications`).
+All `id` should be unique.
 
 Example `index.json`:
 
 ```jsonc
 {
-  "example-pub-1": "EXAMPLE-Publication-1",
-  "example-pub-2": "./EXAMPLE-Publication-2",
-  "example-pub-3": "./relative/path/to/EXAMPLE-Publication-3",
-  "example-pub-4": "/absolute/path/to/EXAMPLE-Publication-4"
+  "example-pub-1": "Publication-1",
+  "example-pub-2": "./Publication-2",
+  "example-pub-3": "./relative/path/to/EXAMPLE-publications/Publication-3",
+  "example-pub-4": "/absolute/path/to/EXAMPLE-publications/Publication-4"
 }
 ```
 
@@ -360,29 +358,29 @@ Publication folder names may be arbitrary, but must match the path specified in 
 
 Publication metadata schema is sourced from the [Publication component](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-daemon/openapi.json#/components/schemas/Publication) of the [MultiSC-Daemon API](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-daemon/openapi.json).
 
-`required`: `_id`, `datasets`
+`required`: `id`, `datasets`
 
 | Field         | Type                | Description                                                        |
 | ------------- | ------------------- | ------------------------------------------------------------------ |
-| `_id`         | string              | Unique publication id                                              |
+| `id`         | string              | Unique publication id                                              |
 | `author`      | Author              | Array of author objects (same as Dataset, [1.2.2.1](#1221-author)) |
-| `date`        | string (YYYY-MM-DD) | Publication date                                                   |
+| `publicationDate`        | string (YYYY-MM-DD) | Publication publicationDate                                                   |
 | `description` | string (HTML)       | Abstract (supports raw HTML)                                       |
 | `journalName` | string              | Journal title                                                      |
 | `identifier`  | string              | External id (e.g., PMID:#######)                                   |
 | `name`        | string (HTML)       | Publication title (supports raw HTML)                              |
 | `url`         | string (URI)        | Link to publication source (if `identifier` is provided)           |
-| `datasets`    | string[]            | Array of dataset `_id`s referenced                                 |
+| `datasets`    | string[]            | Array of dataset `id`s referenced                                 |
 
 Example publication folder `metadata.json`:
 
 ```jsonc
 {
-  "_id": "example-pub-1",
+  "id": "example-pub-1",
   "name": "Multi-omic integration of astrocyte states",
   "journalName": "Nature",
   "identifier": "PMID:00000000",
-  "date": "2025-02-10",
+  "publicationDate": "2025-02-10",
   "author": [{ "name": "Doe J" }, { "name": "Smith A" }],
   "description": "This is an abstract of this publication.",
   "url": "https://pubmed.ncbi.nlm.nih.gov/00000000/",

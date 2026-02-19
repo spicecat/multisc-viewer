@@ -1,15 +1,20 @@
 <script lang="ts">
-	import type { OntologyTerm } from '$lib/types/daemon';
-	import { Globe } from '@lucide/svelte';
-	import type { Snippet } from 'svelte';
-	import Chip from '../List/Chip.svelte';
+import { Globe } from "@lucide/svelte";
+import type { Snippet } from "svelte";
+import Chip from "$lib/components/List/Chip.svelte";
+import type { OntologyTerm } from "$lib/types/daemon";
 
-	let {
-		ontologyTerm = [],
-		tags = $bindable(),
-		tag,
-		children
-	}: { ontologyTerm?: OntologyTerm; tags?: string[]; tag?: string; children?: Snippet } = $props();
+let {
+	ontologyTerm = [],
+	tags = $bindable(),
+	tag,
+	children,
+}: {
+	ontologyTerm?: OntologyTerm;
+	tags?: string[];
+	tag?: string;
+	children?: Snippet;
+} = $props();
 </script>
 
 <span class="inline-flex flex-wrap gap-1">

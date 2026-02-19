@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { Publications } from '$lib/types/daemon';
+import type { Publication } from "$lib/types/daemon";
 
-	let { publication }: { publication: Publications[string] } = $props();
+const { publication }: { publication: Publication } = $props();
 
-	let name = $derived(publication.name ?? publication._id);
+const name = $derived(publication.name ?? publication.id);
 </script>
 
 <section class="mx-auto max-w-5xl">
@@ -17,7 +17,7 @@
 		</span>
 		<span class="inline-block">
 			{publication.journalName}
-			{publication.date}
+			{publication.publicationDate}
 			<!-- eslint-disable svelte/no-navigation-without-resolve -->
 			{#if publication.url}
 				<a

@@ -1,9 +1,9 @@
 <script lang="ts">
-	import OntologyTerm from '$lib/components/Data/OntologyTerm.svelte';
-	import type { PageProps } from './$types';
+import OntologyTerm from "$lib/components/Data/OntologyTerm.svelte";
+import type { PageProps } from "./$types";
 
-	let { data }: PageProps = $props();
-	let { dataset } = $derived(data);
+const { data }: PageProps = $props();
+const { dataset } = $derived(data);
 </script>
 
 <svelte:head>
@@ -21,14 +21,14 @@
 			{dataset.author?.map((a) => a.name).join(', ')}
 		</span>
 		<span class="inline-block">
-			{dataset.date}
+			{dataset.publicationDate}
 			<!-- eslint-disable svelte/no-navigation-without-resolve -->
 			{#if dataset.url}
 				<a
 					class="anchor"
 					href={dataset.url}
 					target="_blank"
-					title={`${dataset.displayName ?? dataset.name ?? dataset._id} dataset source`}
+					title={`${dataset.displayName ?? dataset.name ?? dataset.id} dataset source`}
 					rel="external noopener noreferrer"
 				>
 					{dataset.identifier ?? dataset.url}

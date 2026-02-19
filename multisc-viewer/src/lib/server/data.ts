@@ -1,6 +1,12 @@
-import type { Datasets, DEGs, Genes, GenesRows, Publications } from '$lib/types/daemon';
-import { merge } from 'lodash-es';
-import { getDaemonTargets } from './daemon';
+import { merge } from "lodash-es";
+import type {
+	DatasetsMap,
+	DEGsMap,
+	GenesMap,
+	GenesRowsMap,
+	PublicationsMap,
+} from "$lib/types/daemon";
+import { getDaemonTargets } from "./daemon";
 
 /**
  * Fetch datasets metadata.
@@ -10,59 +16,65 @@ import { getDaemonTargets } from './daemon';
 export const getDatasets = async (ds?: string[]) => {
 	const daemonTargets = await getDaemonTargets(ds);
 	const datasets = await Promise.all(
-		daemonTargets.entries().map(async ([daemon, dds]) => daemon.datasets(dds))
+		daemonTargets.entries().map(async ([daemon, dds]) => daemon.datasets(dds)),
 	);
-	return datasets.reduce(merge<Datasets, Datasets>, {});
+	return datasets.reduce(merge<DatasetsMap, DatasetsMap>, {});
 };
 
 /**
- * Fetch publications metadata.
- * @param pub - list of publication ids to fetch; if `undefined`, fetch all publications
+ * Fetch PublicationsMap metadata.
+ * @param pub - list of publication ids to fetch; if `undefined`, fetch all PublicationsMap
  * @returns Dictionary mapping publication ids to metadata
  */
 export const getPublications = async (pub?: string[]) => {
 	const daemonTargets = await getDaemonTargets();
-	const publications = await Promise.all(
-		daemonTargets.entries().map(async ([daemon]) => daemon.publications(pub))
+	const PublicationsMap = await Promise.all(
+		daemonTargets.entries().map(async ([daemon]) => daemon.publications(pub)),
 	);
-	return publications.reduce(merge<Publications, Publications>, {});
+	return PublicationsMap.reduce(merge<PublicationsMap, PublicationsMap>, {});
 };
 
 /**
- * Fetch genes for datasets.
+ * Fetch GenesMap for datasets.
  * @param ds - list of dataset ids to fetch
- * @returns Dictionary mapping dataset ids to genes
+ * @returns Dictionary mapping dataset ids to GenesMap
  */
 export const getGenes = async (ds: string[]) => {
 	const daemonTargets = await getDaemonTargets(ds);
-	const genes = await Promise.all(
-		daemonTargets.entries().map(async ([daemon, dds]) => daemon.genes(dds))
+	const GenesMap = await Promise.all(
+		daemonTargets.entries().map(async ([daemon, dds]) => daemon.genes(dds)),
 	);
-	return genes.reduce(merge<Genes, Genes>, {});
+	return GenesMap.reduce(merge<GenesMap, GenesMap>, {});
 };
 
 /**
- * Fetch differentially expressed genes for datasets.
+ * Fetch differentially expressed GenesMap for datasets.
  * @param ds - list of dataset ids to fetch
- * @returns Dictionary mapping dataset ids to differentially expressed genes
+ * @returns Dictionary mapping dataset ids to differentially expressed GenesMap
  */
 export const getDEGs = async (ds: string[]) => {
 	const daemonTargets = await getDaemonTargets(ds);
-	const degs = await Promise.all(
-		daemonTargets.entries().map(async ([daemon, dds]) => daemon.degs(dds))
+	const DEGsMap = await Promise.all(
+		daemonTargets.entries().map(async ([daemon, dds]) => daemon.degs(dds)),
 	);
-	return degs.reduce(merge<DEGs, DEGs>, {});
+	return DEGsMap.reduce(merge<DEGsMap, DEGsMap>, {});
 };
 
 /**
- * Fetch rows for gene datasets and differentially expressed genes.
+ * Fetch rows for gene datasets and differentially expressed GenesMap.
  * @param ds - list of dataset ids to fetch
  * @returns List of gene rows
  * */
-export const getGenesRows = async (ds: string[]) => {
+export const getGenesRows = async (
+	ds: string[],
+	limit?: number,
+	offset?: number,
+) => {
 	const daemonTargets = await getDaemonTargets(ds);
-	const genesRows = await Promise.all(
-		daemonTargets.entries().map(async ([daemon, dds]) => daemon.genesRows(dds))
+	const GenesRowsMap = await Promise.all(
+		daemonTargets
+			.entries()
+			.map(async ([daemon, dds]) => daemon.genesRows(dds, limit, offset)),
 	);
-	return genesRows.reduce(merge<GenesRows, GenesRows>, []);
+	return GenesRowsMap.reduce(merge<GenesRowsMap, GenesRowsMap>, {});
 };

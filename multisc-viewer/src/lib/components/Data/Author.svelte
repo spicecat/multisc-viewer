@@ -1,13 +1,13 @@
 <script lang="ts">
-	import type { Author } from '$lib/types/daemon';
-	import { Portal, Tooltip } from '@skeletonlabs/skeleton-svelte';
-	import Chip from '../List/Chip.svelte';
+import { Portal, Tooltip } from "@skeletonlabs/skeleton-svelte";
+import Chip from "$lib/components/List/Chip.svelte";
+import type { Author } from "$lib/types/daemon";
 
-	let {
-		author = [],
-		tags = $bindable(),
-		tag = 'author'
-	}: { author?: Author; tags?: string[]; tag?: string } = $props();
+let {
+	author = [],
+	tags = $bindable(),
+	tag = "author",
+}: { author?: Author; tags?: string[]; tag?: string } = $props();
 </script>
 
 <Tooltip positioning={{ placement: 'left' }} openDelay={200} interactive>

@@ -1,18 +1,18 @@
 <script lang="ts">
-	import { page } from '$app/state';
-	import type { PlotsParams } from '$lib/types/daemon';
+import { page } from "$app/state";
+import type { PlotsParams } from "$lib/types/daemon";
 
-	let groupBy = $state(page.url.searchParams.get('groupBy'));
-	let splitBy = $state(page.url.searchParams.get('splitBy'));
+const groupBy = $state(page.url.searchParams.get("groupBy"));
+const splitBy = $state(page.url.searchParams.get("splitBy"));
 
-	const groupyByOptions: PlotsParams['groupBy'][] = ['CellType', 'Genotype'];
-	const splitByOptions: PlotsParams['splitBy'][] = ['CellType', 'Genotype'];
+const groupByOptions: PlotsParams["groupBy"][] = ["CellType", "Genotype"];
+const splitByOptions: PlotsParams["splitBy"][] = ["CellType", "Genotype"];
 </script>
 
 <label class="label">
 	<span class="label-text">Group By</span>
 	<select class="select" name="groupBy">
-		{#each groupyByOptions as g (`option-groupBy-${g}`)}
+		{#each groupByOptions as g (`option-groupBy-${g}`)}
 			<option value={g} selected={g === groupBy}>{g}</option>
 		{/each}
 	</select>

@@ -1,9 +1,9 @@
 <script lang="ts">
-	import PlotsForm from '$lib/components/Plots/Form.svelte';
-	import type { PageProps } from '../$types';
+import PlotsForm from "$lib/components/Plots/Form.svelte";
+import type { PageProps } from "./$types";
 
-	let { data }: PageProps = $props();
-	let { datasets } = $derived(data);
+const { data }: PageProps = $props();
+const { datasets } = $derived(data);
 </script>
 
 <svelte:head>

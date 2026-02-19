@@ -1,31 +1,31 @@
 <script lang="ts" generics="T">
-	import { Pagination } from '@skeletonlabs/skeleton-svelte';
-	import type { Snippet } from 'svelte';
-	import { ArrowLeftIcon, ArrowRightIcon } from '@lucide/svelte';
+import { ArrowLeftIcon, ArrowRightIcon } from "@lucide/svelte";
+import { Pagination } from "@skeletonlabs/skeleton-svelte";
+import type { Snippet } from "svelte";
 
-	let {
-		data,
-		selected = [],
-		pageSize = 10,
-		children,
-		row
-	}: {
-		data: T[];
-		selected?: T[];
-		pageSize?: number;
-		children?: Snippet;
-		row: Snippet<[T]>;
-	} = $props();
+const {
+	data,
+	selected = [],
+	pageSize = 10,
+	children,
+	row,
+}: {
+	data: T[];
+	selected?: T[];
+	pageSize?: number;
+	children?: Snippet;
+	row: Snippet<[T]>;
+} = $props();
 
-	let items = $derived([...selected, ...data]);
+const items = $derived([...selected, ...data]);
 
-	let page = $state(1);
-	let slice = $derived(items.slice((page - 1) * pageSize, page * pageSize));
+let page = $state(1);
+const slice = $derived(items.slice((page - 1) * pageSize, page * pageSize));
 
-	$effect(() => {
-		const totalPages = Math.ceil(items.length / pageSize);
-		if (page > totalPages) page = Math.max(1, totalPages);
-	});
+$effect(() => {
+	const totalPages = Math.ceil(items.length / pageSize);
+	if (page > totalPages) page = Math.max(1, totalPages);
+});
 </script>
 
 <div class="grid w-full place-items-center">

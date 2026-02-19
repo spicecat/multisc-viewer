@@ -1,10 +1,10 @@
 <script lang="ts">
-	import PlotsForm from '$lib/components/Plots/Form.svelte';
-	import Publication from '$lib/components/Data/Publication.svelte';
-	import type { PageProps } from './$types';
+import Publication from "$lib/components/Data/Publication.svelte";
+import PlotsForm from "$lib/components/Plots/Form.svelte";
+import type { PageProps } from "./$types";
 
-	let { data }: PageProps = $props();
-	let { datasets, publication } = $derived(data);
+const { data }: PageProps = $props();
+const { datasets, publication } = $derived(data);
 </script>
 
 <svelte:head>

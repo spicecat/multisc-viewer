@@ -1,0 +1,18 @@
+{
+  "id": "example-pub-1",
+  "author": [
+    {
+      "name": "Doe J"
+    },
+    {
+      "name": "Smith A"
+    }
+  ],
+  "datasets": ["example-ds-1", "example-ds-2"],
+  "publicationDate": "2000-01-01",
+  "description": "This is an abstract of this publication.",
+  "identifier": "",
+  "journalName": "Nature",
+  "name": "Multi-omic integration of astrocyte states",
+  "url": "https://pubmed.ncbi.nlm.nih.gov/00000000/"
+}

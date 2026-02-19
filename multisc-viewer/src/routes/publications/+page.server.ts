@@ -1,5 +1,5 @@
-import { getPublications, getDatasets } from '$lib/server/data';
-import type { PageServerLoad } from './$types';
+import { getDatasets, getPublications } from "$lib/server/data";
+import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async () => {
 	const publications = await getPublications();
@@ -9,9 +9,9 @@ export const load: PageServerLoad = async () => {
 		datasets,
 		publications,
 		meta: {
-			title: 'MultiSC-Viewer - Publications',
+			title: "MultiSC-Viewer - Publications",
 			description:
-				'Explore publications with MultiSC-Viewer, a web application for visualizing and comparing gene expression across multiple datasets, brain regions, disease conditions, and species.'
-		}
+				"Explore publications with MultiSC-Viewer, a web application for visualizing and comparing gene expression across multiple datasets, brain regions, disease conditions, and species.",
+		},
 	};
 };

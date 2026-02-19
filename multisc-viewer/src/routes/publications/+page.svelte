@@ -1,9 +1,9 @@
 <script lang="ts">
-	import PublicationsTable from '$lib/components/Data/PublicationsTable.svelte';
-	import type { PageProps } from './$types';
+import PublicationsTable from "$lib/components/Data/PublicationsTable.svelte";
+import type { PageProps } from "./$types";
 
-	let { data }: PageProps = $props();
-	let { datasets, publications } = $derived(data);
+const { data }: PageProps = $props();
+const { datasets, publications } = $derived(data);
 </script>
 
 <svelte:head>

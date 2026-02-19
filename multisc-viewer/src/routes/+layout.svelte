@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
-	import { Code, House } from '@lucide/svelte';
-	import { AppBar } from '@skeletonlabs/skeleton-svelte';
-	import '../app.css';
+import { Code, House } from "@lucide/svelte";
+import { AppBar } from "@skeletonlabs/skeleton-svelte";
+import { resolve } from "$app/paths";
+import "../app.css";
 
-	let { children } = $props();
+const { children } = $props();
 </script>
 
 <AppBar>

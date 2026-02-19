@@ -1,36 +1,43 @@
 <script lang="ts">
-	import Publication from '$lib/components/Data/Publication.svelte';
-	import PlotsForm from '$lib/components/Plots/Form.svelte';
-	import { Camera } from '@lucide/svelte';
-	import { Progress } from '@skeletonlabs/skeleton-svelte';
-	import html2canvas from 'html2canvas-pro';
-	import { dndzone } from 'svelte-dnd-action';
-	import { SvelteMap } from 'svelte/reactivity';
-	import type { PageProps } from './$types';
+import { Camera } from "@lucide/svelte";
+import { Progress } from "@skeletonlabs/skeleton-svelte";
+import html2canvas from "html2canvas-pro";
+import { SvelteMap } from "svelte/reactivity";
+import { dndzone } from "svelte-dnd-action";
+import Publication from "$lib/components/Data/Publication.svelte";
+import PlotsForm from "$lib/components/Plots/Form.svelte";
+import type { PageProps } from "./$types";
 
-	let { data }: PageProps = $props();
-	let { datasets, publication, genesRows, plotsIdMap, plotsParams, plotsResults } = $derived(data);
+const { data }: PageProps = $props();
+const {
+	datasets,
+	publication,
+	genesRows,
+	plotsIdMap,
+	plotsParams,
+	plotsResults,
+} = $derived(data);
 
-	let plotsElements = new SvelteMap<string, HTMLImageElement>();
-	async function downloadPlots() {
-		const plotIds = Object.keys(plotsResults);
-		for (const [plotId, element] of plotsElements) {
-			if (!plotIds.includes(plotId) || !element) continue;
-			try {
-				const canvas = await html2canvas(element);
-				const image = canvas.toDataURL('image/png');
-				const link = document.createElement('a');
-				link.download = `${plotId}.png`;
-				link.href = image;
-				link.click();
-				link.remove();
-			} catch (error) {
-				console.error('Error capturing screenshot:', error);
-			}
+const plotsElements = new SvelteMap<string, HTMLImageElement>();
+async function downloadPlots() {
+	const plotIds = Object.keys(plotsResults);
+	for (const [plotId, element] of plotsElements) {
+		if (!plotIds.includes(plotId) || !element) continue;
+		try {
+			const canvas = await html2canvas(element);
+			const image = canvas.toDataURL("image/png");
+			const link = document.createElement("a");
+			link.download = `${plotId}.png`;
+			link.href = image;
+			link.click();
+			link.remove();
+		} catch (error) {
+			console.error("Error capturing screenshot:", error);
 		}
 	}
+}
 
-	let items = $derived(plotsParams.ds.map((d) => ({ id: d, _id: d })));
+let items = $derived(plotsParams.ds.map((d) => ({ id: d })));
 </script>
 
 <svelte:head>
@@ -55,7 +62,7 @@
 		class="flex justify-center-safe gap-2 overflow-scroll"
 	>
 		{#each items as ds (ds.id)}
-			{@const d = ds._id}
+			{@const d = ds.id}
 			<div class="card preset-filled-surface-500 text-center">
 				<div class="font-bold">{datasets[d]?.displayName}</div>
 				{#each plotsParams.gene as g (`plots-gene-${d}-${g}`)}

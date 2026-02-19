@@ -1,15 +1,16 @@
 <script lang="ts">
-	import { navigating, page } from '$app/state';
-	import type { Datasets, GenesRows } from '$lib/types/daemon';
-	import { ArrowRight } from '@lucide/svelte';
-	import { Progress } from '@skeletonlabs/skeleton-svelte';
-	import DatasetsTable from '../Data/DatasetsTable.svelte';
-	import GenesTable from '../Data/GenesTable.svelte';
+import { ArrowRight } from "@lucide/svelte";
+import { Progress } from "@skeletonlabs/skeleton-svelte";
+import { navigating, page } from "$app/state";
+import DatasetsTable from "$lib/components/Data/DatasetsTable.svelte";
+import GenesTable from "$lib/components/Data/GenesTable.svelte";
+import type { DatasetsMap, GenesRowsMap } from "$lib/types/daemon";
 
-	import Groupings from './Groupings.svelte';
-	import PlotTypes from './PlotTypes.svelte';
+import Groupings from "./Groupings.svelte";
+import PlotTypes from "./PlotTypes.svelte";
 
-	let { datasets, genesRows }: { datasets: Datasets; genesRows?: GenesRows } = $props();
+const { datasets, genesRows }: { datasets: DatasetsMap; genesRows?: GenesRowsMap } =
+	$props();
 </script>
 
 <form action="/plots" class="space-y-4">

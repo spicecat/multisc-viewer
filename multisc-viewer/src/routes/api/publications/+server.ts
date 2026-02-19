@@ -1,7 +1,7 @@
-import { getPublications } from '$lib/server/data';
-import { type RequestHandler, json } from '@sveltejs/kit';
+import { json, type RequestHandler } from "@sveltejs/kit";
+import { getPublications } from "$lib/server/data";
 
 export const GET: RequestHandler = async ({ url }) => {
-	const pub = url.searchParams.getAll('pub');
+	const pub = url.searchParams.getAll("pub");
 	return json(await getPublications(pub));
 };
