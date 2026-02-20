@@ -21,8 +21,8 @@ LABEL org.opencontainers.image.title="multisc-viewer" \
 WORKDIR /app
 
 ENV NODE_ENV=production \
-	PORT=3000 \
-	MULTISC_VIEWER_DATA_DIR=/data
+	MULTISC_VIEWER_DATA_DIR=/data \
+	PORT=3000
 
 COPY --from=builder /app/build ./build
 COPY --from=builder /app/node_modules ./node_modules

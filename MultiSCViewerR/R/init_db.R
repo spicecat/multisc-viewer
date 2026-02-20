@@ -1,5 +1,3 @@
-
-
 author_schema <- "STRUCT(name VARCHAR)[]"
 ontology_term_schema <- "STRUCT(
   displayName VARCHAR,
@@ -44,14 +42,31 @@ duckdb_columns <- function(schema) {
   paste0("{", paste(parts, collapse = ", "), "}")
 }
 
+convert_rds_to_qs2 <- function(dir) {
+  qs2_path <- file.path(dir, "data.qs2")
+  if (file.exists(qs2_path)) {
+    return(qs2_path)
+  }
+
+  rds_path <- file.path(dir, "data.rds")
+  if (file.exists(rds_path)) {
+    print(paste("Converting RDS to QS2:", dir))
+    data <- readRDS(rds_path)
+    qs2::qs_save(data, qs2_path)
+    qs2_path
+  }
+}
+
 insert_datasets <- function(con) {
   ds_cols <- duckdb_columns(dataset_schema)
   for (dir in .env$ds_index) {
     print(paste("Adding:", dir))
     meta <- jsonlite::fromJSON(file.path(dir, "metadata.json"))
 
+    # Convert RDS to QS2 if necessary
+    qs_path <- convert_rds_to_qs2(dir)
+
     # Add gene, deg, size to metadata
-    qs_path <- file.path(dir, "data.qs2")
     data <- qs2::qs_read(qs_path)
     meta$gene <- rownames(data[["RNA"]])
     if (file.exists(file.path(dir, "degs.json"))) {
@@ -126,7 +141,7 @@ insert_publications <- function(con) {
 #'
 #' @examples
 #' \dontrun{
-#'   init_db()
+#' init_db()
 #' }
 init_db <- function() {
   init()
