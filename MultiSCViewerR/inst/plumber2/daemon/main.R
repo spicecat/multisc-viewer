@@ -5,7 +5,7 @@ MultiSCViewerR:::init()
 #* MultiSCViewerR API
 #*
 #* Backend service for
-#* [MultiSC-Viewer](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main)
+#* [MultiSC-Viewer](https://github.com/spicecat/multisc-viewer/tree/main)
 #* to serve data and plots.
 #*
 #* @license Apache 2.0 https://www.apache.org/licenses/LICENSE-2.0.html

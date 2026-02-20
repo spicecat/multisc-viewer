@@ -3,7 +3,7 @@ import { env } from "$env/dynamic/private";
 
 export const plotsConfig = {
 	/** Directory to save plots */
-	plotsDir: env.PLOTS_DIR ?? "../data/plots",
+	plotsDir: `${env.MULTISC_VIEWER_DATA_DIR ?? "../data"}/plots`,
 	/** Timeout for plot requests in milliseconds */
 	timeout: Number(env.PLOT_TIMEOUT ?? 1000 * 60 * 4), // 4 minutes
 	/** Maximum size of the plot directory in bytes */

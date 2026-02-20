@@ -11,7 +11,7 @@ const localSpec = path.resolve(
 	"../MultiSCViewerR/inst/plumber2/daemon/openapi.json",
 );
 const remoteSpec =
-	"https://git.jasonxu.dev/JasonXu/plot-viewer/raw/branch/main/MultiSCViewerR/inst/plumber2/daemon/openapi.json";
+	"https://raw.githubusercontent.com/spicecat/multisc-viewer/refs/heads/main/MultiSCViewerR/inst/plumber2/daemon/openapi.json";
 
 // prefer local monorepo file, else remote URL
 try {

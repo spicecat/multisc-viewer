@@ -5,8 +5,8 @@ services:
     build: ./data
     volumes:
       - data:/data
-  multisc-daemon:
-    build: ./multisc-daemon
+  MultiSCViewerR:
+    build: ./MultiSCViewerR
     volumes:
       - data:/data
     depends_on:

@@ -1,6 +1,6 @@
 # MultiSC-Data
 
-Datasets and publications data for [MultiSC-Viewer](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main).
+Datasets and publications data for [MultiSC-Viewer](https://github.com/spicecat/multisc-viewer/tree/main).
 
 ## Data Directory Layout
 
@@ -79,7 +79,7 @@ Optional Files
 
 #### 1.2.2 Dataset Metadata (`metadata.json`)
 
-Dataset metadata schema is sourced from the [Dataset component](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-daemon/openapi.json#/components/schemas/Dataset) of the [MultiSC-Daemon API](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-daemon/openapi.json).
+Dataset metadata schema is sourced from the [Dataset component](https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR/openapi.json#/components/schemas/Dataset) of the [MultiSC-Daemon API](https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR/openapi.json).
 
 `required`: `id`
 
@@ -240,7 +240,7 @@ Example `tissue`:
 
 Array of strings representing genes in the dataset.
 
-If `genes.json` is not provided, [MultiSC-Daemon](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-daemon) will generate a `genes.json` file from the Seurat object in `data.rds`.
+If `genes.json` is not provided, [MultiSC-Daemon](https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR) will generate a `genes.json` file from the Seurat object in `data.rds`.
 
 `genes.json` can be generated manually in a Dataset folder with the R script:
 
@@ -356,7 +356,7 @@ Publication folder names may be arbitrary, but must match the path specified in 
 
 #### 3.2.2 Publication Metadata (`metadata.json`)
 
-Publication metadata schema is sourced from the [Publication component](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-daemon/openapi.json#/components/schemas/Publication) of the [MultiSC-Daemon API](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-daemon/openapi.json).
+Publication metadata schema is sourced from the [Publication component](https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR/openapi.json#/components/schemas/Publication) of the [MultiSC-Daemon API](https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR/openapi.json).
 
 `required`: `id`, `datasets`
 
@@ -392,7 +392,7 @@ Example publication folder `metadata.json`:
 
 ## Related
 
-- MultiSC: [https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-viewer](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/README.md)
-- Add MultiSC-Data: [https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/data](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/data/README.md)
-- Run MultiSC-Daemon: [https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-daemon](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-daemon/README.md)
-- Run MultiSC-Viewer: [https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-viewer](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-viewer/README.md)
+- MultiSC: [https://github.com/spicecat/multisc-viewer/tree/main/multisc-viewer](https://github.com/spicecat/multisc-viewer/tree/main/README.md)
+- Add MultiSC-Data: [https://github.com/spicecat/multisc-viewer/tree/main/data](https://github.com/spicecat/multisc-viewer/tree/main/data/README.md)
+- Run MultiSC-Daemon: [https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR](https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR/README.md)
+- Run MultiSC-Viewer: [https://github.com/spicecat/multisc-viewer/tree/main/multisc-viewer](https://github.com/spicecat/multisc-viewer/tree/main/multisc-viewer/README.md)

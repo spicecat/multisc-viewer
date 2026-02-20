@@ -3,3 +3,5 @@
 ^\.Rprofile$
 ^LICENSE\.md$
 ^README\.Rmd$
+^Dockerfile$
+^.dockerignore$

@@ -5,7 +5,7 @@ Authors@R: c(
     person("Andrew", "Teh", email = "ateh0701@gmail.com", role = c("aut", "cre")),
     person("Jason", "Xu", email = "xinwen31415@gmail.com", role = "aut")
   )
-Description: Backend service to serve data and plots for [MultiSC-Viewer](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main).
+Description: Backend service to serve data and plots for [MultiSC-Viewer](https://github.com/spicecat/multisc-viewer/tree/main).
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

@@ -1,0 +1,11 @@
+.git
+.gitignore
+.Rprofile
+.Rhistory
+.Rproj.user
+*.Rproj
+.vscode
+renv/
+renv.lock
+README.Rmd
+.Rbuildignore

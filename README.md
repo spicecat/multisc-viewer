@@ -1,6 +1,6 @@
 # MultiSC-Viewer
 
-[MultiSC-Viewer](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-viewer) is a web application for visualizing and comparing gene expression in multiple single cell/nucleus datasets across different brain regions, disease conditions, and species.
+[MultiSC-Viewer](https://github.com/spicecat/multisc-viewer/tree/main/multisc-viewer) is a web application for visualizing and comparing gene expression in multiple single cell/nucleus datasets across different brain regions, disease conditions, and species.
 
 ## Features
 
@@ -11,12 +11,12 @@
 
 ## Run Locally
 
-Requires [R](https://www.r-project.org/), [Seurat](https://satijalab.org/seurat/), [plumber](https://www.rplumber.io/), [Node.js](https://nodejs.org/), [PM2](https://pm2.keymetrics.io/).
+Requires [R](https://www.r-project.org/), [Seurat](https://satijalab.org/seurat/), [plumber2](https://plumber2.posit.co/), [Node.js](https://nodejs.org/), [PM2](https://pm2.keymetrics.io/).
 
 ```bash
 # Clone the repository
-git clone --single-branch -b main https://git.jasonxu.dev/JasonXu/plot-viewer.git
-cd plot-viewer
+git clone --single-branch https://github.com/spicecat/multisc-viewer.git
+cd multisc-viewer
 
 # Install system dependencies (Debian/Ubuntu)
 sudo apt update
@@ -24,7 +24,7 @@ sudo apt-get install libglpk-dev libsodium-dev libx11-dev libxml2-dev pandoc pyt
 
 # Install packages and dependencies
 R -e 'install.packages("pak")'
-R -e 'pak::pkg_install(c("plumber", "Seurat"))'
+R -e 'pak::pkg_install(c("plumber2", "Seurat"))'
 
 npm --prefix multisc-viewer install
 npm --prefix multisc-viewer run build
@@ -35,7 +35,7 @@ npm --prefix multisc-viewer run build
 pm2 start ecosystem.config.js
 
 # Scale the number of plotting daemons
-pm2 scale multisc-daemon 4
+pm2 scale MultiSCViewerR 4
 ```
 
 ```bash
@@ -55,7 +55,7 @@ docker compose up -d
 
 ## Related
 
-- MultiSC: [https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-viewer](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/README.md)
-- Add MultiSC-Data: [https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/data](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/data/README.md)
-- Run MultiSC-Daemon: [https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-daemon](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-daemon/README.md)
-- Run MultiSC-Viewer: [https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-viewer](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/multisc-viewer/README.md)
+- MultiSC: [https://github.com/spicecat/multisc-viewer/tree/main/multisc-viewer](https://github.com/spicecat/multisc-viewer/tree/main/README.md)
+- Add MultiSC-Data: [https://github.com/spicecat/multisc-viewer/tree/main/data](https://github.com/spicecat/multisc-viewer/tree/main/data/README.md)
+- Run MultiSC-Daemon: [https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR](https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR/README.md)
+- Run MultiSC-Viewer: [https://github.com/spicecat/multisc-viewer/tree/main/multisc-viewer](https://github.com/spicecat/multisc-viewer/tree/main/multisc-viewer/README.md)

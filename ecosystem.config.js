@@ -1,9 +1,9 @@
 module.exports = {
   apps: [
     {
-      name: "multisc-daemon",
-      cwd: "./multisc-daemon",
-      script: "plumber.R",
+      name: "MultiSCViewerR",
+      cwd: "./MultiSCViewerR",
+      script: "inst/plumber2/run_daemon.R",
       interpreter: "Rscript",
       instances: 1,
       exec_mode: "fork",

@@ -21,7 +21,7 @@ const { children } = $props();
 			<a
 				class="btn preset-tonal"
 				title="Source Code"
-				href="https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main/"
+				href="https://github.com/spicecat/multisc-viewer/tree/main/"
 				target="_blank"
 				rel="external noopener noreferrer"
 			>

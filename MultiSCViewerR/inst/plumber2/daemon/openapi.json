@@ -2,7 +2,7 @@
   "openapi": "3.0.4",
   "info": {
     "title": "MultiSCViewerR API",
-    "description": "Backend service for [MultiSC-Viewer](https://git.jasonxu.dev/JasonXu/plot-viewer/src/branch/main) to serve data and plots.",
+    "description": "Backend service for [MultiSC-Viewer](https://github.com/spicecat/multisc-viewer/tree/main) to serve data and plots.",
     "version": "1.0.0"
   },
   "servers": [
