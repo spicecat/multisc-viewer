@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM scratch
 
 WORKDIR /data
 COPY datasets/ ./datasets/

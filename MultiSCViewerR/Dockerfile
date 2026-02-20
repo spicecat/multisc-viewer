@@ -11,4 +11,4 @@ ENV MULTISC_VIEWER_DATA_DIR=/data \
     PLUMBER_PORT=8080
 EXPOSE 8080
 
-CMD ["R", "--vanilla", "-f", "inst/plumber2/daemon/run_daemon.R"]
+CMD ["R", "--vanilla", "-f", "inst/run_daemon.R"]

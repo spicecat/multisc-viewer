@@ -3,7 +3,7 @@ module.exports = {
     {
       name: "MultiSCViewerR",
       cwd: "./MultiSCViewerR",
-      script: "inst/plumber2/run_daemon.R",
+      script: "inst/run_daemon.R",
       interpreter: "Rscript",
       instances: 1,
       exec_mode: "fork",

@@ -20,10 +20,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	if (gene.length === 0) {
 		if (pub) publication = (await getPublications([pub]))[pub];
 		if (pub && !publication) error(404, `Publication ${pub} not found`);
-		datasets = await getDatasets(
-			publication ? publication.datasets : undefined,
-		);
-
+		datasets = await getDatasets(publication ? publication.datasets : ds);
 		const genesSet = new Set<string>();
 		for (const d of ds) {
 			const defaultGene = datasets[d]?.defaultGene;
