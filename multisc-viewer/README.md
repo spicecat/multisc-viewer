@@ -1,4 +1,4 @@
-# MultiSC-Viewer
+# MultiSC-Viewer Web App
 
 Web application for [MultiSC-Viewer](https://github.com/spicecat/multisc-viewer).
 
@@ -39,5 +39,5 @@ docker run -d -p 3000:80 multisc-viewer
 
 - MultiSC: [https://github.com/spicecat/multisc-viewer/tree/main/multisc-viewer](https://github.com/spicecat/multisc-viewer/tree/main/README.md)
 - Add MultiSC-Data: [https://github.com/spicecat/multisc-viewer/tree/main/data](https://github.com/spicecat/multisc-viewer/tree/main/data/README.md)
-- Run MultiSC-Daemon: [https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR](https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR/README.md)
+- Run MultiSC-Viewer Daemon: [https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR](https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR/README.md)
 - Run MultiSC-Viewer: [https://github.com/spicecat/multisc-viewer/tree/main/multisc-viewer](https://github.com/spicecat/multisc-viewer/tree/main/multisc-viewer/README.md)

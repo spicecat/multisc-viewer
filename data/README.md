@@ -1,4 +1,4 @@
-# MultiSC-Data
+# MultiSC-Viewer Data
 
 Datasets and publications data for [MultiSC-Viewer](https://github.com/spicecat/multisc-viewer/tree/main).
 
@@ -53,7 +53,7 @@ Optional Files
 
 #### 1.1.2 Dataset Metadata (`metadata.json`)
 
-Dataset metadata schema is sourced from the [Dataset component](https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR/openapi.json#/components/schemas/Dataset) of the [MultiSC-Daemon API](https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR/openapi.json).
+Dataset metadata schema is sourced from the [Dataset component](https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR/openapi.json#/components/schemas/Dataset) of the [MultiSC-Viewer Daemon API](https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR/openapi.json).
 
 `required`: `id`
 
@@ -283,7 +283,7 @@ Each publication is stored as its own folder with a consistent naming convention
 
 #### 2.1.2 Publication Metadata (`metadata.json`)
 
-Publication metadata schema is sourced from the [Publication component](https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR/openapi.json#/components/schemas/Publication) of the [MultiSC-Daemon API](https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR/openapi.json).
+Publication metadata schema is sourced from the [Publication component](https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR/openapi.json#/components/schemas/Publication) of the [MultiSC-Viewer Daemon API](https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR/openapi.json).
 
 `required`: `id`, `datasets`
 
@@ -319,7 +319,7 @@ Example publication folder `metadata.json`:
 
 ## Related
 
-- MultiSC: [https://github.com/spicecat/multisc-viewer/tree/main/multisc-viewer](https://github.com/spicecat/multisc-viewer/tree/main/README.md)
-- Add MultiSC-Data: [https://github.com/spicecat/multisc-viewer/tree/main/data](https://github.com/spicecat/multisc-viewer/tree/main/data/README.md)
-- Run MultiSC-Daemon: [https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR](https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR/README.md)
-- Run MultiSC-Viewer: [https://github.com/spicecat/multisc-viewer/tree/main/multisc-viewer](https://github.com/spicecat/multisc-viewer/tree/main/multisc-viewer/README.md)
+- MultiSC-Viewer: [https://github.com/spicecat/multisc-viewer/tree/main/multisc-viewer](https://github.com/spicecat/multisc-viewer/tree/main/README.md)
+- Data: [https://github.com/spicecat/multisc-viewer/tree/main/data](https://github.com/spicecat/multisc-viewer/tree/main/data/README.md)
+- MultiSC-ViewerR Daemon: [https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR](https://github.com/spicecat/multisc-viewer/tree/main/MultiSCViewerR/README.md)
+- MultiSC-Viewer Web App: [https://github.com/spicecat/multisc-viewer/tree/main/multisc-viewer](https://github.com/spicecat/multisc-viewer/tree/main/multisc-viewer/README.md)

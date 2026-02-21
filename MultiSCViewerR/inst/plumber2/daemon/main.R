@@ -31,14 +31,12 @@ function() list(status = "ok")
 
 #* Get loaded datasets
 #* @get /loaded
-#* @serializer json
 #* @response 200:[string] Loaded dataset ids
 #* @tag state
 MultiSCViewerR:::loaded
 
 #* Unload datasets
 #* @post /unload
-#* @serializer json
 #* @query ds:[string] Dataset ids. Unset to unload all datasets.
 #* @response 200:[string] Loaded dataset ids
 #* @tag state
@@ -46,7 +44,6 @@ MultiSCViewerR:::unload_ds
 
 #* Load datasets
 #* @post /load
-#* @serializer json
 #* @query ds:[string]* Dataset ids
 #* @response 200:[string] Loaded dataset ids
 #* @tag state
@@ -54,14 +51,12 @@ MultiSCViewerR:::load_ds
 
 #* Get datasets index
 #* @get /datasets-index
-#* @serializer json
 #* @response 200:[{id:string}] List of datasets ids and sizes
 #* @tag data
 MultiSCViewerR:::get_datasets_index
 
 #* Get datasets metadata
 #* @get /datasets
-#* @serializer json
 #* @query ds:[string] Dataset ids. Unset to get all datasets.
 #* @response 200:[{id:string, deg:[{id:string, name:string}]}]
 #*   List of datasets metadata
@@ -70,7 +65,6 @@ MultiSCViewerR:::get_datasets
 
 #* Get publications metadata
 #* @get /publications
-#* @serializer json
 #* @query pub:[string] Publication ids. Unset to get all publications.
 #* @response 200:[{id:string, datasets:[string]}] List of publications metadata
 #* @tag data
@@ -78,7 +72,6 @@ MultiSCViewerR:::get_publications
 
 #* Get genes for datasets
 #* @get /genes
-#* @serializer json
 #* @query ds:[string]* Dataset ids
 #* @response 200:[{id:string, gene:[string]}] List of datasets genes
 #* @tag data
@@ -86,7 +79,6 @@ MultiSCViewerR:::get_genes
 
 #* Get differentially expressed genes for datasets
 #* @get /degs
-#* @serializer json
 #* @query ds:[string]* Dataset ids
 #* @response 200:[{id:string, deg:[{id:string, name:string}]}]
 #*   List of datasets differentially expressed genes

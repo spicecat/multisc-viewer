@@ -63,10 +63,10 @@ export const load: PageServerLoad = async ({ url }) => {
 		]),
 	);
 
+	const genesRows = await getGenesRows(Object.keys(datasets));
+	
 	const plotsParams: PlotsParams = { ds, gene, pt, groupBy, splitBy };
 	const plotsResults = plots(plotsParams);
-
-	const genesRows = await getGenesRows(Object.keys(datasets));
 
 	const name = publication
 		? (publication.name ?? publication.id)

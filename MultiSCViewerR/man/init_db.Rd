@@ -29,6 +29,6 @@ and gene data from QS2 files
 }
 \examples{
 \dontrun{
-  init_db()
+init_db()
 }
 }

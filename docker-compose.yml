@@ -14,7 +14,7 @@ services:
   multisc-viewer:
     build: ./multisc-viewer
     ports:
-      - "4173:443"
+      - "3000:443"
     volumes:
       - data:/data:ro
     depends_on:

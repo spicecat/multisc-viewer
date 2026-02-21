@@ -12,7 +12,7 @@ RUN Rscript -e "install.packages('renv'); renv::restore()"
 
 COPY . /app/pkg
 RUN Rscript -e "install.packages('remotes'); remotes::install_local('/app/pkg', dependencies = FALSE)"
-
+RUN Rscript -e "MultiSCViewerR::init_db()"
 
 EXPOSE 8080
 

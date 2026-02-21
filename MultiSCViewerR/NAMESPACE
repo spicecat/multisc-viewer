@@ -3,3 +3,5 @@
 export(init_db)
 export(msc_plumb)
 importFrom(ggplot2,ggsave)
+importFrom(stats,setNames)
+importFrom(utils,object.size)

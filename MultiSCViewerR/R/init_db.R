@@ -137,6 +137,9 @@ insert_publications <- function(con) {
 #' @return Invisibly returns `NULL`. Creates or updates the DuckDB
 #'   database file.
 #'
+#' @importFrom stats setNames
+#' @importFrom utils object.size
+#'
 #' @export
 #'
 #' @examples

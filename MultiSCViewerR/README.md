@@ -1,6 +1,7 @@
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# MultiSCDaemon
+# MultiSCViewerR
 
 <!-- badges: start -->
 
@@ -14,7 +15,7 @@ Backend service to serve data and plots for
 Install the development version from the root of the repository (after
 cloning) or directly via `remotes`/`pak`.
 
-```r
+``` r
 # Using pak (recommended)
 install.packages("pak")
 pak::pkg_install("spicecat/multisc-viewer@master", dependencies = TRUE, upgrade = FALSE)
@@ -36,15 +37,16 @@ packages; `pak` will resolve these automatically.
 
 ### From R
 
-```r
+``` r
+library(MultiSCDaemon)
 # Launch on default port (8080)
-MultiSCDaemon::msc_plumb()
+msc_plumb()
 
 # Custom port
-MultiSCDaemon::msc_plumb(port = 8123)
+msc_plumb(port = 8123)
 
 # Pass additional plumber2::api_run() args (e.g. host)
-MultiSCDaemon::msc_plumb(port = 8080, host = "0.0.0.0")
+msc_plumb(port = 8080, host = "0.0.0.0")
 ```
 
 ### Environment variables
@@ -52,14 +54,14 @@ MultiSCDaemon::msc_plumb(port = 8080, host = "0.0.0.0")
 `msc_plumb()` reads the data root from an environment variable before
 starting and sets internal `options()` used by API handlers.
 
-| Variable                  | Default   | Description                                                     |
-| ------------------------- | --------- | --------------------------------------------------------------- |
-| `PLUMBER_PORT`            | 8080      | HTTP port (alternative to `port` argument)                      |
+| Variable | Default | Description |
+|----|----|----|
+| `PLUMBER_PORT` | 8080 | HTTP port (alternative to `port` argument) |
 | `MULTISC_VIEWER_DATA_DIR` | `../data` | Data root containing `datasets/`, `publications/`, and `plots/` |
 
 Set them prior to calling `msc_plumb()`:
 
-```bash
+``` bash
 export MULTISC_VIEWER_DATA_DIR="/path/to/data"
 export PLUMBER_PORT=8123
 R -e 'MultiSCDaemon::msc_plumb()'
@@ -70,14 +72,14 @@ R -e 'MultiSCDaemon::msc_plumb()'
 A Dockerfile is provided (see `MultiSCViewerR/Dockerfile`). Build and
 run:
 
-```bash
+``` bash
 docker build -t MultiSCViewerR MultiSCViewerR
 docker run -d -p 8080:8080 MultiSCViewerR
 ```
 
 Override environment + mount data:
 
-```bash
+``` bash
 docker run -d \
   -p 8123:8080 \
   -e MULTISC_VIEWER_DATA_DIR=/data \
@@ -111,7 +113,7 @@ Returns: the running Plumber2 API (invisibly) after calling `api_run()`.
 
 ## Example request workflow
 
-```r
+``` r
 library(MultiSCDaemon)
 msc_plumb(port = 8080)
 # Then in another session or using httr/curl you could query endpoints, e.g.:
@@ -123,13 +125,13 @@ msc_plumb(port = 8080)
 
 Render this README after edits:
 
-```r
+``` r
 devtools::build_readme()
 ```
 
 Run tests / checks (if added):
 
-```r
+``` r
 devtools::check()
 ```
 
@@ -138,3 +140,8 @@ devtools::check()
 - MultiSC Viewer frontend: `multisc-viewer`
 - Data directory layout: `data/`
 - Daemon (raw R scripts / Docker): `MultiSCViewerR/`
+
+------------------------------------------------------------------------
+
+For issues or contributions, please open a PR or issue in the main
+repository.

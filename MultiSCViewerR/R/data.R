@@ -20,14 +20,14 @@ get_datasets_index <- function() {
 get_datasets <- function(query) {
   con <- connect_db()
   q <- "SELECT * EXCLUDE (gene, size)
-  REPLACE (
-    list_transform(
-      deg,
-      x -> struct_pack(id := x.id, name := x.name, genes := len(x.gene))
-    ) AS deg
-  ),
-  len(gene) AS genes
-  FROM datasets"
+REPLACE (
+  list_transform(
+    deg,
+    x -> struct_pack(id := x.id, name := x.name, genes := len(x.gene))
+  ) AS deg
+),
+len(gene) AS genes
+FROM datasets"
   if (length(query$ds) > 0) {
     q <- paste0(
       q, " WHERE id IN (",
@@ -107,15 +107,15 @@ get_genes_rows <- function(query) {
     "WITH ds as (SELECT * FROM datasets WHERE id in (",
     paste(rep("?", length(query$ds)), collapse = ", "),
     ")), gene_ds AS (SELECT unnest(gene) as gene, id as ds_id FROM ds),
-    gene_deg AS (SELECT unnest(deg.gene) as gene, deg.id as deg_id
-      FROM (SELECT unnest(deg) as deg FROM ds)),
-    genes AS (SELECT gene FROM gene_ds UNION SELECT gene FROM gene_deg),
-    gene_rows AS (SELECT  g.gene AS id,
-      (SELECT list(ds_id) FROM gene_ds WHERE gene = g.gene) as gene,
-      (SELECT list(deg_id) FROM gene_deg WHERE gene = g.gene) as deg
-      FROM genes g)
-    SELECT * FROM gene_rows WHERE regexp_matches(id, ?)
-    ORDER BY len(deg) DESC, len(gene) DESC, id ASC"
+gene_deg AS (SELECT unnest(deg.gene) as gene, deg.id as deg_id
+  FROM (SELECT unnest(deg) as deg FROM ds)),
+genes AS (SELECT gene FROM gene_ds UNION SELECT gene FROM gene_deg),
+gene_rows AS (SELECT  g.gene AS id,
+  (SELECT list(ds_id) FROM gene_ds WHERE gene = g.gene) as gene,
+  (SELECT COALESCE(list(deg_id), []) FROM gene_deg WHERE gene = g.gene) as deg
+  FROM genes g)
+SELECT * FROM gene_rows WHERE regexp_matches(id, ?)
+ORDER BY len(deg) DESC, len(gene) DESC, id ASC"
   )
   if (!is.null(query$limit)) q <- paste(q, "LIMIT ?")
   if (!is.null(query$offset)) q <- paste(q, "OFFSET ?")
